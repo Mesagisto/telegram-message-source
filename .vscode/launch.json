@@ -1,0 +1,42 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'telegram-messaga-fonto'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=telegram-messaga-fonto",
+                    "--package=telegram-messaga-fonto"
+                ],
+                "filter": {
+                    "name": "telegram-messaga-fonto",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'telegram-messaga-fonto'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=telegram-messaga-fonto",
+                    "--package=telegram-messaga-fonto"
+                ],
+                "filter": {
+                    "name": "telegram-messaga-fonto",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
