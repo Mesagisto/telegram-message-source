@@ -1,6 +1,6 @@
 [package]
 name = "telegram-messaga-fonto"
-version = "1.0.0-rc"
+version = "1.0.0"
 authors = ["Itsusinn <itsusinn@foxmail.com>"]
 edition = "2018"
 
@@ -45,7 +45,7 @@ dashmap = { version = "4.0.2" , features = ["serde"] }
 
 # data
 bytes = "1.0.1"
-id3 = "0.6.2"
+id3 = "0.5.3"
 image = "0.23.13"
 
 nats = "0.9.8"
