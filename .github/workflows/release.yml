@@ -1,0 +1,120 @@
+name: release
+
+on: workflow_dispatch
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  linux-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Resume cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-itsusinn-mesagisto-tg-${{ hashFiles('**/Cargo.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-itsusinn-another-cross
+
+    - name: Install stable Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: nightly
+        override: true
+    - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        use-cross: true
+        command: build
+        args:  --release --target x86_64-unknown-linux-musl
+
+    - name: Upload bin
+      uses: actions/upload-artifact@v2
+      with:
+        name: another-amd64-linux
+        path: target/x86_64-unknown-linux-musl/release/another
+
+  macos-build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Resume cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-itsusinn-mesagisto-tg-${{ hashFiles('**/Cargo.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-itsusinn-mesagisto-tg
+
+    - name: Install stable Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: nightly
+        override: true
+
+    - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        use-cross: true
+        command: build
+        args:  --release --target x86_64-apple-darwin
+
+    - name: Upload bin
+      uses: actions/upload-artifact@v2
+      with:
+        name: another-amd64-macos
+        path: target/x86_64-apple-darwin/release/another
+
+  release:
+    name: Release
+    needs: [linux-build, macos-build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download linux-bin
+        uses: actions/download-artifact@v2
+        with:
+          name: another-amd64-linux
+          path: ./packages/amd64-linux
+      - name: Download macos-bin
+        uses: actions/download-artifact@v2
+        with:
+          name: another-amd64-macos
+          path: ./packages/amd64-macos
+      - name: Install zip
+        uses: montudor/action-zip@v1
+      - name: Move,rename packages
+        id: package
+        run: |
+          cd packages
+          zip -qq -r tg-mesaga-fonto-amd64-linux.zip amd64-linux
+          zip -qq -r tg-mesaga-fonto-macos.zip amd64-macos
+          cd $GITHUB_WORKSPACE
+          v1="version"
+          v1=`grep -m 1 $v1 Cargo.toml`
+          v1=${v1%\"*}
+          output=${v1#*\"}
+          echo "::set-output name=VERSION::$output"
+      - name: Github release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ steps.package.outputs.VERSION }}"
+          prerelease: true
+          title: "Mesagisto Telegram 消息源 ${{ steps.package.outputs.VERSION }}"
+          files: |
+            packages/*
