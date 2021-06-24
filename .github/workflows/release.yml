@@ -21,7 +21,7 @@ jobs:
           target
         key: ${{ runner.os }}-itsusinn-mesagisto-tg-${{ hashFiles('**/Cargo.toml') }}
         restore-keys: |
-          ${{ runner.os }}-itsusinn-another-cross
+          ${{ runner.os }}-itsusinn-mesagisto-tg
 
     - name: Install stable Rust toolchain
       uses: actions-rs/toolchain@v1
@@ -29,13 +29,18 @@ jobs:
         profile: minimal
         toolchain: nightly
         override: true
+    - name: Install cross,docker and start it
+      run: |
+        cargo install cross
+        sudo apt update
+        sudo apt install docker docker-compose
+        sudo systemctl start docker
+        sudo groupadd docker
+        sudo usermod -aG docker $USER
     - name: Build
-      uses: actions-rs/cargo@v1
-      with:
-        use-cross: true
-        command: build
-        args:  --release --target x86_64-unknown-linux-musl
-
+      run: |
+        newgrp docker
+        cross build --target x86_64-unknown-linux-musl --release
     - name: Upload bin
       uses: actions/upload-artifact@v2
       with:
