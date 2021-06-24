@@ -22,30 +22,20 @@ jobs:
         key: ${{ runner.os }}-itsusinn-mesagisto-tg-${{ hashFiles('**/Cargo.toml') }}
         restore-keys: |
           ${{ runner.os }}-itsusinn-mesagisto-tg
-
     - name: Install stable Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
         profile: minimal
         toolchain: nightly
         override: true
-    - name: Install cross,docker and start it
-      run: |
-        cargo install cross
-        sudo apt update
-        sudo apt install docker docker-compose
-        sudo systemctl start docker
-        sudo groupadd docker
-        sudo usermod -aG docker $USER
     - name: Build
       run: |
-        newgrp docker
-        cross build --target x86_64-unknown-linux-musl --release
+        cargo build --release
     - name: Upload bin
       uses: actions/upload-artifact@v2
       with:
-        name: another-amd64-linux
-        path: target/x86_64-unknown-linux-musl/release/another
+        name: amd64-linux
+        path: target/release/telegram-mesaga-fonto
 
   macos-build:
     runs-on: macos-latest
@@ -70,19 +60,14 @@ jobs:
         profile: minimal
         toolchain: nightly
         override: true
-
     - name: Build
-      uses: actions-rs/cargo@v1
-      with:
-        use-cross: true
-        command: build
-        args:  --release --target x86_64-apple-darwin
-
+      run: |
+        cargo build --release
     - name: Upload bin
       uses: actions/upload-artifact@v2
       with:
-        name: another-amd64-macos
-        path: target/x86_64-apple-darwin/release/another
+        name: amd64-macos
+        path: target/release/telegram-mesaga-fonto
 
   release:
     name: Release
@@ -93,12 +78,12 @@ jobs:
       - name: Download linux-bin
         uses: actions/download-artifact@v2
         with:
-          name: another-amd64-linux
+          name: amd64-linux
           path: ./packages/amd64-linux
       - name: Download macos-bin
         uses: actions/download-artifact@v2
         with:
-          name: another-amd64-macos
+          name: amd64-macos
           path: ./packages/amd64-macos
       - name: Install zip
         uses: montudor/action-zip@v1
