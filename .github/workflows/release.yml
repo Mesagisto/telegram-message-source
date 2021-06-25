@@ -39,7 +39,7 @@ jobs:
       env:
         PKG_CONFIG_ALLOW_CROSS: 1
         OPENSSL_STATIC: true
-        # OPENSSL_DIR: $GITHUB_WORKSPACE/musl
+        OPENSSL_DIR: ${{ github.workspace }}/musl
     - name: Upload bin
       uses: actions/upload-artifact@v2
       with:
