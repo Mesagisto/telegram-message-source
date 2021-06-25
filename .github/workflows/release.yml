@@ -20,9 +20,9 @@ jobs:
           ~/.cargo/git
           target
           musl
-        key: ${{ runner.os }}-itsusinn-mesagisto-tg-cross-${{ hashFiles('**/Cargo.toml') }}
+        key: ${{ runner.os }}-release-${{ hashFiles('**/Cargo.toml') }}
         restore-keys: |
-          ${{ runner.os }}-itsusinn-mesagisto-tg-cross
+          ${{ runner.os }}-release
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
@@ -36,15 +36,20 @@ jobs:
       run: |
         rustup target add x86_64-unknown-linux-musl
         cargo build --target x86_64-unknown-linux-musl --release
+        mv target/x86_64-unknown-linux-musl/release/telegram-mesaga-fonto target/x86_64-unknown-linux-musl/release/tmf-amd64-linux
       env:
         PKG_CONFIG_ALLOW_CROSS: 1
         OPENSSL_STATIC: true
         OPENSSL_DIR: ${{ github.workspace }}/musl
+    - name: Compress binaries
+      uses: svenstaro/upx-action@v2
+      with:
+        file: target/x86_64-unknown-linux-musl/release/tmf-amd64-linux
     - name: Upload bin
       uses: actions/upload-artifact@v2
       with:
         name: amd64-linux
-        path: target/x86_64-unknown-linux-musl/release/telegram-mesaga-fonto
+        path: target/x86_64-unknown-linux-musl/release/tmf-amd64-linux
 
   macos-build:
     runs-on: macos-latest
@@ -59,9 +64,9 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           target
-        key: ${{ runner.os }}-itsusinn-mesagisto-tg-${{ hashFiles('**/Cargo.toml') }}
+        key: ${{ runner.os }}-release-${{ hashFiles('**/Cargo.toml') }}
         restore-keys: |
-          ${{ runner.os }}-itsusinn-mesagisto-tg
+          ${{ runner.os }}-release
 
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
@@ -72,11 +77,16 @@ jobs:
     - name: Build
       run: |
         cargo build --release
+        mv target/release/telegram-mesaga-fonto target/release/tmf-amd64-macos
+    - name: Compress binaries
+      uses: svenstaro/upx-action@v2
+      with:
+        file: target/release/tmf-amd64-macos
     - name: Upload bin
       uses: actions/upload-artifact@v2
       with:
         name: amd64-macos
-        path: target/release/telegram-mesaga-fonto
+        path: target/release/tmf-amd64-macos
 
   release:
     name: Release
@@ -88,20 +98,15 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: amd64-linux
-          path: ./packages/amd64-linux
+          path: ./packages
       - name: Download macos-bin
         uses: actions/download-artifact@v2
         with:
           name: amd64-macos
-          path: ./packages/amd64-macos
-      - name: Install zip
-        uses: montudor/action-zip@v1
-      - name: Move,rename packages
-        id: package
+          path: ./packages
+      - name: Get version
+        id: version
         run: |
-          cd packages
-          zip -qq -r tg-mesaga-fonto-amd64-linux.zip amd64-linux
-          zip -qq -r tg-mesaga-fonto-macos.zip amd64-macos
           cd $GITHUB_WORKSPACE
           v1="version"
           v1=`grep -m 1 $v1 Cargo.toml`
@@ -112,8 +117,8 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ steps.package.outputs.VERSION }}"
+          automatic_release_tag: "${{ steps.version.outputs.VERSION }}"
           prerelease: true
-          title: "Mesagisto Telegram 消息源 ${{ steps.package.outputs.VERSION }}"
+          title: "Mesagisto Telegram 消息源 ${{ steps.version.outputs.VERSION }}"
           files: |
             packages/*
