@@ -19,23 +19,32 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           target
-        key: ${{ runner.os }}-itsusinn-mesagisto-tg-${{ hashFiles('**/Cargo.toml') }}
+          musl
+        key: ${{ runner.os }}-itsusinn-mesagisto-tg-cross-${{ hashFiles('**/Cargo.toml') }}
         restore-keys: |
-          ${{ runner.os }}-itsusinn-mesagisto-tg
-    - name: Install stable Rust toolchain
+          ${{ runner.os }}-itsusinn-mesagisto-tg-cross
+    - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
         profile: minimal
         toolchain: nightly
         override: true
+    - name: Build openssl
+      run: |
+        bash $GITHUB_WORKSPACE/.github/install-openssl.sh
     - name: Build
       run: |
-        cargo build --release
+        rustup target add x86_64-unknown-linux-musl
+        cargo build --target x86_64-unknown-linux-musl --release
+      env:
+        PKG_CONFIG_ALLOW_CROSS: 1
+        OPENSSL_STATIC: true
+        OPENSSL_DIR: $GITHUB_WORKSPACE/musl
     - name: Upload bin
       uses: actions/upload-artifact@v2
       with:
         name: amd64-linux
-        path: target/release/telegram-mesaga-fonto
+        path: target/x86_64-unknown-linux-musl/release/telegram-mesaga-fonto
 
   macos-build:
     runs-on: macos-latest
@@ -54,7 +63,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-itsusinn-mesagisto-tg
 
-    - name: Install stable Rust toolchain
+    - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
         profile: minimal
