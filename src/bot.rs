@@ -2,7 +2,7 @@ use crate::cover::extract_first_image;
 use std::fmt::Debug;
 use std::future::Future;
 use std::sync::Arc;
-use teloxide::dispatching::{Dispatcher, DispatcherHandlerRx, UpdateWithCx};
+use teloxide::dispatching::{Dispatcher, DispatcherHandlerRx, UpdateWithCx, update_listeners};
 use teloxide::error_handlers::OnError;
 use teloxide::prelude::*;
 use teloxide::{
@@ -13,9 +13,9 @@ use teloxide::{
 use teloxide_core::{requests::Requester, types::Message};
 use tokio_stream::wrappers::UnboundedReceiverStream;
 
-pub async fn commands_or_message_repl<Cmd, CH, MH, FutC, FutM, ErrC, ErrM>(
+pub async fn commands_or_message_repl<N,Cmd, CH, MH, FutC, FutM, ErrC, ErrM>(
     bot: AutoSend<Bot>,
-    bot_name: &'static str,
+    bot_name: N,
     cmd_handler: CH,
     msg_handler: MH,
 ) where
@@ -30,20 +30,25 @@ pub async fn commands_or_message_repl<Cmd, CH, MH, FutC, FutM, ErrC, ErrM>(
     FutM: Future<Output = Result<(), ErrM>> + Send + 'static,
     Result<(), ErrM>: OnError<ErrM>,
     ErrM: Debug + Send,
+
+    N: Into<String> + Send +Clone + 'static
 {
     let cmd_handler = Arc::new(cmd_handler);
     let msg_handler = Arc::new(msg_handler);
 
-    let dispatcher = Dispatcher::new(bot.clone()).messages_handler(
+    let listener = update_listeners::polling_default(bot.clone()).await;
+
+    Dispatcher::new(bot.clone())
+    .messages_handler(
         move |rx: DispatcherHandlerRx<AutoSend<Bot>, Message>| {
             UnboundedReceiverStream::new(rx).for_each_concurrent(None, move |cx| {
                 let msg_handler = Arc::clone(&msg_handler);
                 let cmd_handler = Arc::clone(&cmd_handler);
-
+                let clone_bot_name = bot_name.clone();
                 let cx = Arc::new(cx);
                 async move {
                     if let Some(text_content) = cx.clone().update.text() {
-                        match Cmd::parse(&*text_content, bot_name) {
+                        match Cmd::parse(&*text_content, clone_bot_name) {
                             Ok(command) => {
                                 cmd_handler(cx.to_owned(), command)
                                     .await
@@ -64,9 +69,13 @@ pub async fn commands_or_message_repl<Cmd, CH, MH, FutC, FutM, ErrC, ErrM>(
                 }
             })
         },
-    );
-    dispatcher.dispatch().await;
-
+    ) 
+    .setup_ctrlc_handler()
+    .dispatch_with_listener(
+        listener,
+        LoggingErrorHandler::with_custom_text("An error from the update listener"),
+    )
+    .await
 }
 
 use teloxide_core::types::File as TgFile;
