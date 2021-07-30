@@ -1,6 +1,6 @@
 [package]
 name = "telegram-mesaga-fonto"
-version = "1.0.1"
+version = "1.2.0"
 authors = ["Itsusinn <itsusinn@foxmail.com>"]
 edition = "2018"
 
@@ -45,8 +45,10 @@ dashmap = { version = "4.0.2" , features = ["serde"] }
 
 # data
 bytes = "1.0.1"
-id3 = "0.5.3"
-image = "0.23.13"
+
+#  webhook
+warp = "0.3.0"
+reqwest = "0.11.4"
 
 nats = "0.10.1"
 async-nats = "0.10.1"
