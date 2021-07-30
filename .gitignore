@@ -4,5 +4,6 @@ Cargo.lock
 /.idea
 /config
 config.toml
+config.toml.old
 *.mp3
 *.jpg

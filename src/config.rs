@@ -1,3 +1,4 @@
+use log::error;
 use serde_derive::{Deserialize, Serialize};
 use std::{
     fs, io,
@@ -48,10 +49,17 @@ pub struct ProxyConfig {
 pub struct TelegramConfig {
     pub token: &'static str,
     pub bot_name: &'static str,
+    pub webhook: WebhookConfig
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct WebhookConfig {}
+pub struct WebhookConfig {
+    pub enable: bool,
+    pub heroku:bool,
+    pub port:u16,
+    // Heroku host example .: "heroku-ping-pong-bot.herokuapp.com"
+    pub host:&'static str
+}
 
 impl Config {
     pub fn default() -> Config {
@@ -85,6 +93,17 @@ impl Default for TelegramConfig {
         TelegramConfig {
             token: "BOT_TOKEN".into(),
             bot_name: "BOT_NAME".into(),
+            webhook: WebhookConfig::default(),
+        }
+    }
+}
+impl Default for WebhookConfig{
+    fn default() -> WebhookConfig {
+        WebhookConfig {
+            enable: false,
+            heroku: false,
+            port: 8889,
+            host: "mesagisto.herokuapp.com",
         }
     }
 }
@@ -131,16 +150,21 @@ fn default_config_path() -> PathBuf {
 
 fn read_or_create_config(path: &Path) -> Result<Config, Error> {
     if !path.exists() {
-        fs::create_dir_all(path.parent().unwrap_or(Path::new("./")))
-            .map_err(|_| Error::CannotCreateParentDirectory)?;
+        fs::create_dir_all(path.parent().unwrap_or(Path::new("./")))?;
         fs::write(path, Config::default_string()?)?;
     };
-    let data = fs::read(path).map_err(|_| Error::FailedToReadFile)?;
+    let data = fs::read(path)?;
     let result: Result<Config, toml::de::Error> = toml::from_slice(Box::leak(data.into_boxed_slice()));
     let mut result = match result {
         Ok(val) => val,
         Err(_) => {
+            error!("Cannot de-serialize the configuration file");
+            error!("It may be caused by incompatible configuration files due to version updates");
+            error!("The original file has been changed to config.toml.old, please merge the configuration files manually");
             let default_string = Config::default_string()?;
+            let reanme_path = format!("{}.old", path.clone().to_string_lossy());
+            let rename_path =Path::new(&reanme_path);
+            fs::rename(path, rename_path)?;
             fs::write(path, default_string)?;
             Config::default()
         }
@@ -154,14 +178,8 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("failed to create dir all")]
-    CannotCreateParentDirectory,
-    #[error("无法读取配置文件")]
-    FailedToReadFile,
     #[error("无法序列化")]
     SerializationError,
     #[error("I/O error")]
     IO(#[from] io::Error),
-    #[error("无法反序列化")]
-    TomlDe(#[from] toml::de::Error),
 }
