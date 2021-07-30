@@ -9,16 +9,16 @@ use nats::Headers;
 #[macro_use]
 extern crate lazy_static;
 
-pub mod bot;
-pub mod command;
-pub mod config;
-pub mod cover;
-pub mod data;
+mod command;
+mod config;
+mod data;
 mod message;
+mod webhook;
+mod despatch;
 
 use config::CONFIG;
 use data::DATA;
-
+use despatch::cmd_or_msg_repl;
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
@@ -30,11 +30,11 @@ async fn run() -> Result<(), anyhow::Error> {
     teloxide::enable_logging!();
 
     if !CONFIG.enabled {
-        log::info!("Mesagisto-Bot is not enabled");
+        log::info!("Mesagisto-Bot is not enabled and is about to exit the program");
         return Ok(());
     }
 
-    log::info!("Mesagisto-Bot started");
+    log::info!("Mesagisto-Bot is starting up");
 
     let opts = async_nats::Options::new();
 
@@ -65,7 +65,7 @@ async fn run() -> Result<(), anyhow::Error> {
     let clone_bot = Arc::new(bot.clone());
     let clone_nc = nc.clone();
 
-    bot::commands_or_message_repl(
+    cmd_or_msg_repl(
         bot,
         &*CONFIG.telegram.bot_name,
         command::answer,
