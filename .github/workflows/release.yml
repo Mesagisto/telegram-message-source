@@ -1,6 +1,9 @@
 name: release
 
-on: workflow_dispatch
+on:
+  push:
+    tags:
+      - "v*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -104,21 +107,15 @@ jobs:
         with:
           name: amd64-macos
           path: ./packages
-      - name: Get version
-        id: version
-        run: |
-          cd $GITHUB_WORKSPACE
-          v1="version"
-          v1=`grep -m 1 $v1 Cargo.toml`
-          v1=${v1%\"*}
-          output=${v1#*\"}
-          echo "::set-output name=VERSION::$output"
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
       - name: Github release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ steps.version.outputs.VERSION }}"
           prerelease: true
-          title: "Mesagisto Telegram 消息源 ${{ steps.version.outputs.VERSION }}"
+          title: "Mesagisto Telegram 消息源 ${{ steps.get_version.outputs.VERSION }}"
           files: |
             packages/*
+
