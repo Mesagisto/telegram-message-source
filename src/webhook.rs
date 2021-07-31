@@ -52,7 +52,7 @@ pub async fn webhook(bot: &AutoSend<Bot>) -> impl update_listeners::UpdateListen
 
     let (stop_token, stop_flag) = AsyncStopToken::new_pair();
 
-    let addr = format!("127.0.0.1:{}", port).parse::<SocketAddr>().unwrap();
+    let addr = format!("0.0.0.0:{}", port).parse::<SocketAddr>().unwrap();
     let server = warp::serve(server);
     let (_addr, fut) = server.bind_with_graceful_shutdown(addr, stop_flag);
 
