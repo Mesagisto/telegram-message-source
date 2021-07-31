@@ -107,15 +107,12 @@ jobs:
         with:
           name: amd64-macos
           path: ./packages
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
       - name: Github release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: true
-          title: "Mesagisto Telegram 消息源 ${{ steps.get_version.outputs.VERSION }}"
           files: |
             packages/*
+            LICENSE
 
