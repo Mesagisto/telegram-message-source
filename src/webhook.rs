@@ -1,3 +1,4 @@
+use log::info;
 use reqwest::{StatusCode, Url};
 use teloxide::{
     dispatching::{
@@ -26,11 +27,13 @@ pub async fn webhook(bot: &AutoSend<Bot>) -> impl update_listeners::UpdateListen
         .parse()
         .expect("PORT value to be integer")
     } else { CONFIG.telegram.webhook.port };
+    info!("The port of webhook is {}",&port);
     // Heroku host example .: "heroku-ping-pong-bot.herokuapp.com"
     let host = CONFIG.telegram.webhook.host.to_string();
     let path = format!("bot{}", CONFIG.telegram.token);
     let url = Url::parse(&format!("https://{}/{}", host, path)).unwrap();
 
+    info!("Webhook is being setup");
     bot.set_webhook(url).await.expect("Cannot setup a webhook");
 
     let (tx, rx) = mpsc::unbounded_channel();
@@ -49,7 +52,7 @@ pub async fn webhook(bot: &AutoSend<Bot>) -> impl update_listeners::UpdateListen
 
     let (stop_token, stop_flag) = AsyncStopToken::new_pair();
 
-    let addr = format!("0.0.0.0:{}", port).parse::<SocketAddr>().unwrap();
+    let addr = format!("127.0.0.1:{}", port).parse::<SocketAddr>().unwrap();
     let server = warp::serve(server);
     let (_addr, fut) = server.bind_with_graceful_shutdown(addr, stop_flag);
 

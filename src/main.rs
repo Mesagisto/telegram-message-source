@@ -81,7 +81,7 @@ async fn run() -> Result<(), anyhow::Error> {
                     let target = cx.chat_id();
                     if CONFIG.target_address_mapper.contains_key(&target) {
                         let address = *CONFIG.target_address_mapper.get(&target).unwrap();
-                        let content = format!("{}: {}", cx.update.from().unwrap().username.to_owned().unwrap(),msg);
+                        let content = format!("{}: {}", cx.update.from().unwrap().full_name(),msg);
                         clone_nc.publish_with_reply_or_headers(
                             address,
                             None,

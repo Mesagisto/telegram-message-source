@@ -1,6 +1,6 @@
 [package]
 name = "telegram-mesaga-fonto"
-version = "1.2.0"
+version = "1.2.1"
 
 authors = ["Itsusinn <itsusinn@foxmail.com>"]
 edition = "2018"
