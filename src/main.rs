@@ -1,5 +1,6 @@
 use std::env;
 use std::sync::Arc;
+use async_nats::Connection;
 use teloxide::{prelude::*, Bot};
 use std::{
     collections::{HashMap, HashSet}
@@ -46,8 +47,7 @@ async fn run() -> Result<(), anyhow::Error> {
     let nats_header = {
         let mut inner = HashMap::default();
         let entry = inner.entry("cid".to_string()).or_insert_with(HashSet::default);
-        let clone_cid = cid.clone();
-        entry.insert(clone_cid);
+        entry.insert(cid.clone());
         Arc::new(Headers { inner })
     };
 
@@ -81,34 +81,19 @@ async fn run() -> Result<(), anyhow::Error> {
                     let target = cx.chat_id();
                     if CONFIG.target_address_mapper.contains_key(&target) {
                         let address = *CONFIG.target_address_mapper.get(&target).unwrap();
-                        let content = format!("{}: {}", cx.update.from().unwrap().full_name(),msg);
+                        let sender = cx.update.from().unwrap();
+                        let sender_name = if sender.username.is_none() {
+                            sender.full_name().replace(|c: char| !c.is_alphanumeric(),"")
+                        } else {
+                            sender.username.clone().unwrap()
+                        };
+                        let content = format!("{}: {}", sender_name,msg);
                         clone_nc.publish_with_reply_or_headers(
                             address,
                             None,
                             Some(&*clone_header),
                             content).await.unwrap();
-
-                        if  !DATA.active_endpoint.contains_key(&target) {
-                            DATA.active_endpoint.insert(target, true);
-
-                            let sub = clone_nc.subscribe(address).await.unwrap();
-                            tokio::spawn( async move  {
-                                let clone_bot = clone_bot.clone();
-                                loop {
-                                    if let Some(msg) =  sub.next().await {
-                                        if let Some(headers) =  msg.headers{
-                                            if let Some(cid) = headers.get("cid"){
-                                                if cid.contains(&*clone_cid) {
-                                                    continue;
-                                                }
-                                            }
-                                        }
-                                        let data = msg.data;
-                                        clone_bot.send_message(target, String::from_utf8_lossy(&data)).await.unwrap();
-                                    }
-                                }
-                            });
-                        }
+                        try_create_endpoint(&clone_nc,target, address,clone_cid,clone_bot).await;
                     }
                 };
                 respond(())
@@ -116,8 +101,30 @@ async fn run() -> Result<(), anyhow::Error> {
         },
     ).await;
 
-
     CONFIG.save();
     log::info!("Mesagisto Bot is going to shut down");
     Ok(())
+}
+
+async fn try_create_endpoint(nc:&Connection,target:i64,address:&str,cid:Arc<String>,bot:Arc<AutoSend<Bot>>){
+    if  !DATA.active_endpoint.contains_key(&target) {
+        DATA.active_endpoint.insert(target, true);
+
+        let sub = nc.subscribe(address).await.unwrap();
+        tokio::spawn( async move  {
+            loop {
+                if let Some(msg) =  sub.next().await {
+                    if let Some(headers) =  msg.headers{
+                        if let Some(cid_set) = headers.get("cid"){
+                            if cid_set.contains(&*cid) {
+                                continue;
+                            }
+                        }
+                    }
+                    let data = msg.data;
+                    bot.send_message(target, String::from_utf8_lossy(&data)).await.unwrap();
+                }
+            }
+        });
+    }
 }
