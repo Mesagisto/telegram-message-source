@@ -8,11 +8,11 @@
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=telegram-messaga-fonto",
-                    "--package=telegram-messaga-fonto"
+                    "--bin=telegram-mesaga-fonto",
+                    "--package=telegram-mesaga-fonto"
                 ],
                 "filter": {
-                    "name": "telegram-messaga-fonto",
+                    "name": "telegram-mesaga-fonto",
                     "kind": "bin"
                 }
             },
@@ -22,16 +22,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'telegram-messaga-fonto'",
+            "name": "Debug unit tests in executable 'telegram-mesaga-fonto'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=telegram-messaga-fonto",
-                    "--package=telegram-messaga-fonto"
+                    "--bin=telegram-mesaga-fonto",
+                    "--package=telegram-mesaga-fonto"
                 ],
                 "filter": {
-                    "name": "telegram-messaga-fonto",
+                    "name": "telegram-mesaga-fonto",
                     "kind": "bin"
                 }
             },
