@@ -39,11 +39,13 @@ async fn run() -> Result<(), anyhow::Error> {
 
     let opts = async_nats::Options::new();
 
+    log::info!("Connecting to nats server");
     let nc = opts
         .with_name("telegram client")
         .connect(&CONFIG.forwarding.address).await?;
 
     let cid = nc.client_id().to_string();
+    log::info!("Connected sucessfully,the client id is {}",&cid);
     let nats_header = {
         let mut inner = HashMap::default();
         let entry = inner.entry("cid".to_string()).or_insert_with(HashSet::default);
@@ -52,6 +54,7 @@ async fn run() -> Result<(), anyhow::Error> {
     };
 
     if CONFIG.proxy.enabled {
+        log::info!("Proxy will be enable for teloxide");
         env::set_var("TELOXIDE_PROXY", &CONFIG.proxy.address);
     }
 
@@ -107,9 +110,10 @@ async fn run() -> Result<(), anyhow::Error> {
 }
 
 async fn try_create_endpoint(nc:&Connection,target:i64,address:&str,cid:Arc<String>,bot:Arc<AutoSend<Bot>>){
+    log::info!("Trying to create sub for {}",target);
     if  !DATA.active_endpoint.contains_key(&target) {
         DATA.active_endpoint.insert(target, true);
-
+        log::info!("Creating sub for {}",target);
         let sub = nc.subscribe(address).await.unwrap();
         tokio::spawn( async move  {
             loop {
