@@ -117,16 +117,23 @@ async fn try_create_endpoint(nc:&Connection,target:i64,address:&str,cid:Arc<Stri
         let sub = nc.subscribe(address).await.unwrap();
         tokio::spawn( async move  {
             loop {
-                if let Some(msg) =  sub.next().await {
-                    if let Some(headers) =  msg.headers{
-                        if let Some(cid_set) = headers.get("cid"){
-                            if cid_set.contains(&*cid) {
-                                continue;
-                            }
-                        }
-                    }
-                    let data = msg.data;
-                    bot.send_message(target, String::from_utf8_lossy(&data)).await.unwrap();
+                let next = sub.next().await;
+                if next.is_none() { continue; }
+                let next = next.unwrap();
+
+                let headers = next.headers;
+                if headers.is_none() { continue; }
+                let headers = headers.unwrap();
+
+                let cid_set = headers.get("cid");
+                if cid_set.is_none() {continue;}
+
+                if cid_set.unwrap().contains(&*cid) {continue;}
+
+                if let Err(err) = bot.send_message(
+                    target, String::from_utf8_lossy(&next.data)
+                ).await{
+                    log::error!("Teloxide error {}",&err);
                 }
             }
         });
