@@ -59,7 +59,7 @@ async fn run() -> Result<(), anyhow::Error> {
     }
 
     let bot = Bot::with_client(
-        CONFIG.telegram.token,
+        CONFIG.telegram.token.clone(),
         teloxide::net::client_from_env()
     ).auto_send();
 
@@ -81,9 +81,9 @@ async fn run() -> Result<(), anyhow::Error> {
 
             async move {
                 if !message::answer_msg(cx.clone(), &msg).await? {
-                    let target = cx.chat_id();
+                    let target = Arc::new(cx.chat_id().to_string());
                     if CONFIG.target_address_mapper.contains_key(&target) {
-                        let address = *CONFIG.target_address_mapper.get(&target).unwrap();
+                        let address = CONFIG.target_address_mapper.get(&target).unwrap().clone();
                         let sender = cx.update.from().unwrap();
                         let sender_name = if sender.username.is_none() {
                             sender.full_name().replace(|c: char| !c.is_alphanumeric(),"")
@@ -92,11 +92,11 @@ async fn run() -> Result<(), anyhow::Error> {
                         };
                         let content = format!("{}: {}", sender_name,msg);
                         clone_nc.publish_with_reply_or_headers(
-                            address,
+                            address.as_str(),
                             None,
                             Some(&*clone_header),
                             content).await.unwrap();
-                        try_create_endpoint(&clone_nc,target, address,clone_cid,clone_bot).await;
+                        try_create_endpoint(clone_nc,target, address,clone_cid,clone_bot).await;
                     }
                 };
                 respond(())
@@ -109,12 +109,19 @@ async fn run() -> Result<(), anyhow::Error> {
     Ok(())
 }
 
-async fn try_create_endpoint(nc:&Connection,target:i64,address:&str,cid:Arc<String>,bot:Arc<AutoSend<Bot>>){
-    log::info!("Trying to create sub for {}",target);
-    if  !DATA.active_endpoint.contains_key(&target) {
-        DATA.active_endpoint.insert(target, true);
+async fn try_create_endpoint(
+    nc:Connection,
+    target:Arc<String>,
+    address:Arc<String>,
+    cid:Arc<String>,
+    bot:Arc<AutoSend<Bot>>
+){
+    log::info!("Trying to create sub for {}",*target);
+    if  !DATA.active_endpoint.contains_key(&*target) {
+        DATA.active_endpoint.insert(target.clone(), true);
         log::info!("Creating sub for {}",target);
-        let sub = nc.subscribe(address).await.unwrap();
+        let sub = nc.subscribe(address.as_str()).await.unwrap();
+
         tokio::spawn( async move  {
             loop {
                 let next = sub.next().await;
@@ -127,11 +134,12 @@ async fn try_create_endpoint(nc:&Connection,target:i64,address:&str,cid:Arc<Stri
 
                 let cid_set = headers.get("cid");
                 if cid_set.is_none() {continue;}
+                let cid_set = cid_set.unwrap();
 
-                if cid_set.unwrap().contains(&*cid) {continue;}
+                if cid_set.contains(&*cid) {continue;}
 
                 if let Err(err) = bot.send_message(
-                    target, String::from_utf8_lossy(&next.data)
+                    target.as_str().parse::<i64>().unwrap(), String::from_utf8_lossy(&next.data)
                 ).await{
                     log::error!("Teloxide error {}",&err);
                 }

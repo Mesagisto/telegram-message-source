@@ -11,20 +11,13 @@ pub static CONFIG: Lazy<Config> = Lazy::new(|| {
 
 #[derive(Debug, Serialize, Deserialize,Educe)]
 #[educe(Default)]
-#[serde(bound(deserialize = "'de: 'static"))]
-pub struct Config {
+pub struct Config{
     #[educe(Default = false)]
     pub enabled: bool,
     pub forwarding: ForwardingConfig,
     pub telegram: TelegramConfig,
     pub proxy: ProxyConfig,
-    #[serde(skip)]
-    pub target_address_mapper: DashMap<i64, &'static str>,
-    #[serde(alias = "target_address_mapper")]
-    target_address_mapper_storage: DashMap<&'static str, &'static str>,
-    #[serde(skip, default = "default_config_path")]
-    #[educe(Default(expression = "default_config_path()"))]
-    config_path: PathBuf,
+    pub target_address_mapper: DashMap<Arc<String>, Arc<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize,Educe)]
@@ -32,26 +25,26 @@ pub struct Config {
 pub struct ForwardingConfig {
     // pattern: "nats://{host}:{port}"
     #[educe(Default = "nats://itsusinn.site:4222")]
-    pub address: &'static str
+    pub address: String
 }
 
 #[derive(Debug, Serialize, Deserialize,Educe)]
 #[educe(Default)]
-pub struct ProxyConfig {
+pub struct ProxyConfig{
     #[educe(Default = false)]
     pub enabled: bool,
     // pattern: "http://{username}:{password}@{host}:{port}"
     #[educe(Default = "http://127.0.0.1:7890")]
-    pub address: &'static str,
+    pub address: String,
 }
 
 #[derive(Debug, Serialize, Deserialize,Educe)]
 #[educe(Default)]
 pub struct TelegramConfig {
     #[educe(Default = "BOT_TOKEN")]
-    pub token: &'static str,
+    pub token: String,
     #[educe(Default = "BOT_NAME")]
-    pub bot_name: &'static str,
+    pub bot_name: String,
     pub webhook: WebhookConfig
 }
 
@@ -65,7 +58,7 @@ pub struct WebhookConfig {
     #[educe(Default = 8889)]
     pub port:u16,
     #[educe(Default = "heroku-app-name.herokuapp.com")]
-    pub host:&'static str
+    pub host:String
 }
 
 impl Config {
@@ -76,30 +69,9 @@ impl Config {
     }
     pub fn save(&self) {
         for pair in self.target_address_mapper.iter(){
-            let key = pair.key();
-            let val = pair.value();
-            self.target_address_mapper_storage.insert(
-                Box::leak(key.to_string().into_boxed_str()),
-                val
-            );
-        }
-
-        let ser = toml::ser::to_string_pretty(self).unwrap();
         log::info!("Configuration file was saved");
         fs::write(self.config_path.as_path(), ser).unwrap();
     }
-    fn transfer(&self){
-        for pair in self.target_address_mapper_storage.iter() {
-            let key = pair.key();
-            let val = pair.value();
-            self.target_address_mapper.insert(key.parse().unwrap(), val);
-        }
-        self.target_address_mapper_storage.clear();
-        self.target_address_mapper_storage.shrink_to_fit();
-
-    }
-}
-
 fn default_config_path() -> PathBuf {
     return Path::new("config.toml").to_owned();
 }
@@ -111,7 +83,7 @@ fn read_or_create_config(path: &Path) -> Result<Config, Error> {
     };
     let data = fs::read(path)?;
     let result: Result<Config, toml::de::Error> = toml::from_slice(Box::leak(data.into_boxed_slice()));
-    let mut result = match result {
+    let result = match result {
         Ok(val) => val,
         Err(_) => {
             error!("Cannot de-serialize the configuration file");
@@ -125,7 +97,6 @@ fn read_or_create_config(path: &Path) -> Result<Config, Error> {
             Config::default()
         }
     };
-    result.config_path = path.to_owned();
     Ok(result)
 }
 

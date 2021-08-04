@@ -35,7 +35,7 @@ pub async fn answer(
         Command::SetAddress { address } => {
             CONFIG
                 .target_address_mapper
-                .insert(cx.chat_id(), Box::leak(address.into_boxed_str()));
+                .insert(Arc::new(cx.chat_id().to_string()), Arc::new(address));
             cx.answer("成功设置当前Group的信使地址").await?;
         }
     };
