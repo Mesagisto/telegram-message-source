@@ -1,19 +1,13 @@
 use log::error;
 use serde_derive::{Deserialize, Serialize};
-use std::{
-    fs, io,
-    path::{Path, PathBuf},
-};
-
-
-lazy_static! {
-    pub static ref CONFIG: Config = {
-        let path = Path::new("config.toml");
-        let config = read_or_create_config(path).unwrap();
-        config.transfer();
-        config
-    };
-}
+use std::{fs, io, path::Path, sync::Arc};
+use serde_yaml as yaml;
+use once_cell::sync::Lazy;
+pub static CONFIG: Lazy<Config> = Lazy::new(|| {
+    let path = Path::new("config.yaml");
+    let config = read_or_create_config(path).unwrap();
+    config
+});
 
 #[derive(Debug, Serialize, Deserialize,Educe)]
 #[educe(Default)]
