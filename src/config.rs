@@ -63,17 +63,14 @@ pub struct WebhookConfig {
 
 impl Config {
     pub fn default_string() -> Result<String, Error> {
-        let result = toml::to_string_pretty(&Config::default())
-            .map_err(|_| Error::SerializationError)?;
+        let result = yaml::to_string(&Config::default()).map_err(|_| Error::SerializationError)?;
         Ok(result)
     }
     pub fn save(&self) {
-        for pair in self.target_address_mapper.iter(){
+        let ser = yaml::to_string(self).unwrap();
         log::info!("Configuration file was saved");
-        fs::write(self.config_path.as_path(), ser).unwrap();
+        fs::write("config.yaml", ser).unwrap();
     }
-fn default_config_path() -> PathBuf {
-    return Path::new("config.toml").to_owned();
 }
 
 fn read_or_create_config(path: &Path) -> Result<Config, Error> {
@@ -82,7 +79,7 @@ fn read_or_create_config(path: &Path) -> Result<Config, Error> {
         fs::write(path, Config::default_string()?)?;
     };
     let data = fs::read(path)?;
-    let result: Result<Config, toml::de::Error> = toml::from_slice(Box::leak(data.into_boxed_slice()));
+    let result: Result<Config, yaml::Error> = yaml::from_slice(&data);
     let result = match result {
         Ok(val) => val,
         Err(_) => {

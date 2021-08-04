@@ -2,8 +2,7 @@ Cargo.lock
 /target/
 **/*.rs.bk
 /.idea
-/config
-config.toml
-config.toml.old
+config.yaml
+config.yaml.old
 *.mp3
 *.jpg
