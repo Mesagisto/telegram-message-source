@@ -43,6 +43,7 @@ base64-url = "1.4.8"
 # tools
 lazy_static = "1.4.0"
 dashmap = { version = "4.0.2" , features = ["serde"] }
+educe = "0.4.18"
 
 # data
 bytes = "1.0.1"

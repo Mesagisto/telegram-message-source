@@ -5,6 +5,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
+
 lazy_static! {
     pub static ref CONFIG: Config = {
         let path = Path::new("config.toml");
@@ -14,110 +15,71 @@ lazy_static! {
     };
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize,Educe)]
+#[educe(Default)]
 #[serde(bound(deserialize = "'de: 'static"))]
 pub struct Config {
+    #[educe(Default = false)]
     pub enabled: bool,
     pub forwarding: ForwardingConfig,
     pub telegram: TelegramConfig,
     pub proxy: ProxyConfig,
-
     #[serde(skip)]
     pub target_address_mapper: DashMap<i64, &'static str>,
-
     #[serde(alias = "target_address_mapper")]
     target_address_mapper_storage: DashMap<&'static str, &'static str>,
-
     #[serde(skip, default = "default_config_path")]
+    #[educe(Default(expression = "default_config_path()"))]
     config_path: PathBuf,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize,Educe)]
+#[educe(Default)]
 pub struct ForwardingConfig {
     // pattern: "nats://{host}:{port}"
+    #[educe(Default = "nats://itsusinn.site:4222")]
     pub address: &'static str
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize,Educe)]
+#[educe(Default)]
 pub struct ProxyConfig {
+    #[educe(Default = false)]
     pub enabled: bool,
     // pattern: "http://{username}:{password}@{host}:{port}"
+    #[educe(Default = "http://127.0.0.1:7890")]
     pub address: &'static str,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize,Educe)]
+#[educe(Default)]
 pub struct TelegramConfig {
+    #[educe(Default = "BOT_TOKEN")]
     pub token: &'static str,
+    #[educe(Default = "BOT_NAME")]
     pub bot_name: &'static str,
     pub webhook: WebhookConfig
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize,Educe)]
+#[educe(Default)]
 pub struct WebhookConfig {
+    #[educe(Default = false)]
     pub enable: bool,
+    #[educe(Default = false)]
     pub heroku:bool,
+    #[educe(Default = 8889)]
     pub port:u16,
-    // Heroku host example .: "heroku-ping-pong-bot.herokuapp.com"
+    #[educe(Default = "heroku-app-name.herokuapp.com")]
     pub host:&'static str
 }
 
 impl Config {
-    pub fn default() -> Config {
-        Config {
-            enabled: false,
-            forwarding: ForwardingConfig::default(),
-            telegram: TelegramConfig::default(),
-            proxy: ProxyConfig::default(),
-            target_address_mapper: DashMap::new(),
-            target_address_mapper_storage: DashMap::new(),
-            config_path: default_config_path(),
-        }
-    }
     pub fn default_string() -> Result<String, Error> {
         let result = toml::to_string_pretty(&Config::default())
             .map_err(|_| Error::SerializationError)?;
         Ok(result)
     }
-}
-
-impl Default for ForwardingConfig {
-    fn default() -> ForwardingConfig {
-        ForwardingConfig {
-            address: "nats://itsusinn.site:4222"
-        }
-    }
-}
-
-impl Default for TelegramConfig {
-    fn default() -> TelegramConfig {
-        TelegramConfig {
-            token: "BOT_TOKEN".into(),
-            bot_name: "BOT_NAME".into(),
-            webhook: WebhookConfig::default(),
-        }
-    }
-}
-impl Default for WebhookConfig{
-    fn default() -> WebhookConfig {
-        WebhookConfig {
-            enable: false,
-            heroku: false,
-            port: 8889,
-            host: "mesagisto.herokuapp.com",
-        }
-    }
-}
-
-impl Default for ProxyConfig {
-    fn default() -> ProxyConfig {
-        ProxyConfig {
-            enabled: false,
-            address: "http://127.0.0.1:7890".into(),
-        }
-    }
-}
-
-impl Config {
     pub fn save(&self) {
         for pair in self.target_address_mapper.iter(){
             let key = pair.key();

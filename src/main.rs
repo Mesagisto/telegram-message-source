@@ -9,6 +9,8 @@ use nats::Headers;
 
 #[macro_use]
 extern crate lazy_static;
+#[macro_use]
+extern crate educe;
 
 mod command;
 mod config;
