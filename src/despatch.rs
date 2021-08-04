@@ -38,6 +38,7 @@ pub async fn cmd_or_msg_repl<N,Cmd, CH, MH, FutC, FutM, ErrC, ErrM>(
         let listener =  webhook(&bot).await;
         cmd_or_msg_repl_with_listener(bot, bot_name, cmd_handler, msg_handler, listener).await;
     } else {
+        bot.delete_webhook().await.expect("Failed to delete previous webhook");
         let listener =  update_listeners::polling_default(bot.clone()).await;
         cmd_or_msg_repl_with_listener(bot, bot_name, cmd_handler, msg_handler, listener).await;
     };
