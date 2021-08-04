@@ -54,7 +54,7 @@ async fn run() -> Result<(), anyhow::Error> {
     };
 
     if CONFIG.proxy.enabled {
-        log::info!("Proxy will be enable for teloxide");
+        log::info!("Proxy will be enable");
         env::set_var("TELOXIDE_PROXY", &CONFIG.proxy.address);
     }
 

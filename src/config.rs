@@ -4,7 +4,7 @@ use std::{fs, io, path::Path, sync::Arc};
 use serde_yaml as yaml;
 use once_cell::sync::Lazy;
 pub static CONFIG: Lazy<Config> = Lazy::new(|| {
-    let path = Path::new("config.yaml");
+    let path = Path::new("config.yml");
     let config = read_or_create_config(path).unwrap();
     config
 });
@@ -69,7 +69,7 @@ impl Config {
     pub fn save(&self) {
         let ser = yaml::to_string(self).unwrap();
         log::info!("Configuration file was saved");
-        fs::write("config.yaml", ser).unwrap();
+        fs::write("config.yml", ser).unwrap();
     }
 }
 
