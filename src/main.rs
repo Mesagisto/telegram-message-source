@@ -16,6 +16,7 @@ mod data;
 mod message;
 mod webhook;
 mod despatch;
+mod net;
 
 use config::CONFIG;
 use data::DATA;
@@ -53,14 +54,9 @@ async fn run() -> Result<(), anyhow::Error> {
         Arc::new(Headers { inner })
     };
 
-    if CONFIG.proxy.enabled {
-        log::info!("Proxy will be enable");
-        env::set_var("TELOXIDE_PROXY", &CONFIG.proxy.address);
-    }
-
     let bot = Bot::with_client(
         CONFIG.telegram.token.clone(),
-        teloxide::net::client_from_env()
+        net::client_from_config()
     ).auto_send();
 
     let clone_header = nats_header.clone();

@@ -48,8 +48,7 @@ bytes = "1.0.1"
 
 # webhook
 warp = "0.3.0"
-reqwest = { version = "0.11.4" ,default-features = false ,features = ["rustls"] }
-
+reqwest = { version = "0.11.4" ,default-features = false ,features = ["rustls","socks","rustls-tls-webpki-roots"] }
 
 nats = "0.10.1"
 async-nats = "0.10.1"
