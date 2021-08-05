@@ -1,6 +1,6 @@
 use std::env;
 use std::sync::Arc;
-use async_nats::Connection;
+use nats::asynk::Connection;
 use teloxide::{prelude::*, Bot};
 use std::{
     collections::{HashMap, HashSet}
@@ -38,7 +38,7 @@ async fn run() -> Result<(), anyhow::Error> {
 
     log::info!("Mesagisto-Bot is starting up");
 
-    let opts = async_nats::Options::new();
+    let opts = nats::asynk::Options::new();
 
     log::info!("Connecting to nats server");
     let nc = opts
