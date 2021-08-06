@@ -5,104 +5,96 @@ on:
     tags:
       - "v*"
 
+env:
+  SHORT_NAME: tmf
+
 jobs:
-  linux-build:
-    runs-on: ubuntu-latest
+  build-amd64:
+    name: Build binary for amd64
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            file: ./target/x86_64-unknown-linux-musl/release/${{ github.event.repository.name }}
+            strip: true
+            before_build: true
+            before_build_script: ./.github/before-build-linux.sh
+            build_args: --release  --target x86_64-unknown-linux-musl
+            release_name: lin-amd64
+
+          - os: macos-latest
+            file: ./target/release/${{ github.event.repository.name }}
+            strip: true
+            before_build: false
+            build_args: --release
+            release_name: mac-amd64
+
+          - os: windows-latest
+            file: ./target/release/${{ github.event.repository.name }}.exe
+            strip: false
+            before_build: false
+            build_args: --release
+            release_name: win-amd64.exe
+
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: Resume cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target/x86_64-unknown-linux-musl
-        key: ${{ runner.os }}-release-${{ hashFiles('**/Cargo.toml') }}
-        restore-keys: |
-          ${{ runner.os }}-release
-    - name: Install Rust toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: nightly
-        override: true
-    - name: Install musl
-      run: |
-        sudo apt install -y musl-tools
-        sudo ln -s /usr/include/x86_64-linux-gnu/asm /usr/include/x86_64-linux-musl/asm
-        sudo ln -s /usr/include/asm-generic /usr/include/x86_64-linux-musl/asm-generic
-        sudo ln -s /usr/include/linux /usr/include/x86_64-linux-musl/linux
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
 
-    - name: Build
-      run: |
-        rustup target add x86_64-unknown-linux-musl
-        cargo build --target x86_64-unknown-linux-musl --release
-        mv target/x86_64-unknown-linux-musl/release/telegram-mesaga-fonto target/x86_64-unknown-linux-musl/release/tmf-amd64-linux
-    - name: Compress binaries
-      uses: svenstaro/upx-action@v2
-      with:
-        file: target/x86_64-unknown-linux-musl/release/tmf-amd64-linux
-    - name: Upload bin
-      uses: actions/upload-artifact@v2
-      with:
-        name: amd64-linux
-        path: target/x86_64-unknown-linux-musl/release/tmf-amd64-linux
+      - name: Resume cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-amd64-release-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-amd64-release
 
-  macos-build:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: Resume cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
-        key: ${{ runner.os }}-release-${{ hashFiles('**/Cargo.toml') }}
-        restore-keys: |
-          ${{ runner.os }}-release
+      - name: Install Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
 
-    - name: Install Rust toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: nightly
-        override: true
-    - name: Build
-      run: |
-        cargo build --release
-        mv target/release/telegram-mesaga-fonto target/release/tmf-amd64-macos
-    - name: Compress binaries
-      uses: svenstaro/upx-action@v2
-      with:
-        file: target/release/tmf-amd64-macos
-    - name: Upload bin
-      uses: actions/upload-artifact@v2
-      with:
-        name: amd64-macos
-        path: target/release/tmf-amd64-macos
+      - name: Before Build
+        if: ${{ matrix.before_build }}
+        run: bash ${{ matrix.before_build_script }}
+        shell: bash
+
+      - name: Build
+        run: cargo build ${{ matrix.build_args }}
+
+      - name: Compress binaries
+        uses: svenstaro/upx-action@v2
+        with:
+          file: ${{ matrix.file }}
+          strip: ${{ matrix.strip }}
+          args: --best
+
+      - name: Rename binary
+        run: mv ${{ matrix.file }} ${{ env.SHORT_NAME }}-${{ matrix.release_name }}
+
+      - name: Upload bin
+        uses: actions/upload-artifact@v2
+        with:
+          name: amd64
+          path: ${{ env.SHORT_NAME }}-${{ matrix.release_name }}
 
   release:
     name: Release
-    needs: [linux-build, macos-build]
+    needs: [build-amd64]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Download linux-bin
+      - name: Download lin-bin
         uses: actions/download-artifact@v2
         with:
-          name: amd64-linux
+          name: amd64
           path: ./packages
-      - name: Download macos-bin
-        uses: actions/download-artifact@v2
-        with:
-          name: amd64-macos
-          path: ./packages
+
       - name: Github release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -111,4 +103,3 @@ jobs:
           files: |
             packages/*
             LICENSE
-
