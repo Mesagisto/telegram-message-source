@@ -81,11 +81,10 @@ pub async fn cmd_or_msg_repl_with_listener<'a,N,Cmd, CH, MH, FutC, FutM, ErrC, E
                 let cx = Arc::new(cx);
                 async move {
                     if let Some(text_content) = cx.clone().update.text() {
-                        if text_content.starts_with("/") {
-                            let cmd = Cmd::parse(&*text_content, clone_bot_name).unwrap();
-                            cmd_handler(cx.to_owned(), cmd).await.log_on_error().await
-                        } else {
-                            msg_handler(cx.to_owned(), String::from(text_content)).await.log_on_error().await
+                        let parse =  Cmd::parse(&*text_content, clone_bot_name);
+                        match parse{
+                            Ok(cmd) => cmd_handler(cx.to_owned(), cmd).await.log_on_error().await,
+                            Err(_) => msg_handler(cx.to_owned(), String::from(text_content)).await.log_on_error().await
                         }
                     };
                 }
