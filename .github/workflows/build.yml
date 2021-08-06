@@ -24,7 +24,6 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           target
-          /tmp/assimp
         key: ${{ runner.os }}-build-${{ hashFiles('**/Cargo.toml') }}
         restore-keys: |
           ${{ runner.os }}-build
@@ -32,34 +31,7 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         profile: minimal
-        toolchain: stable
-        override: true
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
-  macos-build:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: Resume cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
-          /tmp/assimp
-        key: ${{ runner.os }}-build-${{ hashFiles('**/Cargo.toml') }}
-        restore-keys: |
-          ${{ runner.os }}-build
-    - name: Install stable Rust toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
+        toolchain: nightly
         override: true
     - name: Build
       run: cargo build --verbose
