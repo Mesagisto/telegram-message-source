@@ -7,7 +7,7 @@ on:
 
 env:
   SHORT_NAME: tmf
-
+  RUST_BACKTRACE: 1
 jobs:
   build-amd64:
     name: Build binary for amd64
