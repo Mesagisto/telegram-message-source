@@ -50,14 +50,10 @@ pub async fn cmd_or_msg_repl_with_listener<N, Cmd, CH, MH, FutC, FutM, L, Listen
   Cmd: BotCommand + Send + 'static,
 
   CH: Fn(Arc<UpdateWithCx<AutoSend<Bot>, Message>>, Cmd) -> FutC + Send + Sync + 'static,
-    FutC: Future<Output = Result<(), ErrC>> + Send + 'static,
-    Result<(), ErrC>: OnError<ErrC>,
-    ErrC: Debug + Send,
+  FutC: Future<Output = anyhow::Result<()>> + Send + 'static,
 
-    MH: Fn(Arc<UpdateWithCx<AutoSend<Bot>, Message>>, String) -> FutM + Send + Sync + 'static,
-    FutM: Future<Output = Result<(), ErrM>> + Send + 'static,
-    Result<(), ErrM>: OnError<ErrM>,
-    ErrM: Debug + Send,
+  MH: Fn(Arc<UpdateWithCx<AutoSend<Bot>, Message>>) -> FutM + Send + Sync + 'static,
+  FutM: Future<Output = anyhow::Result<()>> + Send + 'static,
 
   N: Into<String> + Send + Clone + 'static,
 
