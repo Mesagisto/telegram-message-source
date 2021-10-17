@@ -2,7 +2,9 @@ Cargo.lock
 /target/
 **/*.rs.bk
 /.idea
-config.yml
-config.yml.old
+/db/
+/.history
+/config/*
 *.mp3
 *.jpg
+/.vscode
