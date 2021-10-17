@@ -1,12 +1,8 @@
-use std::sync::Arc;
-use once_cell::sync::Lazy;
 use dashmap::DashMap;
+use std::sync::Arc;
 
-pub static DATA: Lazy<RuntimeData> = Lazy::new(|| {
-    RuntimeData::default()
-});
-#[derive(Educe)]
+#[derive(Educe, Singleton)]
 #[educe(Default)]
-pub struct RuntimeData {
-    pub active_endpoint:DashMap<Arc<String>,bool>
+pub struct Data {
+  pub active_endpoint: DashMap<Arc<String>, bool>,
 }
