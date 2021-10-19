@@ -5,7 +5,6 @@ use std::sync::Arc;
 
 use arcstr::ArcStr;
 use futures::FutureExt;
-use log::{info, warn};
 use mesagisto_client::{OptionExt, cache::CACHE, cipher::CIPHER, db::DB, res::RES, server::SERVER};
 use teloxide::{Bot, prelude::*};
 
@@ -22,7 +21,6 @@ extern crate singleton;
 mod bot;
 mod command;
 mod config;
-mod data;
 mod despatch;
 mod message;
 mod net;
@@ -52,16 +50,16 @@ fn main() {
 #[allow(unused_must_use)]
 async fn run() -> Result<(), anyhow::Error> {
   if !CONFIG.enabled {
-    warn!("Mesagisto-Bot is not enabled and is about to exit the program.");
-    warn!("To enable it, please modify the configuration file.");
-    warn!("Mesagisto-Bot未被启用，即将退出程序。");
-    warn!("若要启用，请修改配置文件。");
+    log::warn!("Mesagisto-Bot is not enabled and is about to exit the program.");
+    log::warn!("To enable it, please modify the configuration file.");
+    log::warn!("Mesagisto-Bot未被启用，即将退出程序。");
+    log::warn!("若要启用，请修改配置文件。");
     return Ok(());
   }
   CACHE.init();
   CIPHER.init(&CONFIG.cipher.key,&CONFIG.cipher.refuse_plain);
-  info!("Mesagisto-Bot is starting up");
-  info!("Mesagisto-Bot正在启动");
+  log::info!("Mesagisto-Bot is starting up");
+  log::info!("Mesagisto-Bot正在启动");
   DB.init(ArcStr::from("tg").some());
   RES.init().await;
   RES.resolve_photo_url(|id_pair| {
