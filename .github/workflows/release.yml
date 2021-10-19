@@ -6,7 +6,7 @@ on:
       - "v*"
 
 env:
-  SHORT_NAME: tmf
+  SHORT_NAME: tms
   RUST_BACKTRACE: 1
 jobs:
   build-amd64:
