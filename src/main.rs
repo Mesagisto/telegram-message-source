@@ -58,7 +58,8 @@ async fn run() -> Result<(), anyhow::Error> {
     warn!("若要启用，请修改配置文件。");
     return Ok(());
   }
-  CIPHER.init(&"this is an example key".to_string());
+  CACHE.init();
+  CIPHER.init(&CONFIG.cipher.key,&CONFIG.cipher.refuse_plain);
   info!("Mesagisto-Bot is starting up");
   info!("Mesagisto-Bot正在启动");
   DB.init(ArcStr::from("tg").some());
@@ -70,8 +71,11 @@ async fn run() -> Result<(), anyhow::Error> {
     }.boxed()
   });
   SERVER.init(&CONFIG.nats.address).await;
-  CACHE.init();
-  let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config()).auto_send();
+
+  let bot = Bot::with_client(
+    CONFIG.telegram.token.clone(),
+    net::client_from_config()
+  ).auto_send();
 
   TG_BOT.init(Arc::new(bot));
 

@@ -10,6 +10,7 @@ pub struct Config {
   #[educe(Default = false)]
   pub enabled: bool,
   pub nats: NatsConfig,
+  pub cipher: CipherConfig,
   pub telegram: TelegramConfig,
   pub proxy: ProxyConfig,
   pub target_address_mapper: DashMap<i64, ArcStr>,
@@ -44,9 +45,10 @@ pub struct ProxyConfig {
 pub struct CipherConfig {
   #[educe(Default = false)]
   pub enabled: bool,
-  // pattern: "http://{username}:{password}@{host}:{port}"
   #[educe(Default = "this-is-an-example-key")]
   pub key: String,
+  #[educe(Default = true)]
+  pub refuse_plain: bool
 }
 
 #[basic_derive]
@@ -69,9 +71,3 @@ pub struct WebhookConfig {
   #[educe(Default = "heroku-app-name.herokuapp.com")]
   pub host: String,
 }
-
-#[basic_derive]
-pub struct BehaviorConfig {}
-
-#[basic_derive]
-pub struct FormatConfig {}
