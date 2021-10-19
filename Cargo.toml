@@ -9,7 +9,7 @@ edition = "2018"
 # bot
 teloxide ={ version = "0.5.2",default-features = false,features = ["frunk", "macros", "auto-send","ctrlc_handler","rustls"] }
 teloxide-core = { version = "0.3.3",default-features = false, features = ["rustls"] }
-teloxide-macros  = "0.4"
+teloxide-macros  = "0.4.1"
 
 # logging
 env_logger = "0.9.0"
