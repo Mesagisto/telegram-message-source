@@ -6,11 +6,12 @@ on:
       - "v*"
 
 env:
-  SHORT_NAME: tms
+  SHORT_NAME: tg
   RUST_BACKTRACE: 1
+
 jobs:
-  build-amd64:
-    name: Build binary for amd64
+  build-x86_64:
+    name: Build binaries for x86_64
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -21,21 +22,21 @@ jobs:
             before_build: true
             before_build_script: ./.github/before-build-linux.sh
             build_args: --release  --target x86_64-unknown-linux-musl
-            release_name: lin-amd64
+            release_name: linux-x86_64
 
           - os: macos-latest
             file: ./target/release/${{ github.event.repository.name }}
             strip: true
             before_build: false
             build_args: --release
-            release_name: mac-amd64
+            release_name: mac-x86_64
 
           - os: windows-latest
             file: ./target/release/${{ github.event.repository.name }}.exe
             strip: false
             before_build: false
             build_args: --release
-            release_name: win-amd64.exe
+            release_name: windows-x86_64.exe
 
     steps:
       - uses: actions/checkout@v2
@@ -49,9 +50,9 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-amd64-release-${{ hashFiles('**/Cargo.toml') }}
+          key: ${{ runner.os }}-x86_64-release-${{ hashFiles('**/Cargo.toml') }}
           restore-keys: |
-            ${{ runner.os }}-amd64-release
+            ${{ runner.os }}-x86_64-release
 
       - name: Install Toolchain
         uses: actions-rs/toolchain@v1
@@ -78,15 +79,15 @@ jobs:
       - name: Rename binary
         run: mv ${{ matrix.file }} ${{ env.SHORT_NAME }}-${{ matrix.release_name }}
 
-      - name: Upload bin
+      - name: Upload binaries
         uses: actions/upload-artifact@v2
         with:
-          name: amd64
+          name: x86_64
           path: ${{ env.SHORT_NAME }}-${{ matrix.release_name }}
 
   release:
     name: Release
-    needs: [build-amd64]
+    needs: [build-x86_64]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -96,7 +97,7 @@ jobs:
       - name: Download binaries
         uses: actions/download-artifact@v2
         with:
-          name: amd64
+          name: x86_64
           path: ./packages
 
       - name: Github release
