@@ -49,7 +49,7 @@ fn main() {
 }
 #[allow(unused_must_use)]
 async fn run() -> Result<(), anyhow::Error> {
-  if !CONFIG.enabled {
+  if !CONFIG.enable {
     log::warn!("Mesagisto-Bot is not enabled and is about to exit the program.");
     log::warn!("To enable it, please modify the configuration file.");
     log::warn!("Mesagisto-Bot未被启用，即将退出程序。");
@@ -57,7 +57,11 @@ async fn run() -> Result<(), anyhow::Error> {
     return Ok(());
   }
   CACHE.init();
-  CIPHER.init(&CONFIG.cipher.key,&CONFIG.cipher.refuse_plain);
+  if CONFIG.cipher.enable {
+    CIPHER.init(&CONFIG.cipher.key,&CONFIG.cipher.refuse_plain);
+  } else {
+    CIPHER.deinit();
+  }
   log::info!("Mesagisto-Bot is starting up");
   log::info!("Mesagisto-Bot正在启动");
   DB.init(ArcStr::from("tg").some());
