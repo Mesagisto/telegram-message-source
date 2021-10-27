@@ -33,7 +33,7 @@ fn main() {
     .write_style(env_logger::WriteStyle::Auto)
     .filter(None, log::LevelFilter::Error)
     .format_timestamp(None)
-    .filter(Some("telegram_mesaga_fonto"), log::LevelFilter::Trace)
+    .filter(Some("telegram_message_source"), log::LevelFilter::Trace)
     .filter(Some("mesagisto_client"), log::LevelFilter::Trace)
     .filter(Some("teloxide"), log::LevelFilter::Info)
     .init();
