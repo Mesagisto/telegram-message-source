@@ -8,7 +8,7 @@ use std::path::Path;
 #[location = "config/tg.yml"]
 pub struct Config {
   #[educe(Default = false)]
-  pub enabled: bool,
+  pub enable: bool,
   pub nats: NatsConfig,
   pub cipher: CipherConfig,
   pub telegram: TelegramConfig,
@@ -35,7 +35,7 @@ pub struct NatsConfig {
 #[basic_derive]
 pub struct ProxyConfig {
   #[educe(Default = false)]
-  pub enabled: bool,
+  pub enable: bool,
   // pattern: "http://{username}:{password}@{host}:{port}"
   #[educe(Default = "http://127.0.0.1:7890")]
   pub address: String,
@@ -44,7 +44,7 @@ pub struct ProxyConfig {
 #[basic_derive]
 pub struct CipherConfig {
   #[educe(Default = false)]
-  pub enabled: bool,
+  pub enable: bool,
   #[educe(Default = "this-is-an-example-key")]
   pub key: String,
   #[educe(Default = true)]
