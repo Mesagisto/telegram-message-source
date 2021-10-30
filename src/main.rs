@@ -25,6 +25,7 @@ mod despatch;
 mod message;
 mod net;
 mod webhook;
+pub mod ext;
 
 fn main() {
   std::env::set_var("RUST_BACKTRACE", "1");

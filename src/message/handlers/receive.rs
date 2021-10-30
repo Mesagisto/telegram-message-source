@@ -1,9 +1,9 @@
 use crate::CONFIG;
 use crate::TG_BOT;
+use crate::ext::DB;
 use mesagisto_client::{
   cache::CACHE,
   data::{message::MessageType, message::Message,Packet},
-  db::DB
 };
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::Requester;

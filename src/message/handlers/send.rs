@@ -2,13 +2,13 @@ use crate::config::CONFIG;
 use crate::bot::TG_BOT;
 use crate::message::handlers::receive::receive_from_server;
 use crate::message::Cx;
+use crate::ext::DB;
 use arcstr::ArcStr;
 use mesagisto_client::EitherExt;
 use mesagisto_client::data::message::{MessageType, Profile};
 use mesagisto_client::data::{message, Packet};
 use mesagisto_client::server::SERVER;
 use mesagisto_client::res::RES;
-use mesagisto_client::db::DB;
 use std::sync::Arc;
 use teloxide::prelude::*;
 
