@@ -1,6 +1,6 @@
 [package]
 name = "telegram-message-source"
-version = "1.1.0"
+version = "1.1.1"
 
 authors = ["Itsusinn <itsusinn@foxmail.com>"]
 edition = "2018"
