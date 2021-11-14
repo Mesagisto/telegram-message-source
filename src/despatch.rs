@@ -106,7 +106,12 @@ impl TracingErrorHandler {
 use futures::future::BoxFuture;
 impl ErrorHandler<anyhow::Error> for TracingErrorHandler {
   fn handle_error(self: Arc<Self>, error: anyhow::Error) -> BoxFuture<'static, ()> {
-    log::error!("{}:{}, \n Backtrace {}",self.text,error,error.backtrace());
+    log::error!(
+      "{}:{}, \n Backtrace {}",
+      self.text,
+      error,
+      error.backtrace()
+    );
     Box::pin(async {})
   }
 }

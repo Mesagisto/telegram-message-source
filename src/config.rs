@@ -17,10 +17,10 @@ pub struct Config {
 }
 
 impl Config {
-  pub fn mapper(&self,target: &i64) -> Option<ArcStr>{
+  pub fn mapper(&self, target: &i64) -> Option<ArcStr> {
     match self.target_address_mapper.get(target) {
-        Some(v) => return Some(v.clone()),
-        None => return None,
+      Some(v) => return Some(v.clone()),
+      None => return None,
     }
   }
 }
@@ -48,7 +48,7 @@ pub struct CipherConfig {
   #[educe(Default = "this-is-an-example-key")]
   pub key: String,
   #[educe(Default = true)]
-  pub refuse_plain: bool
+  pub refuse_plain: bool,
 }
 
 #[basic_derive]

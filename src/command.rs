@@ -34,7 +34,7 @@ pub async fn answer(
     Command::SetAddress { address } => {
       let sender_id = cx.update.from().unwrap().id;
       let chat_id = cx.chat_id();
-      let admins =cx.requester.get_chat_administrators(chat_id).await?;
+      let admins = cx.requester.get_chat_administrators(chat_id).await?;
       let mut is_admin = false;
       for admin in admins {
         if admin.user.id == sender_id {
@@ -43,14 +43,11 @@ pub async fn answer(
         }
       }
       if is_admin {
-        CONFIG
-          .target_address_mapper
-          .insert(chat_id, address.into());
+        CONFIG.target_address_mapper.insert(chat_id, address.into());
         cx.answer("成功设置当前Group的信使地址").await?;
       } else {
         cx.answer("权限不足,拒绝设置信使频道").await?;
       }
-
     }
   };
   Ok(())

@@ -1,9 +1,9 @@
 use std::{ops::Deref, sync::Arc};
 
-use arcstr::ArcStr;
 use crate::config::CONFIG;
-use mesagisto_client::{LateInit, cache::CACHE, res::RES};
-use teloxide::{Bot, adaptors::AutoSend, net::Download, prelude::Requester, types::File as TgFile};
+use arcstr::ArcStr;
+use mesagisto_client::{cache::CACHE, res::RES, LateInit};
+use teloxide::{adaptors::AutoSend, net::Download, prelude::Requester, types::File as TgFile, Bot};
 
 #[derive(Singleton, Default)]
 pub struct TgBot {
@@ -23,12 +23,13 @@ impl TgBot {
     CACHE.put_file(uid, &tmp_path).await?;
     Ok(())
   }
-  pub fn get_url_by_path(&self,file_path: String) -> ArcStr{
+  pub fn get_url_by_path(&self, file_path: String) -> ArcStr {
     format!(
       "https://api.telegram.org/file/bot{token}/{file}",
       token = CONFIG.telegram.token,
       file = file_path
-    ).into()
+    )
+    .into()
   }
 }
 impl Deref for TgBot {

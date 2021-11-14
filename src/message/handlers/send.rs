@@ -42,10 +42,10 @@ pub async fn answer_common(cx: Arc<Cx>) -> anyhow::Result<()> {
     return Ok(());
   }
   let address = CONFIG.target_address_mapper.get(&target).unwrap().clone();
-  let sender = match cx.update.from(){
+  let sender = match cx.update.from() {
     Some(v) => v,
     //fixme
-    None => return Ok(())
+    None => return Ok(()),
   };
   // let avatar = bot_client().get_user_profile_photos(sender.id).await?;
   let profile = Profile {

@@ -1,12 +1,12 @@
 #![allow(incomplete_features)]
-#![feature(backtrace,capture_disjoint_fields)]
+#![feature(backtrace, capture_disjoint_fields)]
 
 use std::sync::Arc;
 
 use arcstr::ArcStr;
 use futures::FutureExt;
-use mesagisto_client::{OptionExt, cache::CACHE, cipher::CIPHER, db::DB, res::RES, server::SERVER};
-use teloxide::{Bot, prelude::*};
+use mesagisto_client::{cache::CACHE, cipher::CIPHER, db::DB, res::RES, server::SERVER, OptionExt};
+use teloxide::{prelude::*, Bot};
 
 use bot::TG_BOT;
 use config::CONFIG;
@@ -22,10 +22,10 @@ mod bot;
 mod command;
 mod config;
 mod despatch;
+pub mod ext;
 mod message;
 mod net;
 mod webhook;
-pub mod ext;
 
 fn main() {
   std::env::set_var("RUST_BACKTRACE", "1");
@@ -39,7 +39,7 @@ fn main() {
     .filter(Some("teloxide"), log::LevelFilter::Info)
     .init();
   tokio::runtime::Builder::new_multi_thread()
-  // fixme: how many do we need
+    // fixme: how many do we need
     .worker_threads(5)
     .enable_all()
     .build()
@@ -59,7 +59,7 @@ async fn run() -> Result<(), anyhow::Error> {
   }
   CACHE.init();
   if CONFIG.cipher.enable {
-    CIPHER.init(&CONFIG.cipher.key,&CONFIG.cipher.refuse_plain);
+    CIPHER.init(&CONFIG.cipher.key, &CONFIG.cipher.refuse_plain);
   } else {
     CIPHER.deinit();
   }
@@ -71,14 +71,12 @@ async fn run() -> Result<(), anyhow::Error> {
     async {
       let file_path = TG_BOT.get_file(id_pair.1.as_str()).await.unwrap().file_path;
       Ok(TG_BOT.get_url_by_path(file_path))
-    }.boxed()
+    }
+    .boxed()
   });
   SERVER.init(&CONFIG.nats.address).await;
 
-  let bot = Bot::with_client(
-    CONFIG.telegram.token.clone(),
-    net::client_from_config()
-  ).auto_send();
+  let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config()).auto_send();
 
   TG_BOT.init(Arc::new(bot));
 
@@ -87,7 +85,8 @@ async fn run() -> Result<(), anyhow::Error> {
     &*CONFIG.telegram.bot_name,
     command::answer,
     message::handler::answer_msg,
-  ).await;
+  )
+  .await;
 
   CONFIG.save();
   log::info!("Mesagisto Bot is going to shut down");
