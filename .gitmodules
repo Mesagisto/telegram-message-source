@@ -1,4 +1,0 @@
-[submodule "libs/mesagisto-client"]
-	path = libs/mesagisto-client
-	url = git@github.com:MeowCat-Studio/mesagisto-client-rs.git
-
