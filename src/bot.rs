@@ -14,9 +14,13 @@ impl TgBot {
     self.inner.init(bot)
   }
   // fixme use this-error
-  pub async fn file(&self,uid:&ArcStr,id: &ArcStr) -> anyhow::Result<()>{
-    let TgFile{ file_path,.. } = self.get_file(id.as_str()).await.expect("failed to get file");
-    let tmp_path = RES.tmp_path(id);
+  pub async fn file(&self, uid: &Vec<u8>, id: &Vec<u8>) -> anyhow::Result<()> {
+    let id_str: ArcStr = base64_url::encode(id).into();
+    let TgFile { file_path, .. } = self
+      .get_file(String::from_utf8_lossy(id))
+      .await
+      .expect("failed to get file");
+    let tmp_path = RES.tmp_path(&id_str);
     let mut file = tokio::fs::File::create(&tmp_path).await?;
     // mention: this is stream
     self.inner.download_file(&file_path, &mut file).await?;

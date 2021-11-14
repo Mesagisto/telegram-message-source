@@ -1,14 +1,14 @@
-use crate::config::CONFIG;
 use crate::bot::TG_BOT;
+use crate::config::CONFIG;
+use crate::ext::db::DbExt;
 use crate::message::handlers::receive::receive_from_server;
 use crate::message::Cx;
-use crate::ext::DB;
-use arcstr::ArcStr;
-use mesagisto_client::EitherExt;
 use mesagisto_client::data::message::{MessageType, Profile};
 use mesagisto_client::data::{message, Packet};
-use mesagisto_client::server::SERVER;
+use mesagisto_client::db::DB;
 use mesagisto_client::res::RES;
+use mesagisto_client::server::SERVER;
+use mesagisto_client::EitherExt;
 use std::sync::Arc;
 use teloxide::prelude::*;
 
@@ -49,7 +49,7 @@ pub async fn answer_common(cx: Arc<Cx>) -> anyhow::Result<()> {
   };
   // let avatar = bot_client().get_user_profile_photos(sender.id).await?;
   let profile = Profile {
-    id: sender.id,
+    id: sender.id.to_be_bytes().into(),
     username: sender.username.clone(),
     nick: Some(
       sender
@@ -59,41 +59,39 @@ pub async fn answer_common(cx: Arc<Cx>) -> anyhow::Result<()> {
   };
   let mut chain = Vec::<MessageType>::new();
   if let Some(text) = udp.text() {
-    chain.push(MessageType::Text{ content: text.to_string() });
+    chain.push(MessageType::Text {
+      content: text.to_string(),
+    });
   } else if let Some(image) = udp.photo() {
     let photo = image.last().unwrap();
-    let file_id:ArcStr = photo.file_id.to_owned().into();
-    let uid:ArcStr = photo.file_unique_id.to_owned().into();
-    RES.store_photo_id(&uid, &file_id);
-    TG_BOT.file(&uid,&file_id).await?;
-    chain.push(MessageType::Image {
-      id: uid,url:None
-    })
+    let file_id: Vec<u8> = photo.file_id.as_bytes().to_vec();
+    let uid: Vec<u8> = photo.file_unique_id.as_bytes().to_vec();
+    RES.put_image_id(&uid, file_id.clone());
+    TG_BOT.file(&uid, &file_id).await?;
+    chain.push(MessageType::Image { id: uid, url: None })
   } else if let Some(sticker) = udp.sticker() {
-    let file_id:ArcStr = sticker.file_id.to_owned().into();
-    let uid:ArcStr = sticker.file_unique_id.to_owned().into();
-    RES.store_photo_id(&uid, &file_id);
-    TG_BOT.file(&uid,&file_id).await?;
-    chain.push(MessageType::Image {
-      id:uid,url:None
-    })
+    let file_id: Vec<u8> = sticker.file_id.as_bytes().to_vec();
+    let uid: Vec<u8> = sticker.file_unique_id.as_bytes().to_vec();
+    RES.put_image_id(&uid, file_id.clone());
+    TG_BOT.file(&uid, &file_id).await?;
+    chain.push(MessageType::Image { id: uid, url: None })
   }
 
-  let reply = match udp.reply_to_message(){
+  let reply = match udp.reply_to_message() {
     Some(v) => {
       let local_id = v.id.to_be_bytes().to_vec();
       DB.get_msg_id_2(&target, &local_id).unwrap_or(None)
-    },
-    None => None
+    }
+    None => None,
   };
-  DB.put_msg_id_0(&udp.chat_id(),&udp.id, &udp.id)?;
+  DB.put_msg_id_0(&udp.chat_id(), &udp.id, &udp.id)?;
   let message = message::Message {
     profile,
-    id:udp.id.to_be_bytes().to_vec(),
+    id: udp.id.to_be_bytes().to_vec(),
     chain,
     reply,
   };
-  let packet = Packet::encrypt_from(message.tl())?;
+  let packet = Packet::from(message.tl())?;
 
   SERVER
     .send_and_receive(target, address, packet, receive_from_server)

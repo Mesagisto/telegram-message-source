@@ -69,7 +69,8 @@ async fn run() -> Result<(), anyhow::Error> {
   RES.init().await;
   RES.resolve_photo_url(|id_pair| {
     async {
-      let file_path = TG_BOT.get_file(id_pair.1.as_str()).await.unwrap().file_path;
+      let file = String::from_utf8_lossy(&id_pair.1);
+      let file_path = TG_BOT.get_file(file).await.unwrap().file_path;
       Ok(TG_BOT.get_url_by_path(file_path))
     }
     .boxed()

@@ -1,6 +1,7 @@
+use crate::ext::db::DbExt;
 use crate::CONFIG;
 use crate::TG_BOT;
-use crate::ext::DB;
+use mesagisto_client::db::DB;
 use mesagisto_client::{
   cache::CACHE,
   data::{message::Message, message::MessageType, Packet},
@@ -30,7 +31,7 @@ pub async fn handle_receive_message(mut message: Message, target: i64) -> anyhow
     } else if message.profile.username.is_some() {
       message.profile.username.take().unwrap()
     } else {
-      message.profile.id.to_string()
+      base64_url::encode(&message.profile.id)
     };
     match single {
       MessageType::Text { content } => {
