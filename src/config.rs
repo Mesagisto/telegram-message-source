@@ -29,24 +29,26 @@ impl Config {
 pub struct NatsConfig {
   // pattern: "nats://{host}:{port}"
   #[educe(Default = "nats://itsusinn.site:4222")]
-  pub address: String,
+  pub address: ArcStr,
 }
 
 #[basic_derive]
 pub struct ProxyConfig {
   #[educe(Default = false)]
   pub enable: bool,
+  #[educe(Default = true)]
+  pub enable_for_mesagisto: bool,
   // pattern: "http://{username}:{password}@{host}:{port}"
   #[educe(Default = "http://127.0.0.1:7890")]
-  pub address: String,
+  pub address: ArcStr,
 }
 
 #[basic_derive]
 pub struct CipherConfig {
-  #[educe(Default = false)]
+  #[educe(Default = true)]
   pub enable: bool,
   #[educe(Default = "this-is-an-example-key")]
-  pub key: String,
+  pub key: ArcStr,
   #[educe(Default = true)]
   pub refuse_plain: bool,
 }

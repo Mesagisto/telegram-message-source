@@ -2,10 +2,8 @@
 #![feature(backtrace, capture_disjoint_fields)]
 
 use std::sync::Arc;
-
-use arcstr::ArcStr;
 use futures::FutureExt;
-use mesagisto_client::{cache::CACHE, cipher::CIPHER, db::DB, res::RES, server::SERVER, OptionExt};
+use mesagisto_client::MesagistoConfig;
 use teloxide::{prelude::*, Bot};
 
 use bot::TG_BOT;
@@ -57,25 +55,30 @@ async fn run() -> Result<(), anyhow::Error> {
     log::warn!("若要启用，请修改配置文件。");
     return Ok(());
   }
-  CACHE.init();
-  if CONFIG.cipher.enable {
-    CIPHER.init(&CONFIG.cipher.key, &CONFIG.cipher.refuse_plain);
-  } else {
-    CIPHER.deinit();
-  }
+  MesagistoConfig::builder()
+    .name("tg")
+    .cipher_enable(CONFIG.cipher.enable)
+    .cipher_key(CONFIG.cipher.key.clone())
+    .cipher_refuse_plain(CONFIG.cipher.refuse_plain)
+    .nats_address(CONFIG.nats.address.clone())
+    .proxy(if CONFIG.proxy.enable_for_mesagisto {
+      Some(CONFIG.proxy.address.clone())
+    } else {
+      None
+    })
+    .photo_url_resolver(|id_pair| {
+      async {
+        let file = String::from_utf8_lossy(&id_pair.1);
+        let file_path = TG_BOT.get_file(file).await.unwrap().file_path;
+        Ok(TG_BOT.get_url_by_path(file_path))
+      }
+      .boxed()
+    })
+    .build()
+    .apply().await;
+
   log::info!("Mesagisto-Bot is starting up");
   log::info!("Mesagisto-Bot正在启动");
-  DB.init(ArcStr::from("tg").some());
-  RES.init().await;
-  RES.resolve_photo_url(|id_pair| {
-    async {
-      let file = String::from_utf8_lossy(&id_pair.1);
-      let file_path = TG_BOT.get_file(file).await.unwrap().file_path;
-      Ok(TG_BOT.get_url_by_path(file_path))
-    }
-    .boxed()
-  });
-  SERVER.init(&CONFIG.nats.address).await;
 
   let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config()).auto_send();
 

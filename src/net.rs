@@ -7,7 +7,7 @@ pub fn client_from_config() -> reqwest::Client {
   let builder = default_reqwest_settings().use_rustls_tls();
   if CONFIG.proxy.enable {
     builder
-      .proxy(reqwest::Proxy::all(&CONFIG.proxy.address).expect("reqwest::Proxy creation failed"))
+      .proxy(reqwest::Proxy::all(CONFIG.proxy.address.as_str()).expect("reqwest::Proxy creation failed"))
   } else {
     builder
   }
