@@ -2,8 +2,8 @@ use std::{ops::Deref, sync::Arc};
 
 use crate::config::CONFIG;
 use arcstr::ArcStr;
-use mesagisto_client::{cache::CACHE, res::RES, LateInit};
-use teloxide::{adaptors::AutoSend, net::Download, prelude::Requester, types::File as TgFile, Bot};
+use mesagisto_client::{LateInit, cache::CACHE, net::NET, res::RES};
+use teloxide::{adaptors::AutoSend, prelude::Requester, types::File as TgFile, Bot};
 
 #[derive(Singleton, Default)]
 pub struct TgBot {
@@ -21,9 +21,8 @@ impl TgBot {
       .await
       .expect("failed to get file");
     let tmp_path = RES.tmp_path(&id_str);
-    let mut file = tokio::fs::File::create(&tmp_path).await?;
-    // mention: this is stream
-    self.inner.download_file(&file_path, &mut file).await?;
+    let url = self.get_url_by_path(file_path);
+    NET.download(&url, &tmp_path).await?;
     CACHE.put_file(uid, &tmp_path).await?;
     Ok(())
   }

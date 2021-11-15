@@ -58,7 +58,7 @@ sled = "0.34.7"
 
 # mesagisto
 nats = "0.16.0"
-mesagisto-client = { git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git", rev = "8d74323" }
+mesagisto-client = { git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git", rev = "cfe7a4" }
 # mesagisto-client = { path = "../../mesagisto-client/rust" }
 automatic-config = { git = "https://github.com/Itsusinn/automatic-config-rs.git" }
 singleton = { git = "https://github.com/Itsusinn/singleton-rs.git", rev = "bee321c" }
