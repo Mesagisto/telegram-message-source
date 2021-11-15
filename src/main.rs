@@ -1,9 +1,9 @@
 #![allow(incomplete_features)]
 #![feature(backtrace, capture_disjoint_fields)]
 
-use std::sync::Arc;
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
+use std::sync::Arc;
 use teloxide::{prelude::*, Bot};
 
 use bot::TG_BOT;
@@ -75,7 +75,8 @@ async fn run() -> Result<(), anyhow::Error> {
       .boxed()
     })
     .build()
-    .apply().await;
+    .apply()
+    .await;
 
   log::info!("Mesagisto-Bot is starting up");
   log::info!("Mesagisto-Bot正在启动");

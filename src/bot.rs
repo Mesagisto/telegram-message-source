@@ -2,7 +2,7 @@ use std::{ops::Deref, sync::Arc};
 
 use crate::config::CONFIG;
 use arcstr::ArcStr;
-use mesagisto_client::{LateInit, cache::CACHE, net::NET, res::RES};
+use mesagisto_client::{cache::CACHE, net::NET, res::RES, LateInit};
 use teloxide::{adaptors::AutoSend, prelude::Requester, types::File as TgFile, Bot};
 
 #[derive(Singleton, Default)]
