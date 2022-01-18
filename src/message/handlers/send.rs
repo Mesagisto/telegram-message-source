@@ -94,7 +94,7 @@ pub async fn answer_common(cx: Arc<Cx>) -> anyhow::Result<()> {
   let packet = Packet::from(message.tl())?;
 
   SERVER
-    .send_and_receive(target, address, packet, receive_from_server)
+    .send_and_receive(target.to_be_bytes().to_vec(), address, packet, receive_from_server)
     .await?;
   Ok(())
 }
