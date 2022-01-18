@@ -7,37 +7,37 @@ on:
 
 env:
   SHORT_NAME: tg
-  RUST_BACKTRACE: 1
 
 jobs:
-  build-x86_64:
-    name: Build binaries for x86_64
+  compile:
+    name: Compile
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
             file: ./target/x86_64-unknown-linux-musl/release/${{ github.event.repository.name }}
-            strip: true
-            before_build: true
-            before_build_script: ./.github/before-build-linux.sh
-            build_args: --release  --target x86_64-unknown-linux-musl
+            target: x86_64-unknown-linux-musl
             release_name: linux-x86_64
-
-          - os: macos-latest
-            file: ./target/release/${{ github.event.repository.name }}
-            strip: true
-            before_build: false
-            build_args: --release
-            release_name: mac-x86_64
+            cross: true
 
           - os: windows-latest
-            file: ./target/release/${{ github.event.repository.name }}.exe
-            strip: false
-            before_build: false
-            build_args: --release
+            file: ./target/x86_64-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
+            target: x86_64-pc-windows-msvc
             release_name: windows-x86_64.exe
+            cross: false
 
+          - os: macos-latest
+            file: ./target/x86_64-apple-darwin/release/${{ github.event.repository.name }}
+            target: x86_64-apple-darwin
+            release_name: mac-x86_64
+            cross: false
+
+          - os: ubuntu-latest
+            file: ./target/aarch64-unknown-linux-gnu/release/${{ github.event.repository.name }}
+            target: aarch64-unknown-linux-gnu
+            release_name: linux-aarch64
+            cross: true
     steps:
       - uses: actions/checkout@v2
         with:
@@ -50,31 +50,21 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-x86_64-release-${{ hashFiles('**/Cargo.toml') }}
+          key: ${{ matrix.target }}-release-${{ hashFiles('**/Cargo.toml') }}
           restore-keys: |
-            ${{ runner.os }}-x86_64-release
+            ${{ matrix.target }}-release
 
-      - name: Install Toolchain
-        uses: actions-rs/toolchain@v1
+      - uses: actions-rs/toolchain@v1
         with:
-          profile: minimal
           toolchain: nightly
+          target: ${{ matrix.target }}
           override: true
 
-      - name: Before Build
-        if: ${{ matrix.before_build }}
-        run: bash ${{ matrix.before_build_script }}
-        shell: bash
-
-      - name: Build
-        run: cargo build ${{ matrix.build_args }}
-
-      - name: Compress binaries
-        uses: svenstaro/upx-action@v2
+      - uses: actions-rs/cargo@v1
         with:
-          file: ${{ matrix.file }}
-          strip: ${{ matrix.strip }}
-          args: --best
+          use-cross: ${{ matrix.cross }}
+          command: build
+          args: --release --target ${{ matrix.target }}
 
       - name: Rename binary
         run: mv ${{ matrix.file }} ${{ env.SHORT_NAME }}-${{ matrix.release_name }}
@@ -82,12 +72,12 @@ jobs:
       - name: Upload binaries
         uses: actions/upload-artifact@v2
         with:
-          name: x86_64
+          name: compile
           path: ${{ env.SHORT_NAME }}-${{ matrix.release_name }}
 
   release:
     name: Release
-    needs: [build-x86_64]
+    needs: [compile]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -97,8 +87,11 @@ jobs:
       - name: Download binaries
         uses: actions/download-artifact@v2
         with:
-          name: x86_64
+          name: compile
           path: ./packages
+
+      - name: Compress
+        run: bash ./.github/compress.sh
 
       - name: Github release
         uses: "marvinpinto/action-automatic-releases@latest"
