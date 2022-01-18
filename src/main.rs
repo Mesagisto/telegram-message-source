@@ -1,6 +1,7 @@
 #![allow(incomplete_features)]
 #![feature(backtrace, capture_disjoint_fields)]
 
+use env_logger::TimestampPrecision;
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
 use std::sync::Arc;
@@ -26,14 +27,14 @@ mod net;
 mod webhook;
 
 fn main() {
-  std::env::set_var("RUST_BACKTRACE", "1");
+
   std::backtrace::Backtrace::force_capture();
   env_logger::builder()
     .write_style(env_logger::WriteStyle::Auto)
-    .filter(None, log::LevelFilter::Error)
-    .format_timestamp(None)
-    .filter(Some("telegram_message_source"), log::LevelFilter::Trace)
-    .filter(Some("mesagisto_client"), log::LevelFilter::Trace)
+    .filter(None, log::LevelFilter::Warn)
+    .format_timestamp(Some(TimestampPrecision::Seconds))
+    .filter(Some("telegram_message_source"), log::LevelFilter::Info)
+    .filter(Some("mesagisto_client"), log::LevelFilter::Info)
     .filter(Some("teloxide"), log::LevelFilter::Info)
     .init();
   tokio::runtime::Builder::new_multi_thread()
@@ -78,7 +79,6 @@ async fn run() -> Result<(), anyhow::Error> {
     .apply()
     .await;
 
-  log::info!("Mesagisto-Bot is starting up");
   log::info!("Mesagisto-Bot正在启动");
 
   let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config()).auto_send();

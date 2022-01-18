@@ -19,7 +19,7 @@ impl TgBot {
     let TgFile { file_path, .. } = self
       .get_file(String::from_utf8_lossy(id))
       .await
-      .expect("failed to get file");
+      .expect("获取文件失败");
     let tmp_path = RES.tmp_path(&id_str);
     let url = self.get_url_by_path(file_path);
     NET.download(&url, &tmp_path).await?;

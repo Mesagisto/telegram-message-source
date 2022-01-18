@@ -63,6 +63,7 @@ pub async fn cmd_or_msg_repl_with_listener<N, Cmd, CH, MH, FutC, FutM, L, Listen
   let cmd_handler = Arc::new(cmd_handler);
   let msg_handler = Arc::new(msg_handler);
 
+  log::info!("Mesagisto-Bot启动成功");
   Dispatcher::new(bot.clone())
     .messages_handler(move |rx: DispatcherHandlerRx<AutoSend<Bot>, Message>| {
       UnboundedReceiverStream::new(rx).for_each_concurrent(None, move |cx| {

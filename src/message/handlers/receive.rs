@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 use crate::ext::db::DbExt;
 use crate::CONFIG;
 use crate::TG_BOT;
@@ -11,8 +13,9 @@ use teloxide::prelude::Requester;
 
 use teloxide::types::InputFile;
 
-pub async fn receive_from_server(message: nats::asynk::Message, target: i64) -> anyhow::Result<()> {
-  log::trace!("Receive from {}", target);
+pub async fn receive_from_server(message: nats::asynk::Message, target: Vec<u8>) -> anyhow::Result<()> {
+  let target = i64::from_be_bytes(target.try_into().unwrap());
+  log::trace!("接收到来自目标{}的消息", target);
   let packet = Packet::from_cbor(&message.data)?;
   match packet {
     either::Left(msg) => {
@@ -25,7 +28,7 @@ pub async fn receive_from_server(message: nats::asynk::Message, target: i64) -> 
 
 pub async fn handle_receive_message(mut message: Message, target: i64) -> anyhow::Result<()> {
   for single in message.chain {
-    log::trace!("handling element in chain");
+    log::trace!("正在处理消息链中的元素");
     let sender_name = if message.profile.nick.is_some() {
       message.profile.nick.take().unwrap()
     } else if message.profile.username.is_some() {
@@ -53,7 +56,7 @@ pub async fn handle_receive_message(mut message: Message, target: i64) -> anyhow
         DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
       }
       MessageType::Image { id, url } => {
-        let channel = CONFIG.mapper(&target).expect("Channel don't exist");
+        let channel = CONFIG.mapper(&target).expect("频道不存在");
         let path = CACHE.file(&id, &url, &channel).await?;
         let receipt = TG_BOT
           .send_message(target, format!("{} :", sender_name))
