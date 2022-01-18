@@ -1,6 +1,20 @@
+use std::time::Duration;
+
 fn default_reqwest_settings() -> reqwest::ClientBuilder {
   // maybe we should configure it by ourselves
-  teloxide_core::net::default_reqwest_settings()
+  use reqwest::header::{HeaderMap, CONNECTION};
+
+  let mut headers = HeaderMap::new();
+  headers.insert(CONNECTION, "keep-alive".parse().unwrap());
+
+  let connect_timeout = Duration::from_secs(10);
+  let timeout = connect_timeout + Duration::from_secs(24);
+
+  reqwest::Client::builder()
+    .connect_timeout(connect_timeout)
+    .timeout(timeout)
+    .tcp_nodelay(true)
+    .default_headers(headers)
 }
 pub fn client_from_config() -> reqwest::Client {
   use crate::config::CONFIG;
