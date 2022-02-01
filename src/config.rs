@@ -9,10 +9,12 @@ use std::path::Path;
 pub struct Config {
   #[educe(Default = false)]
   pub enable: bool,
-  pub nats: NatsConfig,
+  // A-z order
   pub cipher: CipherConfig,
-  pub telegram: TelegramConfig,
+  pub nats: NatsConfig,
   pub proxy: ProxyConfig,
+  pub telegram: TelegramConfig,
+
   pub target_address_mapper: DashMap<i64, ArcStr>,
 }
 
@@ -68,8 +70,13 @@ pub struct WebhookConfig {
   pub enable: bool,
   #[educe(Default = false)]
   pub heroku: bool,
-  #[educe(Default = 8889)]
+  #[educe(Default = 443)]
   pub port: u16,
   #[educe(Default = "heroku-app-name.herokuapp.com")]
   pub host: String,
+}
+
+#[basic_derive]
+pub struct FormatConfig {
+  pub msg: ArcStr
 }
