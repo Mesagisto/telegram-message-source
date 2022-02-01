@@ -26,26 +26,19 @@ mod message;
 mod net;
 mod webhook;
 
-fn main() {
+#[tokio::main]
+async fn main() {
 
-  std::backtrace::Backtrace::force_capture();
   env_logger::builder()
     .write_style(env_logger::WriteStyle::Auto)
-    .filter(None, log::LevelFilter::Warn)
+    .filter(None, log::LevelFilter::Error)
     .format_timestamp(Some(TimestampPrecision::Seconds))
     .filter(Some("telegram_message_source"), log::LevelFilter::Info)
     .filter(Some("mesagisto_client"), log::LevelFilter::Info)
     .filter(Some("teloxide"), log::LevelFilter::Info)
     .init();
-  tokio::runtime::Builder::new_multi_thread()
-    // fixme: how many do we need
-    .worker_threads(5)
-    .enable_all()
-    .build()
-    .unwrap()
-    .block_on(async {
-      run().await.unwrap();
-    });
+
+  run().await.unwrap();
 }
 #[allow(unused_must_use)]
 async fn run() -> Result<(), anyhow::Error> {
