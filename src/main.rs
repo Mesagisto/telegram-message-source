@@ -1,7 +1,6 @@
 #![allow(incomplete_features)]
 #![feature(backtrace, capture_disjoint_fields)]
 
-use env_logger::TimestampPrecision;
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
 use std::sync::Arc;
@@ -28,20 +27,16 @@ mod webhook;
 
 #[tokio::main]
 async fn main() {
-
-  env_logger::builder()
-    .write_style(env_logger::WriteStyle::Auto)
-    .filter(None, log::LevelFilter::Error)
-    .format_timestamp(Some(TimestampPrecision::Seconds))
-    .filter(Some("telegram_message_source"), log::LevelFilter::Info)
-    .filter(Some("mesagisto_client"), log::LevelFilter::Info)
-    .filter(Some("teloxide"), log::LevelFilter::Info)
-    .init();
-
   run().await.unwrap();
 }
 #[allow(unused_must_use)]
 async fn run() -> Result<(), anyhow::Error> {
+  let env = tracing_subscriber::EnvFilter::from("warn")
+  .add_directive("teloxide=info".parse()?)
+  .add_directive("telegram_message_source=info".parse()?)
+  .add_directive("mesagisto_client=info".parse()?);
+  tracing_subscriber::fmt().with_env_filter(env).init();
+
   if !CONFIG.enable {
     log::warn!("Mesagisto-Bot is not enabled and is about to exit the program.");
     log::warn!("To enable it, please modify the configuration file.");
