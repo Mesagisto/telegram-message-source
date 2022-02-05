@@ -78,5 +78,5 @@ pub struct WebhookConfig {
 
 #[basic_derive]
 pub struct FormatConfig {
-  pub msg: ArcStr
+  pub msg: ArcStr,
 }

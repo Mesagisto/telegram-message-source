@@ -7,8 +7,8 @@ edition = "2021"
 
 [dependencies]
 # bot
-teloxide ={ version = "0.5.3",default-features = false,features = ["frunk", "macros", "auto-send","ctrlc_handler","rustls"] }
-teloxide-core = { version = "0.3.3",default-features = false, features = ["rustls"] }
+teloxide ={ rev = "25f8634", default-features = false,features = ["frunk", "macros", "auto-send","ctrlc_handler","rustls","dispatching2"],git = "https://github.com/teloxide/teloxide.git"}
+teloxide-core = { version = "0.4.0", default-features = false, features = ["rustls","cache_me"] }
 teloxide-macros  = "0.4.1"
 
 # logging
@@ -26,7 +26,6 @@ async-std = "1.10.0"
 tokio = { version =  "1.15.0",default-features = false,features = ["rt-multi-thread", "macros","signal"] }
 tokio-util = "0.6.8"
 tokio-stream = "0.1.7"
-smol = "1.2.5"
 futures = "0.3.17"
 
 # error handling
@@ -46,7 +45,6 @@ once_cell = "1.8.0"
 educe = "0.4.18"
 num-bigint = "0.4.2"
 arcstr = { version = "1.1.1", features = ["serde"] }
-
 # webhook
 warp = "0.3.1"
 
@@ -58,20 +56,11 @@ sled = "0.34.7"
 
 # mesagisto
 nats = "0.17.0"
-# mesagisto-client = { rev = "414e33", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git"}
-mesagisto-client = { path = "../../mesagisto-client/rust" }
+mesagisto-client = { rev = "414e33", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git"}
+# mesagisto-client = { path = "../../mesagisto-client/rust" }
 automatic-config = { git = "https://github.com/Itsusinn/automatic-config-rs.git" }
 singleton = { git = "https://github.com/Itsusinn/singleton-rs.git", rev = "bee321c" }
 # singleton = { path = "/home/itsusinn/Workspace/Code/singleton-rs" }
 either = "1.6.1"
 # hex = "0.4"
 base64-url = "1.4.10"
-
-[dependencies.pyo3]
-version = "0.15.1"
-optional = true
-features = ["auto-initialize"]
-
-[features]
-# default = ["yinglish"]
-yinglish = ["pyo3"]

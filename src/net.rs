@@ -1,7 +1,6 @@
 use std::time::Duration;
 
 fn default_reqwest_settings() -> reqwest::ClientBuilder {
-
   let connect_timeout = Duration::from_secs(10);
   let timeout = connect_timeout + Duration::from_secs(24);
 

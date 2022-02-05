@@ -13,7 +13,10 @@ use teloxide::prelude::Requester;
 
 use teloxide::types::InputFile;
 
-pub async fn receive_from_server(message: nats::asynk::Message, target: Vec<u8>) -> anyhow::Result<()> {
+pub async fn receive_from_server(
+  message: nats::asynk::Message,
+  target: Vec<u8>,
+) -> anyhow::Result<()> {
   let target = i64::from_be_bytes(target.try_into().unwrap());
   log::trace!("接收到来自目标{}的消息", target);
   let packet = Packet::from_cbor(&message.data)?;
@@ -62,7 +65,7 @@ pub async fn handle_receive_message(mut message: Message, target: i64) -> anyhow
           .send_message(target, format!("{}:", sender_name))
           .await?;
         DB.put_msg_id_ir_2(&target, &receipt.id, &message.id)?;
-        let receipt = TG_BOT.send_photo(target, InputFile::File(path)).await?;
+        let receipt = TG_BOT.send_photo(target, InputFile::file(path)).await?;
         DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
       }
     }

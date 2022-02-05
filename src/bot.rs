@@ -1,4 +1,4 @@
-use std::{ops::Deref, sync::Arc};
+use std::ops::Deref;
 
 use crate::config::CONFIG;
 use arcstr::ArcStr;
@@ -7,10 +7,10 @@ use teloxide::{adaptors::AutoSend, prelude::Requester, types::File as TgFile, Bo
 
 #[derive(Singleton, Default)]
 pub struct TgBot {
-  inner: LateInit<Arc<AutoSend<Bot>>>,
+  inner: LateInit<AutoSend<Bot>>,
 }
 impl TgBot {
-  pub fn init(&self, bot: Arc<AutoSend<Bot>>) {
+  pub fn init(&self, bot: AutoSend<Bot>) {
     self.inner.init(bot)
   }
   // fixme use this-error
@@ -36,7 +36,7 @@ impl TgBot {
   }
 }
 impl Deref for TgBot {
-  type Target = Arc<AutoSend<Bot>>;
+  type Target = AutoSend<Bot>;
   fn deref(&self) -> &Self::Target {
     &self.inner
   }

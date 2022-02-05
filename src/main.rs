@@ -3,12 +3,10 @@
 
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
-use std::sync::Arc;
-use teloxide::{prelude::*, Bot};
+use teloxide::{prelude2::*, Bot};
 
 use bot::TG_BOT;
 use config::CONFIG;
-use despatch::cmd_or_msg_repl;
 
 #[macro_use]
 extern crate educe;
@@ -19,11 +17,10 @@ extern crate singleton;
 mod bot;
 mod command;
 mod config;
-mod despatch;
+mod dispatch;
 pub mod ext;
 mod message;
 mod net;
-mod webhook;
 
 #[tokio::main]
 async fn main() {
@@ -32,9 +29,9 @@ async fn main() {
 #[allow(unused_must_use)]
 async fn run() -> Result<(), anyhow::Error> {
   let env = tracing_subscriber::EnvFilter::from("warn")
-  .add_directive("teloxide=info".parse()?)
-  .add_directive("telegram_message_source=info".parse()?)
-  .add_directive("mesagisto_client=info".parse()?);
+    .add_directive("teloxide=info".parse()?)
+    .add_directive("telegram_message_source=info".parse()?)
+    .add_directive("mesagisto_client=info".parse()?);
   tracing_subscriber::fmt().with_env_filter(env).init();
 
   if !CONFIG.enable {
@@ -71,15 +68,8 @@ async fn run() -> Result<(), anyhow::Error> {
 
   let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config()).auto_send();
 
-  TG_BOT.init(Arc::new(bot));
-
-  cmd_or_msg_repl(
-    &*TG_BOT,
-    &*CONFIG.telegram.bot_name,
-    command::answer,
-    message::handler::answer_msg,
-  )
-  .await;
+  TG_BOT.init(bot);
+  dispatch::start(&TG_BOT).await;
 
   CONFIG.save();
   log::info!("Mesagisto Bot is going to shut down");
