@@ -14,14 +14,10 @@ pub async fn start(bot: &AutoSend<Bot>) {
       dptree::filter(|msg: Message| msg.chat.is_group() || msg.chat.is_supergroup())
         .endpoint(handlers::send::answer_common),
     );
-  info!("Mesagisto-Bot启动成功");
+  info!("Mesagisto信使启动成功");
   Dispatcher::builder(bot.clone(), handler)
-    .default_handler(|upd| async move {
-      log::warn!("Unhandled update: {:?}", upd);
-    })
-    // If the dispatcher fails for some reason, execute this handler.
     .error_handler(LoggingErrorHandler::with_custom_text(
-      "An error has occurred in the dispatcher",
+      "调度器中发生了一个错误",
     ))
     .build()
     .setup_ctrlc_handler()

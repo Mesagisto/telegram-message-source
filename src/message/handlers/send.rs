@@ -11,7 +11,7 @@ use mesagisto_client::server::SERVER;
 use mesagisto_client::EitherExt;
 use teloxide::prelude2::*;
 
-pub async fn answer_common(msg: Message, bot: AutoSend<Bot>) -> anyhow::Result<()> {
+pub async fn answer_common(msg: Message, _bot: AutoSend<Bot>) -> anyhow::Result<()> {
   let target = msg.chat_id();
   if !CONFIG.target_address_mapper.contains_key(&target) {
     return Ok(());

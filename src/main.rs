@@ -6,7 +6,7 @@ use mesagisto_client::MesagistoConfig;
 use teloxide::{prelude2::*, Bot};
 
 use bot::TG_BOT;
-use config::CONFIG;
+use crate::config::CONFIG;
 
 #[macro_use]
 extern crate educe;
@@ -64,7 +64,7 @@ async fn run() -> Result<(), anyhow::Error> {
     .apply()
     .await;
 
-  log::info!("Mesagisto-Bot正在启动");
+  log::info!("Mesagisto信使正在启动");
 
   let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config()).auto_send();
 
@@ -72,6 +72,6 @@ async fn run() -> Result<(), anyhow::Error> {
   dispatch::start(&TG_BOT).await;
 
   CONFIG.save();
-  log::info!("Mesagisto Bot is going to shut down");
+  log::info!("Mesagisto信使即将关闭");
   Ok(())
 }
