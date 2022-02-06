@@ -64,6 +64,7 @@ automatic-config = { rev = "ac1cd3ac1a225e8b7f1c80d55fe7e5ee34fad81d", git = "ht
 
 singleton = { git = "https://github.com/Itsusinn/singleton-rs.git", rev = "bee321c" }
 # singleton = { path = "/code/singleton-rs" }
-either = "1.6.1"
-# hex = "0.4"
-base64-url = "1.4.10"
+
+[profile.release]
+lto = true
+codegen-units = 1
