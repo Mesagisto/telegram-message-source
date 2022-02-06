@@ -7,9 +7,9 @@ edition = "2021"
 
 [dependencies]
 # bot
-teloxide ={ rev = "25f8634", default-features = false,features = ["frunk", "macros", "auto-send","ctrlc_handler","rustls","dispatching2"],git = "https://github.com/teloxide/teloxide.git"}
+teloxide = { version = "0.6.1", default-features = false,features = ["frunk", "macros", "auto-send","ctrlc_handler","rustls","dispatching2","nightly"] }
 teloxide-core = { version = "0.4.0", default-features = false, features = ["rustls","cache_me"] }
-teloxide-macros  = "0.4.1"
+teloxide-macros = "0.5.0"
 
 # logging
 tracing="0.1.29"
