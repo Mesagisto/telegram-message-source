@@ -17,7 +17,6 @@ pub struct Config {
 
   pub target_address_mapper: DashMap<i64, ArcStr>,
 }
-
 impl Config {
   pub fn mapper(&self, target: &i64) -> Option<ArcStr> {
     match self.target_address_mapper.get(target) {
@@ -59,21 +58,6 @@ pub struct CipherConfig {
 pub struct TelegramConfig {
   #[educe(Default = "BOT_TOKEN")]
   pub token: String,
-  #[educe(Default = "BOT_NAME")]
-  pub bot_name: String,
-  pub webhook: WebhookConfig,
-}
-
-#[basic_derive]
-pub struct WebhookConfig {
-  #[educe(Default = false)]
-  pub enable: bool,
-  #[educe(Default = false)]
-  pub heroku: bool,
-  #[educe(Default = 443)]
-  pub port: u16,
-  #[educe(Default = "heroku-app-name.herokuapp.com")]
-  pub host: String,
 }
 
 #[basic_derive]
