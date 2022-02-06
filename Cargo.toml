@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 # bot
-teloxide = { version = "0.6.1", default-features = false,features = ["frunk", "macros", "auto-send","ctrlc_handler","rustls","dispatching2","nightly"] }
+teloxide = { version = "0.6.1", default-features = false,features = ["macros", "auto-send","ctrlc_handler","rustls","dispatching2","nightly"] }
 teloxide-core = { version = "0.4.0", default-features = false, features = ["rustls","cache_me"] }
 teloxide-macros = "0.5.0"
 
@@ -59,8 +59,8 @@ sled = "0.34.7"
 nats = "0.17.0"
 mesagisto-client = { rev = "49e7c5", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git"}
 # mesagisto-client = { path = "../../mesagisto-client/rust" }
-automatic-config = { rev = "688afad", git = "https://github.com/Itsusinn/automatic-config-rs.git" }
-# automatic-config = { path = "/code/automatic-config-rs" }
+automatic-config = { rev = "ac1cd3ac1a225e8b7f1c80d55fe7e5ee34fad81d", git = "https://github.com/Itsusinn/automatic-config-rs.git" }
+#automatic-config = { path = "/code/automatic-config-rs" }
 
 singleton = { git = "https://github.com/Itsusinn/singleton-rs.git", rev = "bee321c" }
 # singleton = { path = "/code/singleton-rs" }

@@ -5,8 +5,8 @@ use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
 use teloxide::{prelude2::*, Bot};
 
-use bot::TG_BOT;
 use crate::config::CONFIG;
+use bot::TG_BOT;
 
 #[macro_use]
 extern crate educe;
