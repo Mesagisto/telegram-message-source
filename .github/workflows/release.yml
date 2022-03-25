@@ -20,11 +20,23 @@ jobs:
             target: x86_64-unknown-linux-musl
             release_name: linux-x86_64
             cross: true
+\
+          - os: ubuntu-latest
+            file: ./target/i686-unknown-linux-musl/release/${{ github.event.repository.name }}
+            target: i686-unknown-linux-musl
+            release_name: linux-i686
+            cross: true
 
           - os: windows-latest
             file: ./target/x86_64-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
             target: x86_64-pc-windows-msvc
             release_name: windows-x86_64.exe
+            cross: false
+
+          - os: windows-latest
+            file: ./target/i686-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
+            target: i686-pc-windows-msvc
+            release_name: windows-i686.exe
             cross: false
 
           - os: macos-latest
