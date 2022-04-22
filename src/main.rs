@@ -47,7 +47,7 @@ async fn run() -> Result<(), anyhow::Error> {
     .cipher_key(CONFIG.cipher.key.clone())
     .cipher_refuse_plain(CONFIG.cipher.refuse_plain)
     .nats_address(CONFIG.nats.address.clone())
-    .proxy(if CONFIG.proxy.enable_for_mesagisto {
+    .proxy(if CONFIG.proxy.enable && CONFIG.proxy.enable_for_mesagisto {
       Some(CONFIG.proxy.address.clone())
     } else {
       None
