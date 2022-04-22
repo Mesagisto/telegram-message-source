@@ -20,7 +20,7 @@ jobs:
             target: x86_64-unknown-linux-musl
             release_name: linux-x86_64
             cross: true
-\
+
           - os: ubuntu-latest
             file: ./target/i686-unknown-linux-musl/release/${{ github.event.repository.name }}
             target: i686-unknown-linux-musl
