@@ -1,18 +1,18 @@
 use crate::bot::TG_BOT;
 use crate::config::CONFIG;
 use crate::ext::db::DbExt;
-use crate::message::handlers::receive::receive_from_server;
 
+use arcstr::ArcStr;
 use mesagisto_client::data::message::{MessageType, Profile};
 use mesagisto_client::data::{message, Packet};
 use mesagisto_client::db::DB;
 use mesagisto_client::res::RES;
 use mesagisto_client::server::SERVER;
 use mesagisto_client::EitherExt;
-use teloxide::prelude2::*;
+use teloxide::prelude::*;
 
 pub async fn answer_common(msg: Message, _bot: AutoSend<Bot>) -> anyhow::Result<()> {
-  let target = msg.chat_id();
+  let target = msg.chat.id.0;
   if !CONFIG.target_address_mapper.contains_key(&target) {
     return Ok(());
   }
@@ -24,7 +24,7 @@ pub async fn answer_common(msg: Message, _bot: AutoSend<Bot>) -> anyhow::Result<
   };
   // let avatar = bot_client().get_user_profile_photos(sender.id).await?;
   let profile = Profile {
-    id: sender.id.to_be_bytes().into(),
+    id: sender.id.0.to_be_bytes().into(),
     username: sender.username.clone(),
     nick: Some(sender.full_name()),
   };
@@ -55,7 +55,7 @@ pub async fn answer_common(msg: Message, _bot: AutoSend<Bot>) -> anyhow::Result<
     }
     None => None,
   };
-  DB.put_msg_id_0(&msg.chat_id(), &msg.id, &msg.id)?;
+  DB.put_msg_id_0(&msg.chat.id.0, &msg.id, &msg.id)?;
   let message = message::Message {
     profile,
     id: msg.id.to_be_bytes().to_vec(),
@@ -64,13 +64,6 @@ pub async fn answer_common(msg: Message, _bot: AutoSend<Bot>) -> anyhow::Result<
   };
   let packet = Packet::from(message.tl())?;
 
-  SERVER
-    .send_and_receive(
-      target.to_be_bytes().to_vec(),
-      address,
-      packet,
-      receive_from_server,
-    )
-    .await?;
+  SERVER.send(&ArcStr::from(format!("tg_{}",target)),&address,packet,None).await?;
   Ok(())
 }

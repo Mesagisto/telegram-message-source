@@ -3,7 +3,7 @@
 
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
-use teloxide::{prelude2::*, Bot};
+use teloxide::{prelude::*, Bot};
 
 use crate::config::CONFIG;
 use bot::TG_BOT;

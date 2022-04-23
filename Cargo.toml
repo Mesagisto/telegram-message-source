@@ -7,9 +7,9 @@ edition = "2021"
 
 [dependencies]
 # bot
-teloxide = { version = "0.7.1", default-features = false,features = ["macros", "auto-send","ctrlc_handler","rustls","dispatching2","nightly"] }
-teloxide-core = { version = "0.4.3", default-features = false, features = ["rustls","cache_me"] }
-teloxide-macros = "0.5.0"
+teloxide = { version = "0.8.0", default-features = false,features = ["macros", "auto-send","ctrlc_handler","rustls","nightly"] }
+teloxide-core = { version = "0.5.1", default-features = false, features = ["rustls","cache_me"] }
+teloxide-macros = "0.6.0"
 
 # logging
 tracing="0.1.30"
@@ -22,8 +22,8 @@ serde_json = "1.0.68"
 serde_yaml = "0.8.21"
 
 # asynchronous
-tokio = { version =  "1.15.0",default-features = false,features = ["macros","signal"] }
-tokio-util = "0.7.0"
+tokio = { version =  "1.17.0",default-features = false,features = ["macros","signal"] }
+tokio-util = "0.7.1"
 tokio-stream = "0.1.8"
 futures = "0.3.21"
 
@@ -54,8 +54,8 @@ reqwest = { version = "0.11.9" ,default-features = false ,features = ["rustls","
 sled = "0.34.7"
 
 # mesagisto
-nats = "0.17.0"
-mesagisto-client = { rev = "49e7c5", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git"}
+nats = "0.19.0"
+mesagisto-client = { rev = "33bc09", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git"}
 # mesagisto-client = { path = "../../mesagisto-client/rust" }
 automatic-config = { rev = "ac1cd3ac1a225e8b7f1c80d55fe7e5ee34fad81d", git = "https://github.com/Itsusinn/automatic-config-rs.git" }
 #automatic-config = { path = "/code/automatic-config-rs" }

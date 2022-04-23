@@ -1,8 +1,10 @@
 use std::convert::TryInto;
 
+use crate::ext::TrimPrefix;
 use crate::ext::db::DbExt;
 use crate::CONFIG;
 use crate::TG_BOT;
+use arcstr::ArcStr;
 use mesagisto_client::db::DB;
 use mesagisto_client::{
   cache::CACHE,
@@ -11,13 +13,15 @@ use mesagisto_client::{
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::Requester;
 
+use teloxide::types::ChatId;
 use teloxide::types::InputFile;
 
 pub async fn receive_from_server(
   message: nats::asynk::Message,
-  target: Vec<u8>,
+  target: ArcStr,
 ) -> anyhow::Result<()> {
-  let target = i64::from_be_bytes(target.try_into().unwrap());
+  let target:i64 = target.trim_prefix("tg_").unwrap().parse()?;
+  // let target = i64::from_be_bytes(target.try_into().unwrap());
   log::trace!("接收到来自目标{}的消息", target);
   let packet = Packet::from_cbor(&message.data)?;
   match packet {
@@ -30,6 +34,7 @@ pub async fn receive_from_server(
 }
 
 pub async fn handle_receive_message(mut message: Message, target: i64) -> anyhow::Result<()> {
+  let chat_id = ChatId(target);
   for single in message.chain {
     log::trace!("正在处理消息链中的元素");
     let sender_name = if message.profile.nick.is_some() {
@@ -47,14 +52,14 @@ pub async fn handle_receive_message(mut message: Message, target: i64) -> anyhow
           match local_id {
             Some(local_id) => {
               TG_BOT
-                .send_message(target, content)
+                .send_message(chat_id, content)
                 .reply_to_message_id(local_id)
                 .await?
             }
-            None => TG_BOT.send_message(target, content).await?,
+            None => TG_BOT.send_message(chat_id, content).await?,
           }
         } else {
-          TG_BOT.send_message(target, content).await?
+          TG_BOT.send_message(chat_id, content).await?
         };
         DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
       }
@@ -62,10 +67,10 @@ pub async fn handle_receive_message(mut message: Message, target: i64) -> anyhow
         let channel = CONFIG.mapper(&target).expect("频道不存在");
         let path = CACHE.file(&id, &url, &channel).await?;
         let receipt = TG_BOT
-          .send_message(target, format!("{}:", sender_name))
+          .send_message(chat_id, format!("{}:", sender_name))
           .await?;
         DB.put_msg_id_ir_2(&target, &receipt.id, &message.id)?;
-        let receipt = TG_BOT.send_photo(target, InputFile::file(path)).await?;
+        let receipt = TG_BOT.send_photo(chat_id, InputFile::file(path)).await?;
         DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
       }
     }

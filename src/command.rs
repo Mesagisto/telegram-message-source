@@ -1,9 +1,9 @@
 use crate::config::CONFIG;
 
-use teloxide::prelude2::*;
-use teloxide::utils::command::BotCommand;
+use teloxide::prelude::*;
+use teloxide::utils::command::BotCommands;
 
-#[derive(BotCommand, Clone)]
+#[derive(BotCommands, Clone)]
 #[command(rename = "lowercase", description = "信使Bot支持以下命令")]
 pub enum Command {
   #[command(description = "显示命令帮助")]
@@ -19,8 +19,7 @@ impl Command {
   pub async fn answer(msg: Message, bot: AutoSend<Bot>, cmd: Command) -> anyhow::Result<()> {
     match cmd {
       Command::Help => {
-        let chat_id = msg.chat_id();
-        bot.send_message(chat_id, Command::descriptions()).await?;
+        bot.send_message(msg.chat.id, Command::descriptions().to_string()).await?;
       }
       // Command::Enable => {
       //   cx.answer("Mesagisto信使已启用").await?;
@@ -30,7 +29,7 @@ impl Command {
       // }
       Command::SetAddress { address } => {
         let sender_id = msg.from().unwrap().id;
-        let chat_id = msg.chat_id();
+        let chat_id = msg.chat.id;
         let admins = bot.get_chat_administrators(chat_id).await?;
         let mut is_admin = false;
         for admin in admins {
@@ -40,7 +39,7 @@ impl Command {
           }
         }
         if is_admin {
-          CONFIG.target_address_mapper.insert(chat_id, address.into());
+          CONFIG.target_address_mapper.insert(chat_id.0, address.into());
           bot
             .send_message(chat_id, "成功设置当前Group的信使地址")
             .await?;

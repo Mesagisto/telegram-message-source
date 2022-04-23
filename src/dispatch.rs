@@ -1,4 +1,4 @@
-use teloxide::prelude2::*;
+use teloxide::prelude::*;
 use tracing::info;
 
 use crate::{command::Command, message::handlers};
