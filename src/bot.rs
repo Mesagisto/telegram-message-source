@@ -1,17 +1,19 @@
 use std::ops::Deref;
 
-use crate::config::CONFIG;
+use crate::{config::CONFIG, command::Command};
 use arcstr::ArcStr;
 use mesagisto_client::{cache::CACHE, net::NET, res::RES, LateInit};
-use teloxide::{adaptors::AutoSend, prelude::Requester, types::File as TgFile, Bot};
+use teloxide::{adaptors::AutoSend, prelude::Requester, types::File as TgFile, Bot, utils::command::BotCommands};
 
 #[derive(Singleton, Default)]
 pub struct TgBot {
   inner: LateInit<AutoSend<Bot>>,
 }
 impl TgBot {
-  pub fn init(&self, bot: AutoSend<Bot>) {
-    self.inner.init(bot)
+  pub async fn init(&self, bot: AutoSend<Bot>) -> anyhow::Result<()> {
+    bot.set_my_commands(Command::bot_commands()).await?;
+    self.inner.init(bot);
+    Ok(())
   }
   // fixme use this-error
   pub async fn file(&self, uid: &Vec<u8>, id: &Vec<u8>) -> anyhow::Result<()> {
