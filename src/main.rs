@@ -41,6 +41,7 @@ async fn run() -> Result<(), anyhow::Error> {
     log::warn!("若要启用，请修改配置文件。");
     return Ok(());
   }
+  CONFIG.migrate();
   MesagistoConfig::builder()
     .name("tg")
     .cipher_enable(CONFIG.cipher.enable)

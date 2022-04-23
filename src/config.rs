@@ -14,15 +14,21 @@ pub struct Config {
   pub nats: NatsConfig,
   pub proxy: ProxyConfig,
   pub telegram: TelegramConfig,
-
-  pub target_address_mapper: DashMap<i64, ArcStr>,
+  pub bindings: DashMap<i64, ArcStr>,
+  target_address_mapper: DashMap<i64, ArcStr>,
 }
 impl Config {
   pub fn mapper(&self, target: &i64) -> Option<ArcStr> {
-    match self.target_address_mapper.get(target) {
+    match self.bindings.get(target) {
       Some(v) => return Some(v.clone()),
       None => return None,
     }
+  }
+  pub fn migrate(&self){
+    for pair in &self.target_address_mapper {
+      self.bindings.insert(pair.key().clone(), pair.value().clone());
+    }
+    self.target_address_mapper.clear();
   }
 }
 
