@@ -1,39 +1,58 @@
-use std::convert::TryInto;
-
-use crate::ext::TrimPrefix;
 use crate::ext::db::DbExt;
 use crate::CONFIG;
 use crate::TG_BOT;
 use arcstr::ArcStr;
-use mesagisto_client::db::DB;
 use mesagisto_client::{
+  db::DB,
+  server::SERVER,
   cache::CACHE,
   data::{message::Message, message::MessageType, Packet},
 };
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::Requester;
-
 use teloxide::types::ChatId;
 use teloxide::types::InputFile;
 
-pub async fn receive_from_server(
+pub async fn recover() -> anyhow::Result<()> {
+  for pair in &CONFIG.bindings {
+    SERVER.recv(
+      ArcStr::from(pair.key().to_string()),
+      pair.value(),
+      server_msg_handler
+    ).await?;
+  }
+  Ok(())
+}
+pub async fn add(target:i64,address: &ArcStr) -> anyhow::Result<()> {
+  SERVER.recv(
+    target.to_string().into(),
+    address,
+    server_msg_handler
+  ).await?;
+  Ok(())
+}
+pub async fn change(target:i64,address: &ArcStr) -> anyhow::Result<()> {
+  SERVER.unsub(&target.to_string().into()).await;
+  add(target, address).await?;
+  Ok(())
+}
+pub async fn server_msg_handler(
   message: nats::asynk::Message,
   target: ArcStr,
 ) -> anyhow::Result<()> {
-  let target:i64 = target.trim_prefix("tg_").unwrap().parse()?;
-  // let target = i64::from_be_bytes(target.try_into().unwrap());
+  let target:i64 = target.parse()?;
   log::trace!("接收到来自目标{}的消息", target);
   let packet = Packet::from_cbor(&message.data)?;
   match packet {
     either::Left(msg) => {
-      handle_receive_message(msg, target).await?;
+      left_sub_handler(msg, target).await?;
     }
     either::Right(_) => {}
   }
   Ok(())
 }
 
-pub async fn handle_receive_message(mut message: Message, target: i64) -> anyhow::Result<()> {
+async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<()> {
   let chat_id = ChatId(target);
   for single in message.chain {
     log::trace!("正在处理消息链中的元素");

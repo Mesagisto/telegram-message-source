@@ -6,6 +6,7 @@ use mesagisto_client::MesagistoConfig;
 use teloxide::{prelude::*, Bot};
 
 use crate::config::CONFIG;
+use self::message::handlers;
 use bot::TG_BOT;
 
 #[macro_use]
@@ -70,6 +71,8 @@ async fn run() -> Result<(), anyhow::Error> {
   let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config()).auto_send();
 
   TG_BOT.init(bot);
+
+  handlers::receive::recover().await?;
   dispatch::start(&TG_BOT).await;
 
   CONFIG.save();

@@ -1,5 +1,6 @@
 use crate::config::CONFIG;
-
+use crate::message::handlers;
+use arcstr::ArcStr;
 use teloxide::prelude::*;
 use teloxide::utils::command::BotCommands;
 
@@ -33,10 +34,24 @@ impl Command {
           }
         }
         if is_admin {
-          CONFIG.bindings.insert(chat_id.0, address.into());
-          bot
-            .send_message(chat_id, "成功设置当前Group的信使地址")
-            .await?;
+          match CONFIG.bindings.insert(chat_id.0, ArcStr::from(address.clone())) {
+            Some(_) => {
+              bot.send_message(
+                msg.chat.id,
+                format!("成功修改当前Group的信使地址为{}", address),
+              )
+              .await?;
+              handlers::receive::change(chat_id.0, &ArcStr::from(address)).await?;
+            }
+            None => {
+              bot.send_message(
+                msg.chat.id,
+                format!("成功设置当前Group的信使地址{}", address),
+              )
+              .await?;
+              handlers::receive::add(chat_id.0, &ArcStr::from(address)).await?;
+            }
+          }
         } else {
           bot
             .send_message(chat_id, "权限不足,拒绝设置信使频道")

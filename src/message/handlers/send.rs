@@ -13,10 +13,10 @@ use teloxide::prelude::*;
 
 pub async fn answer_common(msg: Message, _bot: AutoSend<Bot>) -> anyhow::Result<()> {
   let target = msg.chat.id.0;
-  if !CONFIG.target_address_mapper.contains_key(&target) {
+  if !CONFIG.bindings.contains_key(&target) {
     return Ok(());
   }
-  let address = CONFIG.target_address_mapper.get(&target).unwrap().clone();
+  let address = CONFIG.bindings.get(&target).unwrap().clone();
   let sender = match msg.from() {
     Some(v) => v,
     //fixme
@@ -64,6 +64,6 @@ pub async fn answer_common(msg: Message, _bot: AutoSend<Bot>) -> anyhow::Result<
   };
   let packet = Packet::from(message.tl())?;
 
-  SERVER.send(&ArcStr::from(format!("tg_{}",target)),&address,packet,None).await?;
+  SERVER.send(&ArcStr::from(target.to_string()),&address,packet,None).await?;
   Ok(())
 }
