@@ -36,6 +36,10 @@ pub async fn change(target:i64,address: &ArcStr) -> anyhow::Result<()> {
   add(target, address).await?;
   Ok(())
 }
+pub async fn del(target:i64) -> anyhow::Result<()> {
+  SERVER.unsub(&target.to_string().into()).await;
+  Ok(())
+}
 pub async fn server_msg_handler(
   message: nats::asynk::Message,
   target: ArcStr,

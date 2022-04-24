@@ -9,6 +9,8 @@ use teloxide::utils::command::BotCommands;
 pub enum Command {
   #[command(description = "关于本项目")]
   About,
+  #[command(description = "删除当前Group的转发地址")]
+  Del,
   #[command(description = "显示命令帮助")]
   Help,
   #[command(description = "显示状态")]
@@ -55,6 +57,41 @@ impl Command {
         } else {
           bot
             .send_message(chat_id, "权限不足,拒绝设置信使频道")
+            .await?;
+        }
+      }
+      Command::Del => {
+        let sender_id = msg.from().unwrap().id;
+        let chat_id = msg.chat.id;
+        let admins = bot.get_chat_administrators(chat_id).await?;
+        let mut is_admin = false;
+        for admin in admins {
+          if admin.user.id == sender_id {
+            is_admin = true;
+            break;
+          }
+        }
+        if is_admin {
+          match CONFIG.bindings.remove(&chat_id.0) {
+            Some(_) => {
+              bot.send_message(
+                msg.chat.id,
+                format!("成功删除当前Group的信使地址"),
+              )
+              .await?;
+              handlers::receive::del(chat_id.0).await?;
+            }
+            None => {
+              bot.send_message(
+                msg.chat.id,
+                format!("当前Group没有设置信使地址"),
+              )
+              .await?;
+            }
+          }
+        } else {
+          bot
+            .send_message(chat_id, "权限不足,拒绝删除信使频道")
             .await?;
         }
       }

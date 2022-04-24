@@ -28,7 +28,7 @@ async fn main() {
   run().await.unwrap();
 }
 #[allow(unused_must_use)]
-async fn run() -> Result<(), anyhow::Error> {
+async fn run() -> anyhow::Result<()> {
   let env = tracing_subscriber::EnvFilter::from("warn")
     .add_directive("teloxide=info".parse()?)
     .add_directive("telegram_message_source=info".parse()?)
@@ -43,6 +43,7 @@ async fn run() -> Result<(), anyhow::Error> {
     return Ok(());
   }
   CONFIG.migrate();
+
   MesagistoConfig::builder()
     .name("tg")
     .cipher_enable(CONFIG.cipher.enable)
@@ -65,12 +66,10 @@ async fn run() -> Result<(), anyhow::Error> {
     .build()
     .apply()
     .await;
-
   log::info!("Mesagisto信使正在启动");
 
   let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config()).auto_send();
-
-  TG_BOT.init(bot);
+  TG_BOT.init(bot).await?;
 
   handlers::receive::recover().await?;
   dispatch::start(&TG_BOT).await;
