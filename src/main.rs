@@ -32,13 +32,13 @@ async fn run() -> anyhow::Result<()> {
   let env = tracing_subscriber::EnvFilter::from("warn")
     .add_directive("teloxide=info".parse()?)
     .add_directive("telegram_message_source=info".parse()?)
-    .add_directive("mesagisto_client=info".parse()?);
+    .add_directive("mesagisto_client=trace".parse()?);
   tracing_subscriber::fmt().with_env_filter(env).init();
 
   if !CONFIG.enable {
     log::warn!("Mesagisto-Bot is not enabled and is about to exit the program.");
     log::warn!("To enable it, please modify the configuration file.");
-    log::warn!("Mesagisto-Bot未被启用，即将退出程序。");
+    log::warn!("Mesagisto-Bot未被启用, 即将退出程序。");
     log::warn!("若要启用，请修改配置文件。");
     return Ok(());
   }
