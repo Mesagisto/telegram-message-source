@@ -9,14 +9,14 @@ use teloxide::utils::command::BotCommands;
 pub enum Command {
   #[command(description = "关于本项目")]
   About,
-  #[command(description = "删除当前Group的转发地址")]
-  Del,
+  #[command(description = "解绑当前群组的转发地址")]
+  Unbind,
   #[command(description = "显示命令帮助")]
   Help,
   #[command(description = "显示状态")]
   Status,
-  #[command(description = "设置当前Group的转发地址", parse_with = "split")]
-  SetAddress { address: String },
+  #[command(description = "绑定当前群组的转发地址", parse_with = "split")]
+  Bind { address: String },
 }
 impl Command {
   pub async fn answer(msg: Message, bot: AutoSend<Bot>, cmd: Command) -> anyhow::Result<()> {
@@ -24,7 +24,7 @@ impl Command {
       Command::Help => {
         bot.send_message(msg.chat.id, Command::descriptions().to_string()).await?;
       }
-      Command::SetAddress { address } => {
+      Command::Bind { address } => {
         let sender_id = msg.from().unwrap().id;
         let chat_id = msg.chat.id;
         let admins = bot.get_chat_administrators(chat_id).await?;
@@ -40,7 +40,7 @@ impl Command {
             Some(_) => {
               bot.send_message(
                 msg.chat.id,
-                format!("成功修改当前Group的信使地址为{}", address),
+                format!("成功重新绑定当前群组的信使地址为{}", address),
               )
               .await?;
               handlers::receive::change(chat_id.0, &ArcStr::from(address)).await?;
@@ -48,7 +48,7 @@ impl Command {
             None => {
               bot.send_message(
                 msg.chat.id,
-                format!("成功设置当前Group的信使地址{}", address),
+                format!("成功绑定当前群组的信使地址{}", address),
               )
               .await?;
               handlers::receive::add(chat_id.0, &ArcStr::from(address)).await?;
@@ -60,7 +60,7 @@ impl Command {
             .await?;
         }
       }
-      Command::Del => {
+      Command::Unbind => {
         let sender_id = msg.from().unwrap().id;
         let chat_id = msg.chat.id;
         let admins = bot.get_chat_administrators(chat_id).await?;
@@ -76,7 +76,7 @@ impl Command {
             Some(_) => {
               bot.send_message(
                 msg.chat.id,
-                format!("成功删除当前Group的信使地址"),
+                format!("成功解绑当前群组的信使地址"),
               )
               .await?;
               handlers::receive::del(chat_id.0).await?;
@@ -84,14 +84,14 @@ impl Command {
             None => {
               bot.send_message(
                 msg.chat.id,
-                format!("当前Group没有设置信使地址"),
+                format!("当前群组没有设置信使地址"),
               )
               .await?;
             }
           }
         } else {
           bot
-            .send_message(chat_id, "权限不足,拒绝删除信使频道")
+            .send_message(chat_id, "权限不足,拒绝解绑信使频道")
             .await?;
         }
       }
