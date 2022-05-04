@@ -43,8 +43,6 @@ pub struct NatsConfig {
 pub struct ProxyConfig {
   #[educe(Default = false)]
   pub enable: bool,
-  #[educe(Default = true)]
-  pub enable_for_mesagisto: bool,
   // pattern: "http://{username}:{password}@{host}:{port}"
   #[educe(Default = "http://127.0.0.1:7890")]
   pub address: ArcStr,
