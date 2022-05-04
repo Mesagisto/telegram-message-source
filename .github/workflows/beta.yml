@@ -1,9 +1,12 @@
-name: release
+name: beta
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [ master ]
+    paths-ignore: [ '*.md' ]
+  pull_request:
+    branches: [ master ]
+    paths-ignore: [ '*.md' ]
 
 env:
   SHORT_NAME: tg
@@ -130,7 +133,9 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Beta Build"
           files: |
             packages/*
             LICENSE
