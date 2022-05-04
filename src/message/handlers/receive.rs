@@ -58,15 +58,15 @@ pub async fn server_msg_handler(
 
 async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<()> {
   let chat_id = ChatId(target);
+  let sender_name = if message.profile.nick.is_some() {
+    message.profile.nick.take().unwrap()
+  } else if message.profile.username.is_some() {
+    message.profile.username.take().unwrap()
+  } else {
+    base64_url::encode(&message.profile.id)
+  };
   for single in message.chain {
     log::trace!("正在处理消息链中的元素");
-    let sender_name = if message.profile.nick.is_some() {
-      message.profile.nick.take().unwrap()
-    } else if message.profile.username.is_some() {
-      message.profile.username.take().unwrap()
-    } else {
-      base64_url::encode(&message.profile.id)
-    };
     match single {
       MessageType::Text { content } => {
         let content = format!("{}:\n{}", sender_name, content);
