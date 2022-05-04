@@ -18,36 +18,56 @@ jobs:
           - os: ubuntu-latest
             file: ./target/x86_64-unknown-linux-musl/release/${{ github.event.repository.name }}
             target: x86_64-unknown-linux-musl
+            extra_args:
             release_name: linux-x86_64
             cross: true
 
           - os: ubuntu-latest
             file: ./target/i686-unknown-linux-musl/release/${{ github.event.repository.name }}
             target: i686-unknown-linux-musl
+            extra_args:
             release_name: linux-i686
             cross: true
 
           - os: ubuntu-latest
             file: ./target/aarch64-unknown-linux-gnu/release/${{ github.event.repository.name }}
             target: aarch64-unknown-linux-gnu
+            extra_args:
             release_name: linux-aarch64
             cross: true
 
           - os: windows-latest
             file: ./target/x86_64-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
             target: x86_64-pc-windows-msvc
+            extra_args: --no-default-features --features no-color
+            release_name: windows-x86_64-no_color.exe
+            cross: false
+
+          - os: windows-latest
+            file: ./target/i686-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
+            target: i686-pc-windows-msvc
+            extra_args: --no-default-features --features no-color
+            release_name: windows-i686-no_color.exe
+            cross: false
+
+          - os: windows-latest
+            file: ./target/x86_64-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
+            target: x86_64-pc-windows-msvc
+            extra_args:
             release_name: windows-x86_64.exe
             cross: false
 
           - os: windows-latest
             file: ./target/i686-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
             target: i686-pc-windows-msvc
+            extra_args:
             release_name: windows-i686.exe
             cross: false
 
           - os: macos-latest
             file: ./target/x86_64-apple-darwin/release/${{ github.event.repository.name }}
             target: x86_64-apple-darwin
+            extra_args:
             release_name: mac-x86_64
             cross: false
 
@@ -77,7 +97,7 @@ jobs:
         with:
           use-cross: ${{ matrix.cross }}
           command: build
-          args: --release --target ${{ matrix.target }}
+          args: --release --target ${{ matrix.target }} ${{ matrix.extra_args }}
 
       - name: Rename binary
         run: mv ${{ matrix.file }} ${{ env.SHORT_NAME }}-${{ matrix.release_name }}

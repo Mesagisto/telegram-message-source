@@ -4,6 +4,7 @@
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
 use teloxide::{prelude::*, Bot};
+use tracing::{warn, info};
 
 use crate::config::CONFIG;
 use self::message::handlers;
@@ -36,10 +37,10 @@ async fn run() -> anyhow::Result<()> {
   tracing_subscriber::fmt().with_env_filter(env).init();
 
   if !CONFIG.enable {
-    log::warn!("Mesagisto-Bot is not enabled and is about to exit the program.");
-    log::warn!("To enable it, please modify the configuration file.");
-    log::warn!("Mesagisto-Bot未被启用, 即将退出程序。");
-    log::warn!("若要启用，请修改配置文件。");
+    warn!("Mesagisto-Bot is not enabled and is about to exit the program.");
+    warn!("To enable it, please modify the configuration file.");
+    warn!("Mesagisto-Bot未被启用, 即将退出程序。");
+    warn!("若要启用，请修改配置文件。");
     return Ok(());
   }
   CONFIG.migrate();
@@ -66,7 +67,7 @@ async fn run() -> anyhow::Result<()> {
     .build()
     .apply()
     .await;
-  log::info!("Mesagisto信使正在启动");
+  info!("Mesagisto信使正在启动");
 
   let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config()).auto_send();
   TG_BOT.init(bot).await?;
