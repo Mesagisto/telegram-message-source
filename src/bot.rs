@@ -3,14 +3,16 @@ use std::ops::Deref;
 use crate::{config::CONFIG, command::Command};
 use arcstr::ArcStr;
 use mesagisto_client::{cache::CACHE, net::NET, res::RES, LateInit};
-use teloxide::{adaptors::AutoSend, prelude::Requester, types::File as TgFile, Bot, utils::command::BotCommands};
+use teloxide::{adaptors::{AutoSend, DefaultParseMode}, prelude::Requester, types::File as TgFile, Bot, utils::command::BotCommands};
+
+pub type BotRequester = AutoSend<DefaultParseMode<Bot>>;
 
 #[derive(Singleton, Default)]
 pub struct TgBot {
-  inner: LateInit<AutoSend<Bot>>,
+  inner: LateInit<BotRequester>,
 }
 impl TgBot {
-  pub async fn init(&self, bot: AutoSend<Bot>) -> anyhow::Result<()> {
+  pub async fn init(&self, bot: BotRequester) -> anyhow::Result<()> {
     bot.set_my_commands(Command::bot_commands()).await?;
     self.inner.init(bot);
     Ok(())
@@ -38,7 +40,7 @@ impl TgBot {
   }
 }
 impl Deref for TgBot {
-  type Target = AutoSend<Bot>;
+  type Target = BotRequester;
   fn deref(&self) -> &Self::Target {
     &self.inner
   }

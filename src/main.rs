@@ -3,7 +3,7 @@
 
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
-use teloxide::{prelude::*, Bot};
+use teloxide::{prelude::*, Bot, types::ParseMode};
 use tracing::{warn, info};
 
 use crate::config::CONFIG;
@@ -69,7 +69,10 @@ async fn run() -> anyhow::Result<()> {
     .await;
   info!("Mesagisto信使正在启动");
 
-  let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config()).auto_send();
+  let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config())
+    .parse_mode(ParseMode::MarkdownV2)
+    .auto_send();
+
   TG_BOT.init(bot).await?;
 
   handlers::receive::recover().await?;

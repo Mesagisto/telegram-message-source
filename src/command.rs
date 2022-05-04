@@ -1,3 +1,4 @@
+use crate::bot::BotRequester;
 use crate::config::CONFIG;
 use crate::message::handlers;
 use arcstr::ArcStr;
@@ -19,7 +20,7 @@ pub enum Command {
   Bind { address: String },
 }
 impl Command {
-  pub async fn answer(msg: Message, bot: AutoSend<Bot>, cmd: Command) -> anyhow::Result<()> {
+  pub async fn answer(msg: Message, bot: BotRequester, cmd: Command) -> anyhow::Result<()> {
     match cmd {
       Command::Help => {
         bot.send_message(msg.chat.id, Command::descriptions().to_string()).await?;

@@ -1,4 +1,4 @@
-use crate::bot::TG_BOT;
+use crate::bot::{TG_BOT, BotRequester};
 use crate::config::CONFIG;
 use crate::ext::db::DbExt;
 
@@ -11,7 +11,7 @@ use mesagisto_client::server::SERVER;
 use mesagisto_client::EitherExt;
 use teloxide::prelude::*;
 
-pub async fn answer_common(msg: Message, _bot: AutoSend<Bot>) -> anyhow::Result<()> {
+pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<()> {
   let target = msg.chat.id.0;
   if !CONFIG.bindings.contains_key(&target) {
     return Ok(());

@@ -2,8 +2,9 @@ use teloxide::prelude::*;
 use tracing::info;
 
 use crate::{command::Command, message::handlers};
+use crate::bot::BotRequester;
 
-pub async fn start(bot: &AutoSend<Bot>) {
+pub async fn start(bot: &BotRequester) {
   let handler = Update::filter_message()
     .branch(
       dptree::entry()
