@@ -12,6 +12,7 @@ use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::Requester;
 use teloxide::types::ChatId;
 use teloxide::types::InputFile;
+use teloxide::utils::markdown;
 
 pub async fn recover() -> anyhow::Result<()> {
   for pair in &CONFIG.bindings {
@@ -69,8 +70,7 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
     log::trace!("正在处理消息链中的元素");
     match single {
       MessageType::Text { content } => {
-        let content = format!("*{}*:\n{}", sender_name, content);
-        let content = teloxide::utils::markdown::escape(&content.as_str());
+        let content = format!("*{}*:\n{}", sender_name, markdown::escape(&content.as_str()));
         let receipt = if let Some(reply_to) = &message.reply {
           let local_id = DB.get_msg_id_1(&target, reply_to)?;
           match local_id {
