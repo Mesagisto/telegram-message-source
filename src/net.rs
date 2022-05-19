@@ -1,13 +1,12 @@
 use std::time::Duration;
 
 fn default_reqwest_settings() -> reqwest::ClientBuilder {
-  let connect_timeout = Duration::from_secs(10);
-  let timeout = connect_timeout + Duration::from_secs(24);
-
   reqwest::Client::builder()
-    .connect_timeout(connect_timeout)
-    .timeout(timeout)
+    .connect_timeout(Duration::from_secs(5))
+    .timeout(Duration::from_secs(17))
+    .tcp_nodelay(true)
 }
+// TODO noproxy
 pub fn client_from_config() -> reqwest::Client {
   use crate::config::CONFIG;
   let builder = default_reqwest_settings().use_rustls_tls();
