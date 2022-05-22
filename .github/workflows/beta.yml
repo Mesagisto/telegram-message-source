@@ -2,10 +2,10 @@ name: beta
 
 on:
   push:
-    branches: [ master, shield ]
+    branches: [ master, shield, waterpr ]
     paths-ignore: [ '*.md' ]
   pull_request:
-    branches: [ master, shield ]
+    branches: [ master, shield, waterpr ]
     paths-ignore: [ '*.md' ]
 
 env:
