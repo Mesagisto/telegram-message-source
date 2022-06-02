@@ -4,7 +4,8 @@
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
 use teloxide::{prelude::*, Bot, types::ParseMode};
-use tracing::{warn, info};
+use tracing::{warn, info, Level};
+use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt};
 
 use crate::config::CONFIG;
 use self::message::handlers;
@@ -30,11 +31,27 @@ async fn main() {
 }
 #[allow(unused_must_use)]
 async fn run() -> anyhow::Result<()> {
-  let env = tracing_subscriber::EnvFilter::from("warn")
-    .add_directive("teloxide=info".parse()?)
-    .add_directive("telegram_message_source=info".parse()?)
-    .add_directive("mesagisto_client=trace".parse()?);
-  tracing_subscriber::fmt().with_env_filter(env).init();
+
+  tracing_subscriber::registry()
+  .with(
+    tracing_subscriber::fmt::layer()
+      .with_target(true)
+      .with_timer(tracing_subscriber::fmt::time::OffsetTime::new(
+        // use local time
+        time::UtcOffset::__from_hms_unchecked(8, 0, 0),
+        time::macros::format_description!(
+          "[year repr:last_two]-[month]-[day] [hour]:[minute]:[second]"
+        ),
+      )),
+  )
+  .with(
+    tracing_subscriber::filter::Targets::new()
+      .with_target("teloxide", Level::INFO)
+      .with_target("telegram_message_source", Level::INFO)
+      .with_target("mesagisto_client", Level::TRACE)
+      .with_default(Level::WARN),
+  )
+  .init();
 
   if !CONFIG.enable {
     warn!("Mesagisto-Bot is not enabled and is about to exit the program.");
