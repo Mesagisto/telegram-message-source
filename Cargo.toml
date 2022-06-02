@@ -12,56 +12,56 @@ color = ["tracing-subscriber/ansi"]
 
 [dependencies]
 # bot
-teloxide = { version = "0.8.0", default-features = false,features = ["macros", "auto-send","ctrlc_handler","rustls","nightly"] }
+teloxide = { version = "0.9.1", default-features = false, features = ["macros", "auto-send","ctrlc_handler","rustls","nightly"] }
 teloxide-core = { version = "0.6.0", default-features = false, features = ["rustls","cache_me"] }
-teloxide-macros = "0.6.0"
+teloxide-macros = "0.6.2"
 
 # logging
-tracing = "0.1.30"
-tracing-subscriber = { version = "0.3.11", default-features = false,features = ["env-filter", "tracing-log", "std", "fmt", "local-time"]}
-log = "0.4.14"
+tracing = "0.1.34"
+tracing-subscriber = { version = "0.3.11", default-features = false, features = ["env-filter", "tracing-log", "std", "fmt", "local-time"] }
+log = "0.4.17"
 colored = "2.0.0"
 
 # serialization
-serde = { version = "1.0.130",default-features = false,features = ["derive","rc"] }
-serde_json = "1.0.68"
-serde_yaml = "0.8.21"
+serde = { version = "1.0.137", default-features = false, features = ["derive","rc"] }
+serde_json = "1.0.81"
+serde_yaml = "0.8.24"
 
 # asynchronous
-tokio = { version =  "1.17.0",default-features = false,features = ["macros","signal"] }
-tokio-util = "0.7.1"
+tokio = { version = "1.18.2", default-features = false, features = ["macros","signal"] }
+tokio-util = "0.7.2"
 tokio-stream = "0.1.8"
 futures = "0.3.21"
 
 # error handling
-thiserror = "1.0.30"
-anyhow = "1.0.44"
+thiserror = "1.0.31"
+anyhow = "1.0.57"
 
 # encoding and decoding
-base64-url = "1.4.10"
+base64-url = "1.4.13"
 # hex = "0.4"
 
 # crypto
-aes-gcm = { version = "0.9.4", features = ["std"]}
+aes-gcm = { version = "0.9.4", features = ["std"] }
 
 # tools
-dashmap = { version = "5.1.0", features = ["serde"] }
-once_cell = "1.8.0"
-educe = { version = "0.4.18", default-features = false, features = ["Default"]}
+dashmap = { version = "5.3.4", features = ["serde"] }
+once_cell = "1.12.0"
+educe = { version = "0.4.19", default-features = false, features = ["Default"] }
 arcstr = { version = "1.1.3", features = ["serde"] }
 yaml-rust = "0.4.5"
 linked-hash-map = "0.5.4"
 either = "1.6.1"
 
 # http
-reqwest = { version = "0.11.10" ,default-features = false ,features = ["rustls","rustls-tls-native-roots","stream","multipart"] }
+reqwest = { version = "0.11.10", default-features = false, features = ["rustls","rustls-tls-native-roots","stream","multipart"] }
 
 # database
 sled = "0.34.7"
 
 # mesagisto
-nats = "0.19.0"
-mesagisto-client = { rev = "33bc09", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git"}
+nats = "0.20.1"
+mesagisto-client = { rev = "b4ec52a", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git"}
 # mesagisto-client = { path = "../../mesagisto-client/rust" }
 automatic-config = { rev = "ac1cd3ac1a225e8b7f1c80d55fe7e5ee34fad81d", git = "https://github.com/Itsusinn/automatic-config-rs.git" }
 #automatic-config = { path = "/code/automatic-config-rs" }
