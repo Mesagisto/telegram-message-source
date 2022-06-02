@@ -82,7 +82,6 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
           key: ${{ matrix.target }}-release-${{ hashFiles('**/Cargo.toml') }}
           restore-keys: |
             ${{ matrix.target }}-release
