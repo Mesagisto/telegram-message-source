@@ -92,7 +92,7 @@ async fn run() -> anyhow::Result<()> {
 
   TG_BOT.init(bot).await?;
 
-  handlers::receive::recover().await?;
+  handlers::receive::recover()?;
   dispatch::start(&TG_BOT).await;
 
   CONFIG.save();

@@ -44,7 +44,7 @@ impl Command {
                 format!("成功重新绑定当前群组的信使地址为{}", address),
               )
               .await?;
-              handlers::receive::change(chat_id.0, &ArcStr::from(address)).await?;
+              handlers::receive::change(chat_id.0, &ArcStr::from(address))?;
             }
             None => {
               bot.send_message(
@@ -52,7 +52,7 @@ impl Command {
                 format!("成功绑定当前群组的信使地址{}", address),
               )
               .await?;
-              handlers::receive::add(chat_id.0, &ArcStr::from(address)).await?;
+              handlers::receive::add(chat_id.0, &ArcStr::from(address))?;
             }
           }
         } else {
@@ -80,7 +80,7 @@ impl Command {
                 format!("成功解绑当前群组的信使地址"),
               )
               .await?;
-              handlers::receive::del(chat_id.0).await?;
+              handlers::receive::del(chat_id.0)?;
             }
             None => {
               bot.send_message(

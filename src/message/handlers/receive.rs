@@ -40,21 +40,18 @@ pub fn recover() -> anyhow::Result<()> {
   CHANNEL.init(tx);
   Ok(())
 }
-pub async fn add(target:i64,address: &ArcStr) -> anyhow::Result<()> {
-  SERVER.recv(
+
+pub fn add(target:i64,address: &ArcStr) -> anyhow::Result<()> {
   CHANNEL.send((target,address.clone()))?;
-    address,
-    server_msg_handler
-  ).await?;
   Ok(())
 }
-pub async fn change(target:i64,address: &ArcStr) -> anyhow::Result<()> {
-  SERVER.unsub(&target.to_string().into()).await;
-  add(target, address).await?;
+pub fn change(target:i64,address: &ArcStr) -> anyhow::Result<()> {
+  SERVER.unsub(&target.to_string().into());
+  add(target, address)?;
   Ok(())
 }
-pub async fn del(target:i64) -> anyhow::Result<()> {
-  SERVER.unsub(&target.to_string().into()).await;
+pub fn del(target:i64) -> anyhow::Result<()> {
+  SERVER.unsub(&target.to_string().into());
   Ok(())
 }
 pub async fn server_msg_handler(
