@@ -10,13 +10,14 @@ pub struct Config {
   #[educe(Default = false)]
   pub enable: bool,
   // A-z order
+  pub bindings: DashMap<i64, ArcStr>,
   pub cipher: CipherConfig,
   pub nats: NatsConfig,
   pub proxy: ProxyConfig,
   pub telegram: TelegramConfig,
-  pub bindings: DashMap<i64, ArcStr>,
   target_address_mapper: DashMap<i64, ArcStr>,
 }
+
 impl Config {
   pub fn mapper(&self, target: &i64) -> Option<ArcStr> {
     match self.bindings.get(target) {
@@ -29,6 +30,13 @@ impl Config {
       self.bindings.insert(pair.key().clone(), pair.value().clone());
     }
     self.target_address_mapper.clear();
+  }
+  pub fn migrate_chat(&self, old_chat_id: &i64, new_chat_id: &i64)->Option<ArcStr>{
+    if let Some((_,address)) = self.bindings.remove(&old_chat_id){
+      self.bindings.insert(*new_chat_id, address.clone());
+      return Some(address);
+    };
+    return None;
   }
 }
 

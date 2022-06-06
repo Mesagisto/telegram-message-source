@@ -2,31 +2,47 @@ use crate::ext::db::DbExt;
 use crate::CONFIG;
 use crate::TG_BOT;
 use arcstr::ArcStr;
+use mesagisto_client::LateInit;
 use mesagisto_client::{
   db::DB,
   server::SERVER,
   cache::CACHE,
   data::{message::Message, message::MessageType, Packet},
 };
-use teloxide::payloads::SendMessageSetters;
-use teloxide::prelude::Requester;
 use teloxide::types::ChatId;
 use teloxide::types::InputFile;
 use teloxide::utils::markdown;
+use tokio::sync::mpsc::UnboundedSender;
+use tracing::error;
 
-pub async fn recover() -> anyhow::Result<()> {
+static CHANNEL: LateInit<UnboundedSender<(i64, ArcStr)>> = LateInit::new();
+
+pub fn recover() -> anyhow::Result<()> {
+  let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<(i64,ArcStr)>();
+  tokio::spawn(async move {
+    for element in rx.recv().await {
+      let res = SERVER.recv(
+        ArcStr::from(element.0.to_string()),
+        &element.1,
+        server_msg_handler
+      ).await;
+      match res {
+        Ok(_) => {},
+        Err(e) => {
+          error!("error when add callback handler {}\n{}",e,e.backtrace());
+        }
+      }
+    };
+  });
   for pair in &CONFIG.bindings {
-    SERVER.recv(
-      ArcStr::from(pair.key().to_string()),
-      pair.value(),
-      server_msg_handler
-    ).await?;
+    tx.send((pair.key().to_owned(),pair.value().clone()))?;
   }
+  CHANNEL.init(tx);
   Ok(())
 }
 pub async fn add(target:i64,address: &ArcStr) -> anyhow::Result<()> {
   SERVER.recv(
-    target.to_string().into(),
+  CHANNEL.send((target,address.clone()))?;
     address,
     server_msg_handler
   ).await?;
@@ -73,28 +89,23 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
         let content = format!("*{}*:\n{}", markdown::escape(&sender_name.as_str()), markdown::escape(&content.as_str()));
         let receipt = if let Some(reply_to) = &message.reply {
           let local_id = DB.get_msg_id_1(&target, reply_to)?;
-          match local_id {
-            Some(local_id) => {
-              TG_BOT
-                .send_message(chat_id, content)
-                .reply_to_message_id(local_id)
-                .await?
-            }
-            None => TG_BOT.send_message(chat_id, content).await?,
-          }
+          TG_BOT.send_text(chat_id, content,local_id).await?
         } else {
-          TG_BOT.send_message(chat_id, content).await?
+          TG_BOT.send_text(chat_id, content,None).await?
         };
         DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
       }
       MessageType::Image { id, url } => {
         let channel = CONFIG.mapper(&target).expect("频道不存在");
         let path = CACHE.file(&id, &url, &channel).await?;
-        let receipt = TG_BOT
-          .send_message(chat_id, format!("*{}*:", sender_name))
-          .await?;
+        let receipt = TG_BOT.send_text(chat_id, format!("*{}*:", sender_name),None).await?;
         DB.put_msg_id_ir_2(&target, &receipt.id, &message.id)?;
-        let receipt = TG_BOT.send_photo(chat_id, InputFile::file(path)).await?;
+        let receipt = if let Some(reply_to) = &message.reply {
+          let local_id = DB.get_msg_id_1(&target, reply_to)?;
+          TG_BOT.send_image(chat_id, InputFile::file(path), local_id).await?
+        } else {
+          TG_BOT.send_image(chat_id, InputFile::file(path), None).await?
+        };
         DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
       }
     }
