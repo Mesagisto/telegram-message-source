@@ -22,6 +22,9 @@ pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<(
     //fixme
     None => return Ok(()),
   };
+  if sender.is_bot {
+    return Ok(());
+  }
   // let avatar = bot_client().get_user_profile_photos(sender.id).await?;
   let profile = Profile {
     id: sender.id.0.to_be_bytes().into(),
