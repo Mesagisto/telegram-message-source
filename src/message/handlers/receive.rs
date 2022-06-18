@@ -95,7 +95,7 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
       MessageType::Image { id, url } => {
         let channel = CONFIG.mapper(&target).expect("频道不存在");
         let path = CACHE.file(&id, &url, &channel).await?;
-        let receipt = TG_BOT.send_text(chat_id, format!("*{}*:", sender_name),None).await?;
+        let receipt = TG_BOT.send_text(chat_id, format!("*{}*:", markdown::escape(&sender_name.as_str())),None).await?;
         DB.put_msg_id_ir_2(&target, &receipt.id, &message.id)?;
         let receipt = if let Some(reply_to) = &message.reply {
           let local_id = DB.get_msg_id_1(&target, reply_to)?;
