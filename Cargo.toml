@@ -32,6 +32,7 @@ tokio = { version = "1.18.2", default-features = false, features = ["macros","si
 tokio-util = "0.7.2"
 tokio-stream = "0.1.8"
 futures = "0.3.21"
+async-trait = "0.1.53"
 
 # error handling
 thiserror = "1.0.31"
@@ -62,12 +63,12 @@ sled = "0.34.7"
 
 # mesagisto
 nats = "0.20.1"
-mesagisto-client = { rev = "ccc12b", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git"}
+mesagisto-client = { branch = "master", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git"}
 # mesagisto-client = { path = "../../mesagisto-client/rust" }
-automatic-config = { rev = "ac1cd3ac1a225e8b7f1c80d55fe7e5ee34fad81d", git = "https://github.com/Itsusinn/automatic-config-rs.git" }
+automatic-config = { branch = "master", git = "https://github.com/Itsusinn/automatic-config-rs.git" }
 #automatic-config = { path = "/code/automatic-config-rs" }
 
-singleton = { git = "https://github.com/Itsusinn/singleton-rs.git", rev = "bee321c" }
+singleton = { branch="master", git = "https://github.com/Itsusinn/singleton-rs.git" }
 # singleton = { path = "/code/singleton-rs" }
 
 [profile.release]
