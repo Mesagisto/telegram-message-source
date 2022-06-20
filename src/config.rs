@@ -45,7 +45,7 @@ impl Config {
 #[basic_derive]
 pub struct NatsConfig {
   // pattern: "nats://{host}:{port}"
-  #[educe(Default = "nats://itsusinn.site:4222")]
+  #[educe(Default = "nats://nats.mesagisto.org:4222")]
   pub address: ArcStr,
 }
 
