@@ -60,9 +60,17 @@ pub async fn server_msg_handler(
   message: nats::asynk::Message,
   target: ArcStr,
 ) -> anyhow::Result<()> {
-  let target:i64 = target.parse()?;
+  let target: i64 = target.parse()?;
   log::trace!("接收到来自目标{}的消息", target);
-  let packet = Packet::from_cbor(&message.data)?;
+  let packet = Packet::from_cbor(&message.data);
+  let packet = match packet {
+    Ok(v) => v,
+    Err(_e) => {
+      //todo logging
+      tracing::warn!("未知的数据包类型，请更新本消息源，若已是最新请等待适配");
+      return Ok(());
+    }
+  };
   match packet {
     either::Left(msg) => {
       left_sub_handler(msg, target).await?;
