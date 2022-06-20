@@ -1,4 +1,4 @@
-use crate::bot::{TG_BOT, BotRequester};
+use crate::bot::{BotRequester, TG_BOT};
 use crate::config::CONFIG;
 use crate::ext::db::DbExt;
 
@@ -67,6 +67,8 @@ pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<(
   };
   let packet = Packet::from(message.tl())?;
 
-  SERVER.send(&ArcStr::from(target.to_string()),&address,packet,None).await?;
+  SERVER
+    .send(&ArcStr::from(target.to_string()), &address, packet, None)
+    .await?;
   Ok(())
 }

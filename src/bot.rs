@@ -1,11 +1,18 @@
-use std::ops::Deref;
-use teloxide_core::types::ChatId;
-use tracing::warn;
-use crate::{config::CONFIG, command::Command };
+use crate::message::handlers;
+use crate::{command::Command, config::CONFIG};
 use arcstr::ArcStr;
 use mesagisto_client::{cache::CACHE, net::NET, res::RES, LateInit};
-use teloxide::{adaptors::{AutoSend, DefaultParseMode}, prelude::Requester, types::{File as TgFile, InputFile}, Bot, utils::command::BotCommands, payloads::{SendMessageSetters, SendPhotoSetters}};
-use crate::message::handlers;
+use std::ops::Deref;
+use teloxide::{
+  adaptors::{AutoSend, DefaultParseMode},
+  payloads::{SendMessageSetters, SendPhotoSetters},
+  prelude::Requester,
+  types::{File as TgFile, InputFile},
+  utils::command::BotCommands,
+  Bot,
+};
+use teloxide_core::types::ChatId;
+use tracing::warn;
 pub type BotRequester = AutoSend<DefaultParseMode<Bot>>;
 
 #[derive(Singleton, Default)]
@@ -41,14 +48,17 @@ impl TgBot {
   }
   pub async fn send_text<T>(
     &self,
-    chat_id:ChatId,
+    chat_id: ChatId,
     text: T,
-    reply:Option<i32>
-  ) -> anyhow::Result<teloxide::types::Message> where T:Into<String> + Clone{
+    reply: Option<i32>,
+  ) -> anyhow::Result<teloxide::types::Message>
+  where
+    T: Into<String> + Clone,
+  {
     let send = self.inner.send_message(chat_id, text.clone());
     let send = if let Some(reply) = reply {
       send.reply_to_message_id(reply)
-    }else {
+    } else {
       send
     };
     match send.await {
@@ -56,8 +66,8 @@ impl TgBot {
       Err(e) => match e {
         teloxide::RequestError::MigrateToChatId(new_id) => {
           let target = chat_id.0;
-          warn!("Chat migrated from {} to {}",target,new_id);
-          if let Some(address) = CONFIG.migrate_chat(&target, &new_id){
+          warn!("Chat migrated from {} to {}", target, new_id);
+          if let Some(address) = CONFIG.migrate_chat(&target, &new_id) {
             handlers::receive::del(target)?;
             handlers::receive::add(new_id, &address)?;
             let send = TG_BOT.send_message(ChatId(new_id), text.clone());
@@ -68,23 +78,23 @@ impl TgBot {
             };
             return Ok(receipt);
           } else {
-            return Err(e.into())
+            return Err(e.into());
           }
-        },
+        }
         _ => return Err(e.into()),
       },
     }
   }
   pub async fn send_image(
     &self,
-    chat_id :ChatId,
+    chat_id: ChatId,
     photo: InputFile,
-    reply:Option<i32>
+    reply: Option<i32>,
   ) -> anyhow::Result<teloxide::types::Message> {
     let send = self.inner.send_photo(chat_id, photo.clone());
     let send = if let Some(reply) = reply {
       send.reply_to_message_id(reply)
-    }else {
+    } else {
       send
     };
     match send.await {
@@ -92,8 +102,8 @@ impl TgBot {
       Err(e) => match e {
         teloxide::RequestError::MigrateToChatId(new_id) => {
           let target = chat_id.0;
-          warn!("Chat migrated from {} to {}",target,new_id);
-          if let Some(address) = CONFIG.migrate_chat(&target, &new_id){
+          warn!("Chat migrated from {} to {}", target, new_id);
+          if let Some(address) = CONFIG.migrate_chat(&target, &new_id) {
             handlers::receive::del(target)?;
             handlers::receive::add(new_id, &address)?;
             let send = TG_BOT.send_photo(ChatId(new_id), photo);
@@ -104,14 +114,13 @@ impl TgBot {
             };
             return Ok(receipt);
           } else {
-            return Err(e.into())
+            return Err(e.into());
           }
-        },
+        }
         _ => return Err(e.into()),
       },
     }
   }
-
 }
 
 impl Deref for TgBot {

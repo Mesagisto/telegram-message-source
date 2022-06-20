@@ -25,14 +25,16 @@ impl Config {
       None => return None,
     }
   }
-  pub fn migrate(&self){
+  pub fn migrate(&self) {
     for pair in &self.target_address_mapper {
-      self.bindings.insert(pair.key().clone(), pair.value().clone());
+      self
+        .bindings
+        .insert(pair.key().clone(), pair.value().clone());
     }
     self.target_address_mapper.clear();
   }
-  pub fn migrate_chat(&self, old_chat_id: &i64, new_chat_id: &i64)->Option<ArcStr>{
-    if let Some((_,address)) = self.bindings.remove(&old_chat_id){
+  pub fn migrate_chat(&self, old_chat_id: &i64, new_chat_id: &i64) -> Option<ArcStr> {
+    if let Some((_, address)) = self.bindings.remove(&old_chat_id) {
       self.bindings.insert(*new_chat_id, address.clone());
       return Some(address);
     };

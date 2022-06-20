@@ -23,7 +23,9 @@ impl Command {
   pub async fn answer(msg: Message, bot: BotRequester, cmd: Command) -> anyhow::Result<()> {
     match cmd {
       Command::Help => {
-        bot.send_message(msg.chat.id, Command::descriptions().to_string()).await?;
+        bot
+          .send_message(msg.chat.id, Command::descriptions().to_string())
+          .await?;
       }
       Command::Bind { address } => {
         let sender_id = msg.from().unwrap().id;
@@ -37,21 +39,26 @@ impl Command {
           }
         }
         if is_admin {
-          match CONFIG.bindings.insert(chat_id.0, ArcStr::from(address.clone())) {
+          match CONFIG
+            .bindings
+            .insert(chat_id.0, ArcStr::from(address.clone()))
+          {
             Some(_) => {
-              bot.send_message(
-                msg.chat.id,
-                format!("成功重新绑定当前群组的信使地址为{}", address),
-              )
-              .await?;
+              bot
+                .send_message(
+                  msg.chat.id,
+                  format!("成功重新绑定当前群组的信使地址为{}", address),
+                )
+                .await?;
               handlers::receive::change(chat_id.0, &ArcStr::from(address))?;
             }
             None => {
-              bot.send_message(
-                msg.chat.id,
-                format!("成功绑定当前群组的信使地址{}", address),
-              )
-              .await?;
+              bot
+                .send_message(
+                  msg.chat.id,
+                  format!("成功绑定当前群组的信使地址{}", address),
+                )
+                .await?;
               handlers::receive::add(chat_id.0, &ArcStr::from(address))?;
             }
           }
@@ -75,19 +82,15 @@ impl Command {
         if is_admin {
           match CONFIG.bindings.remove(&chat_id.0) {
             Some(_) => {
-              bot.send_message(
-                msg.chat.id,
-                format!("成功解绑当前群组的信使地址"),
-              )
-              .await?;
+              bot
+                .send_message(msg.chat.id, format!("成功解绑当前群组的信使地址"))
+                .await?;
               handlers::receive::del(chat_id.0)?;
             }
             None => {
-              bot.send_message(
-                msg.chat.id,
-                format!("当前群组没有设置信使地址"),
-              )
-              .await?;
+              bot
+                .send_message(msg.chat.id, format!("当前群组没有设置信使地址"))
+                .await?;
             }
           }
         } else {
