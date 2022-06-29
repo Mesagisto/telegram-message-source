@@ -97,7 +97,7 @@ async fn run() -> anyhow::Result<()> {
   handlers::receive::recover()?;
   dispatch::start(&TG_BOT).await;
 
-  CONFIG.save();
+  CONFIG.save().await.expect("保存配置文件失败");
   info!("Mesagisto信使即将关闭");
   Ok(())
 }
