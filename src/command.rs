@@ -107,9 +107,12 @@ impl Command {
             chat_id,
             format!(
               "GitHub项目主页:{} \n 本消息源版本 v{}",
-              html::link("https://github.com/MeowCat-Studio/mesagisto","MeowCat-Studio/mesagisto"),
+              html::link(
+                "https://github.com/MeowCat-Studio/mesagisto",
+                "MeowCat-Studio/mesagisto"
+              ),
               env!("CARGO_PKG_VERSION"),
-            )
+            ),
           )
           .await?;
       }
