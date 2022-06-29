@@ -4,6 +4,8 @@ use arcstr::ArcStr;
 use lateinit::LateInit;
 use mesagisto_client::{cache::CACHE, net::NET, res::RES};
 use std::ops::Deref;
+use teloxide::payloads::SendAnimationSetters;
+use teloxide::types::Message;
 use teloxide::{
   adaptors::{AutoSend, DefaultParseMode},
   payloads::{SendMessageSetters, SendPhotoSetters},
@@ -89,16 +91,32 @@ impl TgBot {
   pub async fn send_image(
     &self,
     chat_id: ChatId,
-    photo: InputFile,
+    image_path: &std::path::Path,
     reply: Option<i32>,
   ) -> anyhow::Result<teloxide::types::Message> {
-    let send = self.inner.send_photo(chat_id, photo.clone());
-    let send = if let Some(reply) = reply {
-      send.reply_to_message_id(reply)
+    let photo = InputFile::file(image_path);
+    let kind = infer::get_from_path(image_path)
+      .expect("file read failed when refering file type")
+      .expect("Unkown file type");
+    let is_gif = "gif" == kind.extension();
+
+    let result = if is_gif {
+      let send = self.inner.send_animation(chat_id, photo.clone());
+      if let Some(reply) = reply {
+        send.reply_to_message_id(reply).await
+      } else {
+        send.await
+      }
     } else {
-      send
+      let send = self.inner.send_photo(chat_id, photo.clone());
+      if let Some(reply) = reply {
+        send.reply_to_message_id(reply).await
+      } else {
+        send.await
+      }
     };
-    match send.await {
+
+    match result {
       Ok(ok) => return Ok(ok),
       Err(e) => match e {
         teloxide::RequestError::MigrateToChatId(new_id) => {
@@ -107,11 +125,20 @@ impl TgBot {
           if let Some(address) = CONFIG.migrate_chat(&target, &new_id) {
             handlers::receive::del(target)?;
             handlers::receive::add(new_id, &address)?;
-            let send = TG_BOT.send_photo(ChatId(new_id), photo);
-            let receipt = if let Some(reply) = reply {
-              send.reply_to_message_id(reply).await?
+            let receipt: Message = if is_gif {
+              let send = self.inner.send_animation(chat_id, photo.clone());
+              if let Some(reply) = reply {
+                send.reply_to_message_id(reply).await?
+              } else {
+                send.await?
+              }
             } else {
-              send.await?
+              let send = self.inner.send_photo(chat_id, photo.clone());
+              if let Some(reply) = reply {
+                send.reply_to_message_id(reply).await?
+              } else {
+                send.await?
+              }
             };
             return Ok(receipt);
           } else {

@@ -9,8 +9,8 @@ use mesagisto_client::{
   db::DB,
   server::SERVER,
 };
+
 use teloxide::types::ChatId;
-use teloxide::types::InputFile;
 use teloxide::utils::html;
 use tokio::sync::mpsc::UnboundedSender;
 use tracing::error;
@@ -121,13 +121,9 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
         DB.put_msg_id_ir_2(&target, &receipt.id, &message.id)?;
         let receipt = if let Some(reply_to) = &message.reply {
           let local_id = DB.get_msg_id_1(&target, reply_to)?;
-          TG_BOT
-            .send_image(chat_id, InputFile::file(path), local_id)
-            .await?
+          TG_BOT.send_image(chat_id, &path, local_id).await?
         } else {
-          TG_BOT
-            .send_image(chat_id, InputFile::file(path), None)
-            .await?
+          TG_BOT.send_image(chat_id, &path, None).await?
         };
         DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
       }
