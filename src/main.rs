@@ -8,7 +8,7 @@ use tracing::{info, warn, Level};
 use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt};
 
 use self::message::handlers;
-use crate::config::CONFIG;
+use crate::config::{CONFIG, Config};
 use bot::TG_BOT;
 
 #[macro_use]
@@ -51,7 +51,7 @@ async fn run() -> anyhow::Result<()> {
         .with_default(Level::WARN),
     )
     .init();
-
+  Config::reload().await?;
   if !CONFIG.enable {
     warn!("Mesagisto-Bot is not enabled and is about to exit the program.");
     warn!("To enable it, please modify the configuration file.");

@@ -130,7 +130,7 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
         };
         DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
       }
-      MessageType::Edit { content } => {}
+      MessageType::Edit { content: _ } => {}
       _ => {}
     }
   }
