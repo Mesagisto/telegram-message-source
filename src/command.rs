@@ -4,6 +4,7 @@ use crate::message::handlers;
 use arcstr::ArcStr;
 use teloxide::prelude::*;
 use teloxide::utils::command::BotCommands;
+use teloxide::utils::html;
 
 #[derive(BotCommands, Clone)]
 #[command(rename = "lowercase", description = "信使Bot支持以下命令")]
@@ -105,15 +106,18 @@ impl Command {
           .send_message(
             chat_id,
             format!(
-              "项目主页: https://github.com/MeowCat-Studio/mesagisto \n 本消息源版本 {}",
-              env!("CARGO_PKG_VERSION")
-            ),
+              "GitHub项目主页:{} \n 本消息源版本 v{}",
+              html::link("https://github.com/MeowCat-Studio/mesagisto","MeowCat-Studio/mesagisto"),
+              env!("CARGO_PKG_VERSION"),
+            )
           )
           .await?;
       }
       Command::Status => {
         let chat_id = msg.chat.id;
-        bot.send_message(chat_id, "唔... 也许是在正常运行?").await?;
+        bot
+          .send_message(chat_id, html::strike("唔... 也许是在正常运行?"))
+          .await?;
       }
     };
     Ok(())

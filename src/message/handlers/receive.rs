@@ -11,7 +11,7 @@ use mesagisto_client::{
 };
 use teloxide::types::ChatId;
 use teloxide::types::InputFile;
-use teloxide::utils::markdown;
+use teloxide::utils::html;
 use tokio::sync::mpsc::UnboundedSender;
 use tracing::error;
 
@@ -96,8 +96,8 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
       MessageType::Text { content } => {
         let content = format!(
           "*{}*:\n{}",
-          markdown::escape(&sender_name.as_str()),
-          markdown::escape(&content.as_str())
+          html::escape(&sender_name.as_str()),
+          html::escape(&content.as_str())
         );
         let receipt = if let Some(reply_to) = &message.reply {
           let local_id = DB.get_msg_id_1(&target, reply_to)?;
@@ -113,7 +113,7 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
         let receipt = TG_BOT
           .send_text(
             chat_id,
-            format!("*{}*:", markdown::escape(&sender_name.as_str())),
+            format!("*{}*:", html::escape(&sender_name.as_str())),
             None,
           )
           .await?;

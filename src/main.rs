@@ -89,7 +89,7 @@ async fn run() -> anyhow::Result<()> {
   );
 
   let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config())
-    .parse_mode(ParseMode::MarkdownV2)
+    .parse_mode(ParseMode::Html)
     .auto_send();
 
   TG_BOT.init(bot).await?;
