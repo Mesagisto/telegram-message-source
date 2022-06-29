@@ -60,7 +60,16 @@ pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<(
     // TODO
   } else if let Some(_) = msg.audio() {
     // TODO
-  } else if let Some(_) = msg.animation() {
+  } else if let Some(animation) = msg.animation() {
+    if let Some(mime_type) =  animation.mime_type.as_ref()
+      && let mime::GIF = mime_type.subtype()
+    {
+      let file_id: Vec<u8> = animation.file_id.as_bytes().to_vec();
+      let uid: Vec<u8> = animation.file_unique_id.as_bytes().to_vec();
+      RES.put_image_id(&uid, file_id.clone());
+      TG_BOT.file(&uid, &file_id).await?;
+      chain.push(MessageType::Image { id: uid, url: None })
+    }
     // TODO
     // animation is GIF or video
   }
