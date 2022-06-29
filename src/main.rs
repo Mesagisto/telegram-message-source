@@ -8,7 +8,7 @@ use tracing::{info, warn, Level};
 use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt};
 
 use self::message::handlers;
-use crate::config::{CONFIG, Config};
+use crate::config::{Config, CONFIG};
 use bot::TG_BOT;
 
 #[macro_use]
@@ -83,7 +83,10 @@ async fn run() -> anyhow::Result<()> {
     .build()
     .apply()
     .await;
-  info!("Mesagisto信使正在启动, version: v{}",env!("CARGO_PKG_VERSION"));
+  info!(
+    "Mesagisto信使正在启动, version: v{}",
+    env!("CARGO_PKG_VERSION")
+  );
 
   let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config())
     .parse_mode(ParseMode::MarkdownV2)

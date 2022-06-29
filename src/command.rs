@@ -104,7 +104,10 @@ impl Command {
         bot
           .send_message(
             chat_id,
-            format!("项目主页: https://github.com/MeowCat-Studio/mesagisto \n 本消息源版本 {}",env!("CARGO_PKG_VERSION")),
+            format!(
+              "项目主页: https://github.com/MeowCat-Studio/mesagisto \n 本消息源版本 {}",
+              env!("CARGO_PKG_VERSION")
+            ),
           )
           .await?;
       }

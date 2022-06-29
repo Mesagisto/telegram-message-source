@@ -55,11 +55,11 @@ pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<(
     });
   } else if let Some(_) = msg.new_chat_members() {
     // TODO
-  } else if let Some(_) = msg.left_chat_member()  {
+  } else if let Some(_) = msg.left_chat_member() {
     // TODO
-  } else if let Some(_) = msg.audio()  {
+  } else if let Some(_) = msg.audio() {
     // TODO
-  } else if let Some(_) = msg.animation()  {
+  } else if let Some(_) = msg.animation() {
     // TODO
     // animation is GIF or video
   }
