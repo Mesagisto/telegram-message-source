@@ -2,7 +2,7 @@ use crate::ext::db::DbExt;
 use crate::CONFIG;
 use crate::TG_BOT;
 use arcstr::ArcStr;
-use mesagisto_client::LateInit;
+use lateinit::LateInit;
 use mesagisto_client::{
   cache::CACHE,
   data::{message::Message, message::MessageType, Packet},
@@ -89,6 +89,7 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
   } else {
     base64_url::encode(&message.profile.id)
   };
+
   for single in message.chain {
     log::trace!("正在处理消息链中的元素");
     match single {
@@ -129,8 +130,8 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
         };
         DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
       }
-      MessageType::Edit { content } => {},
-      _ => {},
+      MessageType::Edit { content } => {}
+      _ => {}
     }
   }
 

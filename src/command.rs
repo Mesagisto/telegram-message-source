@@ -102,14 +102,15 @@ impl Command {
       Command::About => {
         let chat_id = msg.chat.id;
         bot
-        .send_message(chat_id, "项目主页: https://github.com/MeowCat-Studio/mesagisto")
-        .await?;
+          .send_message(
+            chat_id,
+            "项目主页: https://github.com/MeowCat-Studio/mesagisto",
+          )
+          .await?;
       }
       Command::Status => {
         let chat_id = msg.chat.id;
-        bot
-        .send_message(chat_id, "唔... 也许是在正常运行?")
-        .await?;
+        bot.send_message(chat_id, "唔... 也许是在正常运行?").await?;
       }
     };
     Ok(())

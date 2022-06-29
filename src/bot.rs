@@ -1,7 +1,8 @@
 use crate::message::handlers;
 use crate::{command::Command, config::CONFIG};
 use arcstr::ArcStr;
-use mesagisto_client::{cache::CACHE, net::NET, res::RES, LateInit};
+use lateinit::LateInit;
+use mesagisto_client::{cache::CACHE, net::NET, res::RES};
 use std::ops::Deref;
 use teloxide::{
   adaptors::{AutoSend, DefaultParseMode},

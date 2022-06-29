@@ -66,8 +66,8 @@ nats = "0.21.0"
 mesagisto-client = { branch = "master", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git"}
 # mesagisto-client = { path = "../../mesagisto-client/rust" }
 automatic-config = { branch = "master", git = "https://github.com/Itsusinn/automatic-config-rs.git" }
-#automatic-config = { path = "/code/automatic-config-rs" }
-
+# automatic-config = { path = "/code/automatic-config-rs" }
+lateinit = { branch = "master", git = "https://github.com/Itsusinn/lateinit-rs.git" }
 singleton = { branch="master", git = "https://github.com/Itsusinn/singleton-rs.git" }
 # singleton = { path = "/code/singleton-rs" }
 
