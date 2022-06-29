@@ -14,6 +14,7 @@ use teloxide::types::InputFile;
 use teloxide::utils::html;
 use tokio::sync::mpsc::UnboundedSender;
 use tracing::error;
+use tracing::trace;
 
 static CHANNEL: LateInit<UnboundedSender<(i64, ArcStr)>> = LateInit::new();
 
@@ -61,7 +62,7 @@ pub async fn server_msg_handler(
   target: ArcStr,
 ) -> anyhow::Result<()> {
   let target: i64 = target.parse()?;
-  log::trace!("接收到来自目标{}的消息", target);
+  trace!("接收到来自目标{}的消息", target);
   let packet = Packet::from_cbor(&message.data);
   let packet = match packet {
     Ok(v) => v,
@@ -91,7 +92,7 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
   };
 
   for single in message.chain {
-    log::trace!("正在处理消息链中的元素");
+    trace!("正在处理消息链中的元素");
     match single {
       MessageType::Text { content } => {
         let content = format!(

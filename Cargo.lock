@@ -2239,7 +2239,6 @@ dependencies = [
  "futures",
  "lateinit",
  "linked-hash-map",
- "log",
  "mesagisto-client",
  "mime",
  "nats",

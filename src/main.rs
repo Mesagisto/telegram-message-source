@@ -98,6 +98,6 @@ async fn run() -> anyhow::Result<()> {
   dispatch::start(&TG_BOT).await;
 
   CONFIG.save();
-  log::info!("Mesagisto信使即将关闭");
+  info!("Mesagisto信使即将关闭");
   Ok(())
 }

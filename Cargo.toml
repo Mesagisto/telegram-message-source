@@ -19,7 +19,6 @@ teloxide-macros = "0.6.2"
 # logging
 tracing = "0.1.35"
 tracing-subscriber = { version = "0.3.11", default-features = false, features = ["tracing-log", "std", "local-time","fmt"] }
-log = "0.4.17"
 colored = "2.0.0"
 time = { version = "0.3.11", features = ["macros", "local-offset"] }
 
