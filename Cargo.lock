@@ -1214,7 +1214,7 @@ dependencies = [
 [[package]]
 name = "mesagisto-client"
 version = "0.1.0"
-source = "git+https://github.com/MeowCat-Studio/mesagisto-client-rs.git?branch=master#6c1ab2eb227ae0337b366d16ee2168710b0839aa"
+source = "git+https://github.com/MeowCat-Studio/mesagisto-client-rs.git?branch=master#286327ebf1cdb2e06aa5c3df87feb9b668c13ab0"
 dependencies = [
  "aes-gcm",
  "anyhow",
@@ -2224,7 +2224,7 @@ checksum = "20f34339676cdcab560c9a82300c4c2581f68b9369aedf0fae86f2ff9565ff3e"
 
 [[package]]
 name = "telegram-message-source"
-version = "1.4.1"
+version = "1.4.2"
 dependencies = [
  "aes-gcm",
  "anyhow",
