@@ -53,6 +53,15 @@ pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<(
     chain.push(MessageType::Text {
       content: caption.to_string(),
     });
+  } else if let Some(_) = msg.new_chat_members() {
+    // TODO
+  } else if let Some(_) = msg.left_chat_member()  {
+    // TODO
+  } else if let Some(_) = msg.audio()  {
+    // TODO
+  } else if let Some(_) = msg.animation()  {
+    // TODO
+    // animation is GIF or video
   }
 
   let reply = match msg.reply_to_message() {
