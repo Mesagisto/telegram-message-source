@@ -83,7 +83,7 @@ async fn run() -> anyhow::Result<()> {
     .build()
     .apply()
     .await;
-  info!("Mesagisto信使正在启动");
+  info!("Mesagisto信使正在启动, version: v{}",env!("CARGO_PKG_VERSION"));
 
   let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config())
     .parse_mode(ParseMode::MarkdownV2)
