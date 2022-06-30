@@ -49,11 +49,6 @@ pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<(
     RES.put_image_id(&uid, file_id.clone());
     TG_BOT.file(&uid, &file_id).await?;
     chain.push(MessageType::Image { id: uid, url: None });
-    if let Some(caption) = msg.caption() {
-      chain.push(MessageType::Text {
-        content: caption.to_string(),
-      });
-    }
   } else if let Some(_) = msg.new_chat_members() {
     // TODO
   } else if let Some(_) = msg.left_chat_member() {
@@ -72,6 +67,11 @@ pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<(
     }
     // TODO
     // animation is GIF or video
+  }
+  if let Some(caption) = msg.caption() {
+    chain.push(MessageType::Text {
+      content: caption.to_string(),
+    });
   }
 
   let reply = match msg.reply_to_message() {
