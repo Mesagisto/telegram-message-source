@@ -96,8 +96,8 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
     match single {
       MessageType::Text { content } => {
         let content = format!(
-          "*{}*:\n{}",
-          html::escape(&sender_name.as_str()),
+          "{}:\n{}",
+          html::bold(&sender_name.as_str()),
           html::escape(&content.as_str())
         );
         let receipt = if let Some(reply_to) = &message.reply {
@@ -114,7 +114,7 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
         let receipt = TG_BOT
           .send_text(
             chat_id,
-            format!("*{}*:", html::escape(&sender_name.as_str())),
+            format!("{}:", html::bold(&sender_name.as_str())),
             None,
           )
           .await?;
