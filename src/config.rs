@@ -13,6 +13,8 @@ pub struct Config {
   pub nats: NatsConfig,
   pub proxy: ProxyConfig,
   pub telegram: TelegramConfig,
+
+  // TODO remove in next major version
   target_address_mapper: DashMap<i64, ArcStr>,
 }
 
@@ -58,12 +60,8 @@ pub struct ProxyConfig {
 
 #[config_derive]
 pub struct CipherConfig {
-  #[educe(Default = true)]
-  pub enable: bool,
-  #[educe(Default = "this-is-an-example-key")]
+  #[educe(Default = "default")]
   pub key: ArcStr,
-  #[educe(Default = true)]
-  pub refuse_plain: bool,
 }
 
 #[config_derive]
