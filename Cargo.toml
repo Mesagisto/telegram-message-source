@@ -24,7 +24,7 @@ time = { version = "0.3.11", features = ["macros", "local-offset"] }
 
 # serialization
 serde = { version = "1.0.137", default-features = false, features = ["derive","rc"] }
-serde_json = "1.0.81"
+serde_json = "1.0.82"
 serde_yaml = "0.8.24"
 
 # asynchronous
@@ -53,7 +53,7 @@ educe = { version = "0.4.19", default-features = false, features = ["Default"] }
 arcstr = { version = "1.1.4", features = ["serde"] }
 yaml-rust = "0.4.5"
 linked-hash-map = "0.5.6"
-either = "1.6.1"
+either = "1.7.0"
 mime = "0.3.16"
 infer = "0.8.1"
 
