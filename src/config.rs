@@ -20,25 +20,20 @@ pub struct Config {
 
 impl Config {
   pub fn mapper(&self, target: &i64) -> Option<ArcStr> {
-    match self.bindings.get(target) {
-      Some(v) => return Some(v.clone()),
-      None => return None,
-    }
+    self.bindings.get(target).map(|v| v.clone())
   }
   pub fn migrate(&self) {
     for pair in &self.target_address_mapper {
-      self
-        .bindings
-        .insert(pair.key().clone(), pair.value().clone());
+      self.bindings.insert(*pair.key(), pair.value().clone());
     }
     self.target_address_mapper.clear();
   }
   pub fn migrate_chat(&self, old_chat_id: &i64, new_chat_id: &i64) -> Option<ArcStr> {
-    if let Some((_, address)) = self.bindings.remove(&old_chat_id) {
+    if let Some((_, address)) = self.bindings.remove(old_chat_id) {
       self.bindings.insert(*new_chat_id, address.clone());
       return Some(address);
     };
-    return None;
+    None
   }
 }
 

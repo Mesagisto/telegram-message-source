@@ -65,7 +65,7 @@ impl TgBot {
       send
     };
     match send.await {
-      Ok(ok) => return Ok(ok),
+      Ok(ok) => Ok(ok),
       Err(e) => match e {
         teloxide::RequestError::MigrateToChatId(new_id) => {
           let target = chat_id.0;
@@ -79,12 +79,12 @@ impl TgBot {
             } else {
               send.await?
             };
-            return Ok(receipt);
+            Ok(receipt)
           } else {
-            return Err(e.into());
+            Err(e.into())
           }
         }
-        _ => return Err(e.into()),
+        _ => Err(e.into()),
       },
     }
   }
@@ -117,7 +117,7 @@ impl TgBot {
     };
 
     match result {
-      Ok(ok) => return Ok(ok),
+      Ok(ok) => Ok(ok),
       Err(e) => match e {
         teloxide::RequestError::MigrateToChatId(new_id) => {
           let target = chat_id.0;
@@ -140,12 +140,12 @@ impl TgBot {
                 send.await?
               }
             };
-            return Ok(receipt);
+            Ok(receipt)
           } else {
-            return Err(e.into());
+            Err(e.into())
           }
         }
-        _ => return Err(e.into()),
+        _ => Err(e.into()),
       },
     }
   }

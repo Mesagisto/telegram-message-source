@@ -84,13 +84,13 @@ impl Command {
           match CONFIG.bindings.remove(&chat_id.0) {
             Some(_) => {
               bot
-                .send_message(msg.chat.id, format!("成功解绑当前群组的信使地址"))
+                .send_message(msg.chat.id, "成功解绑当前群组的信使地址".to_string())
                 .await?;
               handlers::receive::del(chat_id.0)?;
             }
             None => {
               bot
-                .send_message(msg.chat.id, format!("当前群组没有设置信使地址"))
+                .send_message(msg.chat.id, "当前群组没有设置信使地址".to_string())
                 .await?;
             }
           }

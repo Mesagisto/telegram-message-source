@@ -49,11 +49,11 @@ pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<(
     RES.put_image_id(&uid, file_id.clone());
     TG_BOT.file(&uid, &file_id).await?;
     chain.push(MessageType::Image { id: uid, url: None });
-  } else if let Some(_) = msg.new_chat_members() {
+  } else if let Some(_v) = msg.new_chat_members() {
     // TODO
-  } else if let Some(_) = msg.left_chat_member() {
+  } else if let Some(_v) = msg.left_chat_member() {
     // TODO
-  } else if let Some(_) = msg.audio() {
+  } else if let Some(_v) = msg.audio() {
     // TODO
   } else if let Some(animation) = msg.animation() {
     if let Some(mime_type) =  animation.mime_type.as_ref()

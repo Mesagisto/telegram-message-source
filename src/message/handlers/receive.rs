@@ -21,7 +21,7 @@ static CHANNEL: LateInit<UnboundedSender<(i64, ArcStr)>> = LateInit::new();
 pub fn recover() -> anyhow::Result<()> {
   let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<(i64, ArcStr)>();
   tokio::spawn(async move {
-    for element in rx.recv().await {
+    while let Some(element) = rx.recv().await {
       let res = SERVER
         .recv(
           ArcStr::from(element.0.to_string()),
@@ -97,8 +97,8 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
       MessageType::Text { content } => {
         let content = format!(
           "{}:\n{}",
-          html::bold(&sender_name.as_str()),
-          html::escape(&content.as_str())
+          html::bold(sender_name.as_str()),
+          html::escape(content.as_str())
         );
         let receipt = if let Some(reply_to) = &message.reply {
           let local_id = DB.get_msg_id_1(&target, reply_to)?;
@@ -114,7 +114,7 @@ async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<(
         let receipt = TG_BOT
           .send_text(
             chat_id,
-            format!("{}:", html::bold(&sender_name.as_str())),
+            format!("{}:", html::bold(sender_name.as_str())),
             None,
           )
           .await?;
