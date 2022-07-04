@@ -66,12 +66,15 @@ pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<(
       chain.push(MessageType::Image { id: uid, url: None })
     }
     // TODO
-    // animation is GIF or video
+    // animation is video
   }
   if let Some(caption) = msg.caption() {
     chain.push(MessageType::Text {
       content: caption.to_string(),
     });
+  }
+  if chain.is_empty() {
+    return Ok(());
   }
 
   let reply = match msg.reply_to_message() {
