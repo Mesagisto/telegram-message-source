@@ -2,8 +2,8 @@ use arcstr::ArcStr;
 use arcstr::Substr;
 
 pub mod db;
+pub mod err;
 pub mod res;
-
 pub trait TrimPrefix {
   fn trim_prefix(&self, prefix: &str) -> Option<Substr>;
 }

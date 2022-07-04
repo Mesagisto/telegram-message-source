@@ -1,4 +1,5 @@
 use crate::ext::db::DbExt;
+use crate::ext::err::LogResultExt;
 use crate::CONFIG;
 use crate::TG_BOT;
 use arcstr::ArcStr;
@@ -13,7 +14,6 @@ use mesagisto_client::{
 use teloxide::types::ChatId;
 use teloxide::utils::html;
 use tokio::sync::mpsc::UnboundedSender;
-use tracing::error;
 use tracing::trace;
 
 static CHANNEL: LateInit<UnboundedSender<(i64, ArcStr)>> = LateInit::new();
@@ -22,19 +22,14 @@ pub fn recover() -> anyhow::Result<()> {
   let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<(i64, ArcStr)>();
   tokio::spawn(async move {
     while let Some(element) = rx.recv().await {
-      let res = SERVER
+      SERVER
         .recv(
           ArcStr::from(element.0.to_string()),
           &element.1,
           server_msg_handler,
         )
-        .await;
-      match res {
-        Ok(_) => {}
-        Err(e) => {
-          error!("error when add callback handler {}\n{}", e, e.backtrace());
-        }
-      }
+        .await
+        .log_if_error("error when add callback handler");
     }
   });
   for pair in &CONFIG.bindings {
@@ -57,13 +52,10 @@ pub fn del(target: i64) -> anyhow::Result<()> {
   SERVER.unsub(&target.to_string().into());
   Ok(())
 }
-pub async fn server_msg_handler(
-  message: nats::asynk::Message,
-  target: ArcStr,
-) -> anyhow::Result<()> {
+pub async fn server_msg_handler(message: nats::Message, target: ArcStr) -> anyhow::Result<()> {
   let target: i64 = target.parse()?;
   trace!("接收到来自目标{}的消息", target);
-  let packet = Packet::from_cbor(&message.data);
+  let packet = Packet::from_cbor(&message.payload);
   let packet = match packet {
     Ok(v) => v,
     Err(_e) => {

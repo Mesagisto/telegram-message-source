@@ -27,10 +27,6 @@ mod net;
 
 #[tokio::main]
 async fn main() {
-  run().await.unwrap();
-}
-#[allow(unused_must_use)]
-async fn run() -> anyhow::Result<()> {
   tracing_subscriber::registry()
     .with(
       tracing_subscriber::fmt::layer()
@@ -51,6 +47,10 @@ async fn run() -> anyhow::Result<()> {
         .with_default(Level::WARN),
     )
     .init();
+  run().await.unwrap();
+}
+#[allow(unused_must_use)]
+async fn run() -> anyhow::Result<()> {
   Config::reload().await?;
   if !CONFIG.enable {
     warn!("Mesagisto-Bot is not enabled and is about to exit the program.");
