@@ -101,7 +101,10 @@ impl TgBot {
     let is_gif = "gif" == kind.extension();
 
     let result = if is_gif {
-      let photo = photo.clone().file_name(format!("{:?}.gif",image_path.file_name().expect("Wrong filename")));
+      let photo = photo.clone().file_name(format!(
+        "{:?}.gif",
+        image_path.file_name().expect("Wrong filename")
+      ));
       let send = self.inner.send_animation(chat_id, photo.clone());
       if let Some(reply) = reply {
         send.reply_to_message_id(reply).await
