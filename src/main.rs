@@ -4,8 +4,7 @@
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
 use teloxide::{prelude::*, types::ParseMode, Bot};
-use tracing::{info, warn, Level};
-use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt};
+use tracing::*;
 
 use self::message::handlers;
 use crate::config::{Config, CONFIG};
@@ -22,31 +21,13 @@ mod command;
 mod config;
 mod dispatch;
 pub mod ext;
+mod log;
 mod message;
 mod net;
 
 #[tokio::main]
 async fn main() {
-  tracing_subscriber::registry()
-    .with(
-      tracing_subscriber::fmt::layer()
-        .with_target(true)
-        .with_timer(tracing_subscriber::fmt::time::OffsetTime::new(
-          // use local time
-          time::UtcOffset::__from_hms_unchecked(8, 0, 0),
-          time::macros::format_description!(
-            "[year repr:last_two]-[month]-[day] [hour]:[minute]:[second]"
-          ),
-        )),
-    )
-    .with(
-      tracing_subscriber::filter::Targets::new()
-        .with_target("teloxide", Level::INFO)
-        .with_target("telegram_message_source", Level::INFO)
-        .with_target("mesagisto_client", Level::TRACE)
-        .with_default(Level::WARN),
-    )
-    .init();
+  self::log::init();
   run().await.unwrap();
 }
 #[allow(unused_must_use)]
