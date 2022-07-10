@@ -1,8 +1,7 @@
 use teloxide::prelude::*;
 use tracing::info;
 
-use crate::bot::BotRequester;
-use crate::{command::Command, message::handlers};
+use crate::{bot::BotRequester, command::Command, message::handlers};
 
 pub async fn start(bot: &BotRequester) {
   let message_handler = Update::filter_message()

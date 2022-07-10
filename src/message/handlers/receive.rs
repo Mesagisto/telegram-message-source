@@ -1,20 +1,22 @@
-use crate::ext::db::DbExt;
-use crate::ext::err::LogResultExt;
-use crate::CONFIG;
-use crate::TG_BOT;
 use arcstr::ArcStr;
 use lateinit::LateInit;
 use mesagisto_client::{
   cache::CACHE,
-  data::{message::Message, message::MessageType, Packet},
+  data::{
+    message::{Message, MessageType},
+    Packet,
+  },
   db::DB,
   server::SERVER,
 };
-
-use teloxide::types::ChatId;
-use teloxide::utils::html;
+use teloxide::{types::ChatId, utils::html};
 use tokio::sync::mpsc::UnboundedSender;
 use tracing::trace;
+
+use crate::{
+  ext::{db::DbExt, err::LogResultExt},
+  CONFIG, TG_BOT,
+};
 
 static CHANNEL: LateInit<UnboundedSender<(i64, ArcStr)>> = LateInit::new();
 
@@ -59,7 +61,7 @@ pub async fn server_msg_handler(message: nats::Message, target: ArcStr) -> anyho
   let packet = match packet {
     Ok(v) => v,
     Err(_e) => {
-      //todo logging
+      // todo logging
       tracing::warn!("未知的数据包类型，请更新本消息源，若已是最新请等待适配");
       return Ok(());
     }

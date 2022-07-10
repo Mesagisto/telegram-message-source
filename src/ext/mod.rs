@@ -1,5 +1,4 @@
-use arcstr::ArcStr;
-use arcstr::Substr;
+use arcstr::{ArcStr, Substr};
 
 pub mod db;
 pub mod err;

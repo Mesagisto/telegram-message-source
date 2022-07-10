@@ -1,6 +1,7 @@
 #![allow(incomplete_features)]
 #![feature(backtrace, capture_disjoint_fields, let_chains)]
 
+use bot::TG_BOT;
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
 use teloxide::{prelude::*, types::ParseMode, Bot};
@@ -8,7 +9,6 @@ use tracing::*;
 
 use self::message::handlers;
 use crate::config::{Config, CONFIG};
-use bot::TG_BOT;
 
 #[macro_use]
 extern crate educe;

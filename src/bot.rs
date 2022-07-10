@@ -1,21 +1,20 @@
-use crate::message::handlers;
-use crate::{command::Command, config::CONFIG};
+use std::ops::Deref;
+
 use arcstr::ArcStr;
 use lateinit::LateInit;
 use mesagisto_client::{cache::CACHE, net::NET, res::RES};
-use std::ops::Deref;
-use teloxide::payloads::SendAnimationSetters;
-use teloxide::types::Message;
 use teloxide::{
   adaptors::{AutoSend, DefaultParseMode},
-  payloads::{SendMessageSetters, SendPhotoSetters},
+  payloads::{SendAnimationSetters, SendMessageSetters, SendPhotoSetters},
   prelude::Requester,
-  types::{File as TgFile, InputFile},
+  types::{File as TgFile, InputFile, Message},
   utils::command::BotCommands,
   Bot,
 };
 use teloxide_core::types::ChatId;
 use tracing::warn;
+
+use crate::{command::Command, config::CONFIG, message::handlers};
 pub type BotRequester = AutoSend<DefaultParseMode<Bot>>;
 
 #[derive(Singleton, Default)]
@@ -28,6 +27,7 @@ impl TgBot {
     self.inner.init(bot);
     Ok(())
   }
+
   // fixme use this-error
   pub async fn file(&self, uid: &Vec<u8>, id: &Vec<u8>) -> anyhow::Result<()> {
     let id_str: ArcStr = base64_url::encode(id).into();
@@ -41,6 +41,7 @@ impl TgBot {
     CACHE.put_file(uid, &tmp_path).await?;
     Ok(())
   }
+
   pub fn get_url_by_path(&self, file_path: String) -> ArcStr {
     format!(
       "https://api.telegram.org/file/bot{token}/{file}",
@@ -49,6 +50,7 @@ impl TgBot {
     )
     .into()
   }
+
   pub async fn send_text<T>(
     &self,
     chat_id: ChatId,
@@ -88,6 +90,7 @@ impl TgBot {
       },
     }
   }
+
   pub async fn send_image(
     &self,
     chat_id: ChatId,
@@ -157,6 +160,7 @@ impl TgBot {
 
 impl Deref for TgBot {
   type Target = BotRequester;
+
   fn deref(&self) -> &Self::Target {
     &self.inner
   }

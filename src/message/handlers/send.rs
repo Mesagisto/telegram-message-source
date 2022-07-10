@@ -1,15 +1,22 @@
-use crate::bot::{BotRequester, TG_BOT};
-use crate::config::CONFIG;
-use crate::ext::db::DbExt;
-
 use arcstr::ArcStr;
-use mesagisto_client::data::message::{MessageType, Profile};
-use mesagisto_client::data::{message, Packet};
-use mesagisto_client::db::DB;
-use mesagisto_client::res::RES;
-use mesagisto_client::server::SERVER;
-use mesagisto_client::EitherExt;
+use mesagisto_client::{
+  data::{
+    message,
+    message::{MessageType, Profile},
+    Packet,
+  },
+  db::DB,
+  res::RES,
+  server::SERVER,
+  EitherExt,
+};
 use teloxide::prelude::*;
+
+use crate::{
+  bot::{BotRequester, TG_BOT},
+  config::CONFIG,
+  ext::db::DbExt,
+};
 
 pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<()> {
   let target = msg.chat.id.0;
@@ -19,7 +26,7 @@ pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<(
   let address = CONFIG.bindings.get(&target).unwrap().clone();
   let sender = match msg.from() {
     Some(v) => v,
-    //fixme
+    // fixme
     None => return Ok(()),
   };
   if sender.is_bot {

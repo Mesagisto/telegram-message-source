@@ -1,10 +1,10 @@
-use crate::bot::BotRequester;
-use crate::config::CONFIG;
-use crate::message::handlers;
 use arcstr::ArcStr;
-use teloxide::prelude::*;
-use teloxide::utils::command::BotCommands;
-use teloxide::utils::html;
+use teloxide::{
+  prelude::*,
+  utils::{command::BotCommands, html},
+};
+
+use crate::{bot::BotRequester, config::CONFIG, message::handlers};
 
 #[derive(BotCommands, Clone)]
 #[command(rename = "lowercase", description = "信使Bot支持以下命令")]
