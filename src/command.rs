@@ -1,4 +1,5 @@
 use arcstr::ArcStr;
+use color_eyre::eyre::Result;
 use teloxide::{
   prelude::*,
   utils::{command::BotCommands, html},
@@ -21,7 +22,7 @@ pub enum Command {
   Bind { address: String },
 }
 impl Command {
-  pub async fn answer(msg: Message, bot: BotRequester, cmd: Command) -> anyhow::Result<()> {
+  pub async fn answer(msg: Message, bot: BotRequester, cmd: Command) -> Result<()> {
     match cmd {
       Command::Help => {
         bot

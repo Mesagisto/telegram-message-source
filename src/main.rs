@@ -2,6 +2,7 @@
 #![feature(backtrace, capture_disjoint_fields, let_chains)]
 
 use bot::TG_BOT;
+use color_eyre::eyre::Result;
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
 use teloxide::{prelude::*, types::ParseMode, Bot};
@@ -27,11 +28,21 @@ mod net;
 
 #[tokio::main]
 async fn main() {
+
+  #[cfg(feature = "color")]
+  color_eyre::install().unwrap();
+
+  #[cfg(feature = "no-color")]
+  color_eyre::config::HookBuilder::new()
+    .theme(color_eyre::config::Theme::new())
+    .install()
+    .unwrap();
+
   self::log::init();
   run().await.unwrap();
 }
 #[allow(unused_must_use)]
-async fn run() -> anyhow::Result<()> {
+async fn run() -> Result<()> {
   Config::reload().await?;
   if !CONFIG.enable {
     warn!("Mesagisto-Bot is not enabled and is about to exit the program.");

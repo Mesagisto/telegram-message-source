@@ -2,7 +2,8 @@ use chrono::{Local, Offset, TimeZone};
 use tracing::Level;
 use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt};
 
-pub(crate) fn init() {
+pub(crate) fn init()  {
+
   tracing_subscriber::registry()
     .with(
       tracing_subscriber::fmt::layer()

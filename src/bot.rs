@@ -1,6 +1,7 @@
 use std::ops::Deref;
 
 use arcstr::ArcStr;
+use color_eyre::eyre::Result;
 use lateinit::LateInit;
 use mesagisto_client::{cache::CACHE, net::NET, res::RES};
 use teloxide::{
@@ -22,14 +23,14 @@ pub struct TgBot {
   inner: LateInit<BotRequester>,
 }
 impl TgBot {
-  pub async fn init(&self, bot: BotRequester) -> anyhow::Result<()> {
+  pub async fn init(&self, bot: BotRequester) -> Result<()> {
     bot.set_my_commands(Command::bot_commands()).await?;
     self.inner.init(bot);
     Ok(())
   }
 
   // fixme use this-error
-  pub async fn file(&self, uid: &Vec<u8>, id: &Vec<u8>) -> anyhow::Result<()> {
+  pub async fn file(&self, uid: &Vec<u8>, id: &Vec<u8>) -> Result<()> {
     let id_str: ArcStr = base64_url::encode(id).into();
     let TgFile { file_path, .. } = self
       .get_file(String::from_utf8_lossy(id))
@@ -56,7 +57,7 @@ impl TgBot {
     chat_id: ChatId,
     text: T,
     reply: Option<i32>,
-  ) -> anyhow::Result<teloxide::types::Message>
+  ) -> Result<teloxide::types::Message>
   where
     T: Into<String> + Clone,
   {
@@ -96,7 +97,7 @@ impl TgBot {
     chat_id: ChatId,
     image_path: &std::path::Path,
     reply: Option<i32>,
-  ) -> anyhow::Result<teloxide::types::Message> {
+  ) -> Result<teloxide::types::Message> {
     let photo = InputFile::file(image_path);
     let kind = infer::get_from_path(image_path)
       .expect("file read failed when refering file type")

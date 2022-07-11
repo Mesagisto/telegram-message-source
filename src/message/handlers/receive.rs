@@ -1,4 +1,5 @@
 use arcstr::ArcStr;
+use color_eyre::eyre::Result;
 use lateinit::LateInit;
 use mesagisto_client::{
   cache::CACHE,
@@ -20,7 +21,7 @@ use crate::{
 
 static CHANNEL: LateInit<UnboundedSender<(i64, ArcStr)>> = LateInit::new();
 
-pub fn recover() -> anyhow::Result<()> {
+pub fn recover() -> Result<()> {
   let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<(i64, ArcStr)>();
   tokio::spawn(async move {
     while let Some(element) = rx.recv().await {
@@ -41,20 +42,20 @@ pub fn recover() -> anyhow::Result<()> {
   Ok(())
 }
 
-pub fn add(target: i64, address: &ArcStr) -> anyhow::Result<()> {
+pub fn add(target: i64, address: &ArcStr) -> Result<()> {
   CHANNEL.send((target, address.clone()))?;
   Ok(())
 }
-pub fn change(target: i64, address: &ArcStr) -> anyhow::Result<()> {
+pub fn change(target: i64, address: &ArcStr) -> Result<()> {
   SERVER.unsub(&target.to_string().into());
   add(target, address)?;
   Ok(())
 }
-pub fn del(target: i64) -> anyhow::Result<()> {
+pub fn del(target: i64) -> Result<()> {
   SERVER.unsub(&target.to_string().into());
   Ok(())
 }
-pub async fn server_msg_handler(message: nats::Message, target: ArcStr) -> anyhow::Result<()> {
+pub async fn server_msg_handler(message: nats::Message, target: ArcStr) -> Result<()> {
   let target: i64 = target.parse()?;
   trace!("接收到来自目标{}的消息", target);
   let packet = Packet::from_cbor(&message.payload);
@@ -75,7 +76,7 @@ pub async fn server_msg_handler(message: nats::Message, target: ArcStr) -> anyho
   Ok(())
 }
 
-async fn left_sub_handler(mut message: Message, target: i64) -> anyhow::Result<()> {
+async fn left_sub_handler(mut message: Message, target: i64) -> Result<()> {
   let chat_id = ChatId(target);
   let sender_name = if message.profile.nick.is_some() {
     message.profile.nick.take().unwrap()

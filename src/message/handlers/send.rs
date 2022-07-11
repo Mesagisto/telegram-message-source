@@ -1,4 +1,5 @@
 use arcstr::ArcStr;
+use color_eyre::eyre::Result;
 use mesagisto_client::{
   data::{
     message,
@@ -18,7 +19,7 @@ use crate::{
   ext::db::DbExt,
 };
 
-pub async fn answer_common(msg: Message, _bot: BotRequester) -> anyhow::Result<()> {
+pub async fn answer_common(msg: Message, _bot: BotRequester) -> Result<()> {
   let target = msg.chat.id.0;
   if !CONFIG.bindings.contains_key(&target) {
     return Ok(());

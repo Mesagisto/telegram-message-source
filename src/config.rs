@@ -1,4 +1,5 @@
 use arcstr::ArcStr;
+use color_eyre::eyre::{Error, Result};
 use dashmap::DashMap;
 
 #[config_derive]
