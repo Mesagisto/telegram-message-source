@@ -64,34 +64,6 @@ jobs:
             extra_args:
             release_name: i686-windows-gnu-colored.exe
             cross: true
-          # Windows MSVC NO-COLOR
-          - os: windows-latest
-            file: ./target/x86_64-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
-            target: x86_64-pc-windows-msvc
-            extra_args: --no-default-features --features no-color
-            release_name: x86_64-windows-msvc.exe
-            cross: false
-
-          - os: windows-latest
-            file: ./target/i686-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
-            target: i686-pc-windows-msvc
-            extra_args: --no-default-features --features no-color
-            release_name: i686-windows-msvc.exe
-            cross: false
-          # Windows MSVC
-          - os: windows-latest
-            file: ./target/x86_64-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
-            target: x86_64-pc-windows-msvc
-            extra_args:
-            release_name: x86_64-windows-msvc-colored.exe
-            cross: false
-
-          - os: windows-latest
-            file: ./target/i686-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
-            target: i686-pc-windows-msvc
-            extra_args:
-            release_name: i686-windows-msvc-colored.exe
-            cross: false
           # Mac OSX
           - os: macos-latest
             file: ./target/x86_64-apple-darwin/release/${{ github.event.repository.name }}
