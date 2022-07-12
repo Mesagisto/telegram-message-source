@@ -15,60 +15,89 @@ jobs:
     strategy:
       matrix:
         include:
+          # Linux
           - os: ubuntu-latest
             file: ./target/x86_64-unknown-linux-musl/release/${{ github.event.repository.name }}
             target: x86_64-unknown-linux-musl
             extra_args:
-            release_name: linux-x86_64
+            release_name: x86_64-linux-musl
             cross: true
 
           - os: ubuntu-latest
             file: ./target/i686-unknown-linux-musl/release/${{ github.event.repository.name }}
             target: i686-unknown-linux-musl
             extra_args:
-            release_name: linux-i686
+            release_name: i686-linux-musl
             cross: true
 
           - os: ubuntu-latest
             file: ./target/aarch64-unknown-linux-gnu/release/${{ github.event.repository.name }}
             target: aarch64-unknown-linux-gnu
             extra_args:
-            release_name: linux-aarch64
+            release_name: aarch64-linux-gnu
+            cross: true
+          # Windows GNU
+          - os: ubuntu-latest
+            file: ./target/x86_64-pc-windows-gnu/release/${{ github.event.repository.name }}.exe
+            target: x86_64-pc-windows-gnu
+            extra_args: --no-default-features --features no-color
+            release_name: x86_64-windows-gnu.exe
             cross: true
 
+          - os: ubuntu-latest
+            file: ./target/i686-pc-windows-gnu/release/${{ github.event.repository.name }}.exe
+            target: i686-pc-windows-gnu
+            extra_args: --no-default-features --features no-color
+            release_name: i686-windows-gnu.exe
+            cross: true
+
+          - os: ubuntu-latest
+            file: ./target/x86_64-pc-windows-gnu/release/${{ github.event.repository.name }}.exe
+            target: x86_64-pc-windows-gnu
+            extra_args:
+            release_name: x86_64-windows-gnu-colored.exe
+            cross: true
+
+          - os: ubuntu-latest
+            file: ./target/i686-pc-windows-gnu/release/${{ github.event.repository.name }}.exe
+            target: i686-pc-windows-gnu
+            extra_args:
+            release_name: i686-windows-gnu-colored.exe
+            cross: true
+          # Windows MSVC NO-COLOR
           - os: windows-latest
             file: ./target/x86_64-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
             target: x86_64-pc-windows-msvc
             extra_args: --no-default-features --features no-color
-            release_name: windows-x86_64.exe
+            release_name: x86_64-windows-msvc.exe
             cross: false
 
           - os: windows-latest
             file: ./target/i686-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
             target: i686-pc-windows-msvc
             extra_args: --no-default-features --features no-color
-            release_name: windows-i686.exe
+            release_name: i686-windows-msvc.exe
             cross: false
-
+          # Windows MSVC
           - os: windows-latest
             file: ./target/x86_64-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
             target: x86_64-pc-windows-msvc
             extra_args:
-            release_name: windows-x86_64-colored.exe
+            release_name: x86_64-windows-msvc-colored.exe
             cross: false
 
           - os: windows-latest
             file: ./target/i686-pc-windows-msvc/release/${{ github.event.repository.name }}.exe
             target: i686-pc-windows-msvc
             extra_args:
-            release_name: windows-i686-colored.exe
+            release_name: i686-windows-msvc-colored.exe
             cross: false
-
+          # Mac OSX
           - os: macos-latest
             file: ./target/x86_64-apple-darwin/release/${{ github.event.repository.name }}
             target: x86_64-apple-darwin
             extra_args:
-            release_name: mac-x86_64
+            release_name: x86_64-mac
             cross: false
 
     steps:
@@ -97,14 +126,6 @@ jobs:
           use-cross: ${{ matrix.cross }}
           command: build
           args: --release --target ${{ matrix.target }} ${{ matrix.extra_args }}
-
-      - name: UPX Compress
-        if: matrix.os == 'windows-latest'
-        uses: svenstaro/upx-action@v2
-        with:
-          file: ${{ matrix.file }}
-          strip: false
-          args: --best --lzma
 
       - name: Rename binary
         run: mv ${{ matrix.file }} ${{ env.SHORT_NAME }}-${{ matrix.release_name }}
