@@ -98,6 +98,12 @@ jobs:
           command: build
           args: --release --target ${{ matrix.target }} ${{ matrix.extra_args }}
 
+      - name: UPX Compress
+        if: matrix.os == 'windows-latest'
+        uses: svenstaro/upx-action@v2
+        with:
+          file: ${{ matrix.file }}
+
       - name: Rename binary
         run: mv ${{ matrix.file }} ${{ env.SHORT_NAME }}-${{ matrix.release_name }}
 
