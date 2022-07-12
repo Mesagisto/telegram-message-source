@@ -103,6 +103,8 @@ jobs:
         uses: svenstaro/upx-action@v2
         with:
           file: ${{ matrix.file }}
+          strip: false
+          args: --best --lzma
 
       - name: Rename binary
         run: mv ${{ matrix.file }} ${{ env.SHORT_NAME }}-${{ matrix.release_name }}
