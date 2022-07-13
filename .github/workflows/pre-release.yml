@@ -7,6 +7,7 @@ on:
 
 env:
   SHORT_NAME: tg
+  CRATE_NAME: telegram-message-source
 
 jobs:
   compile:
@@ -17,59 +18,59 @@ jobs:
         include:
           # Linux
           - os: ubuntu-latest
-            file: ./target/x86_64-unknown-linux-musl/release/${{ github.event.repository.name }}
             target: x86_64-unknown-linux-musl
-            extra_args:
             release_name: x86_64-linux-musl
+            postfix: ""
+            extra_args: ""
             cross: true
 
           - os: ubuntu-latest
-            file: ./target/i686-unknown-linux-musl/release/${{ github.event.repository.name }}
             target: i686-unknown-linux-musl
-            extra_args:
             release_name: i686-linux-musl
+            postfix: ""
+            extra_args: ""
             cross: true
 
           - os: ubuntu-latest
-            file: ./target/aarch64-unknown-linux-gnu/release/${{ github.event.repository.name }}
             target: aarch64-unknown-linux-gnu
-            extra_args:
             release_name: aarch64-linux-gnu
+            postfix: ""
+            extra_args: ""
             cross: true
           # Windows GNU
           - os: ubuntu-latest
-            file: ./target/x86_64-pc-windows-gnu/release/${{ github.event.repository.name }}.exe
             target: x86_64-pc-windows-gnu
-            extra_args: --no-default-features --features no-color
             release_name: x86_64-windows-gnu.exe
-            cross: true
-
-          - os: ubuntu-latest
-            file: ./target/i686-pc-windows-gnu/release/${{ github.event.repository.name }}.exe
-            target: i686-pc-windows-gnu
+            postfix: ".exe"
             extra_args: --no-default-features --features no-color
-            release_name: i686-windows-gnu.exe
             cross: true
 
           - os: ubuntu-latest
-            file: ./target/x86_64-pc-windows-gnu/release/${{ github.event.repository.name }}.exe
-            target: x86_64-pc-windows-gnu
-            extra_args:
-            release_name: x86_64-windows-gnu-colored.exe
-            cross: true
-
-          - os: ubuntu-latest
-            file: ./target/i686-pc-windows-gnu/release/${{ github.event.repository.name }}.exe
             target: i686-pc-windows-gnu
-            extra_args:
+            release_name: i686-windows-gnu.exe
+            postfix: ".exe"
+            extra_args: --no-default-features --features no-color
+            cross: true
+
+          - os: ubuntu-latest
+            target: x86_64-pc-windows-gnu
+            release_name: x86_64-windows-gnu-colored.exe
+            postfix: ".exe"
+            extra_args: ""
+            cross: true
+
+          - os: ubuntu-latest
+            target: i686-pc-windows-gnu
             release_name: i686-windows-gnu-colored.exe
+            postfix: ".exe"
+            extra_args: ""
             cross: true
           # Mac OSX
           - os: macos-latest
-            file: ./target/x86_64-apple-darwin/release/${{ github.event.repository.name }}
             target: x86_64-apple-darwin
-            extra_args:
             release_name: x86_64-mac
+            postfix: ""
+            extra_args: ""
             cross: false
 
     steps:
@@ -100,7 +101,7 @@ jobs:
           args: --release --target ${{ matrix.target }} ${{ matrix.extra_args }}
 
       - name: Rename binary
-        run: mv ${{ matrix.file }} ${{ env.SHORT_NAME }}-${{ matrix.release_name }}
+        run: mv target/${{ matrix.target }}/release/${{ env.CRATE_NAME }}${{ matrix.postfix }} ${{ env.SHORT_NAME }}-${{ matrix.release_name }}
 
       - name: Upload binaries
         uses: actions/upload-artifact@v2
