@@ -7,7 +7,6 @@ edition = "2021"
 
 [features]
 default = ["color"]
-no-color = ["colored/no-color"]
 color = ["tracing-subscriber/ansi"]
 
 [dependencies]

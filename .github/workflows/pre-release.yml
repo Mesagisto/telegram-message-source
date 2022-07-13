@@ -42,14 +42,14 @@ jobs:
             target: x86_64-pc-windows-gnu
             release_name: x86_64-windows-gnu.exe
             postfix: ".exe"
-            extra_args: --no-default-features --features no-color
+            extra_args: --no-default-features
             cross: true
 
           - os: ubuntu-latest
             target: i686-pc-windows-gnu
             release_name: i686-windows-gnu.exe
             postfix: ".exe"
-            extra_args: --no-default-features --features no-color
+            extra_args: --no-default-features
             cross: true
 
           - os: ubuntu-latest

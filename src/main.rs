@@ -27,19 +27,20 @@ mod message;
 mod net;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
 
   #[cfg(feature = "color")]
-  color_eyre::install().unwrap();
+  color_eyre::install()?;
 
-  #[cfg(feature = "no-color")]
+  #[cfg(not(feature = "color"))]
   color_eyre::config::HookBuilder::new()
     .theme(color_eyre::config::Theme::new())
-    .install()
-    .unwrap();
+    .install()?;
 
   self::log::init();
-  run().await.unwrap();
+
+  run().await?;
+  Ok(())
 }
 #[allow(unused_must_use)]
 async fn run() -> Result<()> {
