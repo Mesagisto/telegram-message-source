@@ -8,6 +8,7 @@ edition = "2021"
 [features]
 default = ["color"]
 color = ["tracing-subscriber/ansi"]
+tokio-console = ["console-subscriber","tokio/tracing"]
 
 [dependencies]
 # bot
@@ -34,10 +35,11 @@ tokio-stream = "0.1.9"
 futures = "0.3.21"
 async-trait = "0.1.56"
 reqwest = { version = "0.11.11", default-features = false, features = ["rustls","rustls-tls-native-roots","stream","multipart"] }
+console-subscriber = { version = "0.1.6", optional = true }
 
 # error handling
 thiserror = "1.0.31"
-color-eyre = "0.6.1"
+color-eyre = "0.6.2"
 
 # encoding and decoding
 base64-url = "1.4.13"

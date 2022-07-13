@@ -1,10 +1,23 @@
 use chrono::{Local, Offset, TimeZone};
 use tracing::Level;
-use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::prelude::*;
 
 pub(crate) fn init()  {
-
-  tracing_subscriber::registry()
+  #[cfg(not(feature = "tokio-console"))]
+  let filter = tracing_subscriber::filter::Targets::new()
+    .with_target("teloxide", Level::INFO)
+    .with_target("telegram_message_source", Level::INFO)
+    .with_target("mesagisto_client", Level::TRACE)
+    .with_default(Level::WARN);
+  #[cfg(feature = "tokio-console")]
+  let filter = tracing_subscriber::filter::Targets::new()
+    .with_target("teloxide", Level::INFO)
+    .with_target("telegram_message_source", Level::INFO)
+    .with_target("mesagisto_client", Level::TRACE)
+    .with_target("tokio",Level::TRACE)
+    .with_target("runtime",Level::TRACE)
+    .with_default(Level::WARN);
+  let registry = tracing_subscriber::registry()
     .with(
       tracing_subscriber::fmt::layer()
         .with_target(true)
@@ -18,12 +31,11 @@ pub(crate) fn init()  {
           ),
         )),
     )
-    .with(
-      tracing_subscriber::filter::Targets::new()
-        .with_target("teloxide", Level::INFO)
-        .with_target("telegram_message_source", Level::INFO)
-        .with_target("mesagisto_client", Level::TRACE)
-        .with_default(Level::WARN),
-    )
-    .init();
+    .with(filter);
+
+  #[cfg(feature = "tokio-console")]
+  registry.with(console_subscriber::spawn()).init();
+  #[cfg(not(feature = "tokio-console"))]
+  registry.init();
+
 }
