@@ -3,20 +3,19 @@ use tracing::Level;
 use tracing_subscriber::prelude::*;
 
 pub(crate) fn init()  {
-  #[cfg(not(feature = "tokio-console"))]
-  let filter = tracing_subscriber::filter::Targets::new()
+
+  let mut filter = tracing_subscriber::filter::Targets::new()
     .with_target("teloxide", Level::INFO)
     .with_target("telegram_message_source", Level::INFO)
     .with_target("mesagisto_client", Level::TRACE)
     .with_default(Level::WARN);
-  #[cfg(feature = "tokio-console")]
-  let filter = tracing_subscriber::filter::Targets::new()
-    .with_target("teloxide", Level::INFO)
-    .with_target("telegram_message_source", Level::INFO)
-    .with_target("mesagisto_client", Level::TRACE)
-    .with_target("tokio",Level::TRACE)
-    .with_target("runtime",Level::TRACE)
-    .with_default(Level::WARN);
+
+  if cfg!(feature = "tokio-console") {
+    filter = filter
+      .with_target("tokio",Level::TRACE)
+      .with_target("runtime",Level::TRACE);
+  }
+
   let registry = tracing_subscriber::registry()
     .with(
       tracing_subscriber::fmt::layer()

@@ -41,7 +41,7 @@ async fn main() -> Result<()>{
   run().await?;
   Ok(())
 }
-#[allow(unused_must_use)]
+
 async fn run() -> Result<()> {
   Config::reload().await?;
   if !CONFIG.enable {
@@ -72,7 +72,7 @@ async fn run() -> Result<()> {
     })
     .build()
     .apply()
-    .await;
+    .await?;
   info!(
     "Mesagisto信使正在启动, version: v{}",
     env!("CARGO_PKG_VERSION")
