@@ -90,7 +90,7 @@ jobs:
 
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly
+          toolchain: nightly-2022-7-10
           target: ${{ matrix.target }}
           override: true
 
