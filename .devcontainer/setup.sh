@@ -13,8 +13,8 @@ apt-get install -y \
 
 ## Install rustup and common components
 curl https://sh.rustup.rs -sSf | sh -s -- -y
-rustup install nightly-2022-7-10
-rustup default nightly-2022-7-10
+rustup install nightly-2022-07-01
+rustup default nightly-2022-07-01
 rustup component add rustfmt
 rustup component add rustfmt --toolchain nightly
 rustup component add clippy

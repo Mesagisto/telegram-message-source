@@ -88,11 +88,10 @@ jobs:
           restore-keys: |
             ${{ matrix.target }}-release
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: nightly-2022-7-10
+          toolchain: nightly-2022-07-01
           target: ${{ matrix.target }}
-          override: true
 
       - uses: actions-rs/cargo@v1
         with:

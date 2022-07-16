@@ -27,14 +27,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-build
 
-    - name: Install nightly Rust toolchain
-      uses: actions-rs/toolchain@v1
+    - uses: dtolnay/rust-toolchain@master
       with:
-        profile: minimal
-        toolchain: nightly
+        toolchain: nightly-2022-07-01
+        target: ${{ matrix.target }}
         components: clippy
-        override: true
-
     - name: Build
       run: cargo build --verbose
     - name: Run tests
