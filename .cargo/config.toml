@@ -1,6 +1,2 @@
 [build]
 rustflags = ["--cfg", "tokio_unstable"]
-[target.'cfg(all(target_arch = "x86"))']
-rustflags = ["--cfg", "tokio_unstable","-C","target-cpu=sandybridge","-C","target-feature=+aes,+sse2,+sse4.1,+ssse3"]
-[target.'cfg(all(target_arch = "x86_64"))']
-rustflags = ["--cfg", "tokio_unstable","-C","target-cpu=sandybridge","-C","target-feature=+aes,+sse2,+sse4.1,+ssse3"]
