@@ -65,34 +65,6 @@ jobs:
             postfix: ".exe"
             extra_args: ""
             cross: true
-          # Windows MSVC
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            release_name: x86_64-windows-msvc.exe
-            postfix: ".exe"
-            extra_args: --no-default-features --features no-color
-            cross: false
-
-          - os: windows-latest
-            target: i686-pc-windows-msvc
-            release_name: i686-windows-msvc.exe
-            postfix: ".exe"
-            extra_args: --no-default-features --features no-color
-            cross: false
-
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            release_name: x86_64-windows-msvc-colored.exe
-            postfix: ".exe"
-            extra_args: ""
-            cross: false
-
-          - os: windows-latest
-            release_name: i686-windows-msvc-colored.exe
-            target: i686-pc-windows-msvc
-            postfix: ".exe"
-            extra_args: ""
-            cross: false
           # Mac OSX
           - os: macos-latest
             target: x86_64-apple-darwin
