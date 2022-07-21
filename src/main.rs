@@ -1,5 +1,5 @@
 #![allow(incomplete_features)]
-#![feature(backtrace, capture_disjoint_fields)]
+#![feature(backtrace, capture_disjoint_fields, let_chains)]
 
 use bot::TG_BOT;
 use color_eyre::eyre::Result;
