@@ -1,5 +1,5 @@
 #![allow(incomplete_features)]
-#![feature(backtrace, capture_disjoint_fields, let_chains)]
+#![feature(backtrace, capture_disjoint_fields)]
 
 use bot::TG_BOT;
 use color_eyre::eyre::Result;
@@ -85,8 +85,10 @@ async fn run() -> Result<()> {
   TG_BOT.init(bot).await?;
 
   handlers::receive::recover()?;
-  dispatch::start(&TG_BOT).await;
-
+  tokio::spawn(async {
+    dispatch::start(&TG_BOT).await;
+  });
+  tokio::signal::ctrl_c().await?;
   CONFIG.save().await.expect("保存配置文件失败");
   info!("Mesagisto信使即将关闭");
   Ok(())

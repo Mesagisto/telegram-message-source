@@ -32,7 +32,6 @@ pub async fn start(bot: &BotRequester) {
       "调度器中发生了一个错误",
     ))
     .build()
-    .setup_ctrlc_handler()
     .dispatch()
     .await;
 }
