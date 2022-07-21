@@ -13,24 +13,24 @@ tokio-console = ["console-subscriber","tokio/tracing"]
 
 [dependencies]
 # bot
-teloxide = { version = "0.9.2", default-features = false, features = ["macros", "auto-send","ctrlc_handler","rustls","nightly"] }
-teloxide-core = { version = "0.6.3", default-features = false, features = ["rustls","cache_me"] }
-teloxide-macros = "0.6.2"
+teloxide = { version = "0.10.0", default-features = false, features = ["macros", "auto-send","ctrlc_handler","rustls","nightly"] }
+teloxide-core = { version = "0.7.0", default-features = false, features = ["rustls","cache_me"] }
+teloxide-macros = "0.6.3"
 
 # logging
 tracing = "0.1.35"
-tracing-subscriber = { version = "0.3.14", default-features = false, features = ["tracing-log", "std", "local-time","fmt"] }
+tracing-subscriber = { version = "0.3.15", default-features = false, features = ["tracing-log", "std", "local-time","fmt"] }
 colored = "2.0.0"
 time = { version = "0.3.11", features = ["macros", "local-offset"] }
 chrono = "0.4.19"
 
 # serialization
-serde = { version = "1.0.139", default-features = false, features = ["derive","rc"] }
+serde = { version = "1.0.140", default-features = false, features = ["derive","rc"] }
 serde_json = "1.0.82"
-serde_yaml = "0.8.25"
+serde_yaml = "0.8.26"
 
 # asynchronous
-tokio = { version = "1.19.2", default-features = false, features = ["macros","signal","rt-multi-thread"] }
+tokio = { version = "1.20.0", default-features = false, features = ["macros","signal","rt-multi-thread"] }
 tokio-util = "0.7.3"
 tokio-stream = "0.1.9"
 futures = "0.3.21"
