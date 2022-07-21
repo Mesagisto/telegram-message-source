@@ -27,14 +27,13 @@ mod message;
 mod net;
 
 #[tokio::main]
-async fn main() -> Result<()>{
-
+async fn main() -> Result<()> {
   if cfg!(feature = "color") {
     color_eyre::install()?;
   } else {
     color_eyre::config::HookBuilder::new()
-    .theme(color_eyre::config::Theme::new())
-    .install()?;
+      .theme(color_eyre::config::Theme::new())
+      .install()?;
   }
 
   self::log::init();
