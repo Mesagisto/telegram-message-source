@@ -41,6 +41,8 @@ console-subscriber = { version = "0.1.6", optional = true }
 # error handling
 thiserror = "1.0.31"
 color-eyre = "0.6.2"
+tracing-error = "0.2.0"
+color-spantrace = "0.2.0"
 
 # encoding and decoding
 base64-url = "1.4.13"

@@ -30,11 +30,11 @@ pub(crate) fn init()  {
           ),
         )),
     )
+    .with(ErrorLayer::default())
     .with(filter);
 
   #[cfg(feature = "tokio-console")]
   registry.with(console_subscriber::spawn()).init();
   #[cfg(not(feature = "tokio-console"))]
   registry.init();
-
 }
