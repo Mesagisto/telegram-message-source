@@ -5,6 +5,11 @@ version = "1.6.0"
 authors = ["Itsusinn <itsusinn@foxmail.com>"]
 edition = "2021"
 
+[package.metadata.i18n]
+available-locales = ["en-US", "zh-CN"]
+default-locale = "en-US"
+load-path = "locales"
+
 [features]
 default = ["color"]
 no-color = ["colored/no-color"]
@@ -23,6 +28,7 @@ tracing-subscriber = { version = "0.3.15", default-features = false, features = 
 colored = "2.0.0"
 time = { version = "0.3.11", features = ["macros", "local-offset"] }
 chrono = "0.4.19"
+rust-i18n = "0.6.1"
 
 # serialization
 serde = { version = "1.0.140", default-features = false, features = ["derive","rc"] }
@@ -82,3 +88,4 @@ lto = true
 incremental = false
 codegen-units = 1
 strip = "debuginfo"
+

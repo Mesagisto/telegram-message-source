@@ -1,0 +1,4 @@
+---
+en-US:
+  not-enable: "Mesagisto-Bot is not enabled and is about to exit the program."
+  not-enable-helper: "To enable it, please modify the configuration file."

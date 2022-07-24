@@ -1,0 +1,4 @@
+---
+zh-CN:
+  not-enable: "Mesagisto-Bot未被启用, 即将退出程序。"
+  not-enable-helper: "若要启用，请修改配置文件。"

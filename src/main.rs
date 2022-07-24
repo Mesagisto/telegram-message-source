@@ -7,6 +7,7 @@ use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
 use teloxide::{prelude::*, types::ParseMode, Bot};
 use tracing::*;
+use rust_i18n::t;
 
 use self::message::handlers;
 use crate::config::{Config, CONFIG};
@@ -17,6 +18,10 @@ extern crate educe;
 extern crate automatic_config;
 #[macro_use]
 extern crate singleton;
+#[macro_use]
+extern crate rust_i18n;
+i18n!("locales");
+
 mod bot;
 mod command;
 mod config;
@@ -43,11 +48,10 @@ async fn main() -> Result<()> {
 
 async fn run() -> Result<()> {
   Config::reload().await?;
+  rust_i18n::set_locale(&CONFIG.locale);
   if !CONFIG.enable {
-    warn!("Mesagisto-Bot is not enabled and is about to exit the program.");
-    warn!("To enable it, please modify the configuration file.");
-    warn!("Mesagisto-Bot未被启用, 即将退出程序。");
-    warn!("若要启用，请修改配置文件。");
+    warn!("{}",t!("not-enable"));
+    warn!("{}",t!("not-enable-helper"));
     return Ok(());
   }
   CONFIG.migrate();
