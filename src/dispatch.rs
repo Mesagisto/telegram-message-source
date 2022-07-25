@@ -1,6 +1,8 @@
 use teloxide::prelude::*;
 use tracing::info;
 
+const TARGET: &str = "mesagisto";
+
 use crate::{bot::BotRequester, command::Command, message::handlers};
 
 pub async fn start(bot: &BotRequester) {
@@ -26,10 +28,11 @@ pub async fn start(bot: &BotRequester) {
     .branch(message_handler)
     .branch(edit_message_handler);
 
-  info!("Mesagisto信使启动成功");
+  // info!(target: TARGET,"TG信使启动成功");
+  info!(target: TARGET, "{}", t!("log.boot-sucess"));
   Dispatcher::builder(bot.clone(), handler)
     .error_handler(LoggingErrorHandler::with_custom_text(
-      "调度器中发生了一个错误",
+      t!("log.log-callback-error"),
     ))
     .build()
     .dispatch()

@@ -5,9 +5,9 @@ use bot::TG_BOT;
 use color_eyre::eyre::Result;
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
+use rust_i18n::t;
 use teloxide::{prelude::*, types::ParseMode, Bot};
 use tracing::*;
-use rust_i18n::t;
 
 use self::message::handlers;
 use crate::config::{Config, CONFIG};
@@ -31,6 +31,8 @@ mod log;
 mod message;
 mod net;
 
+const TARGET: &str = "mesagisto";
+
 #[tokio::main]
 async fn main() -> Result<()> {
   if cfg!(feature = "color") {
@@ -50,8 +52,8 @@ async fn run() -> Result<()> {
   Config::reload().await?;
   rust_i18n::set_locale(&CONFIG.locale);
   if !CONFIG.enable {
-    warn!("{}",t!("not-enable"));
-    warn!("{}",t!("not-enable-helper"));
+    warn!(target: TARGET, "{}", t!("log.not-enable"));
+    warn!(target: TARGET, "{}", t!("log.not-enable-helper"));
     return Ok(());
   }
   CONFIG.migrate();
@@ -77,10 +79,10 @@ async fn run() -> Result<()> {
     .apply()
     .await?;
   info!(
-    "Mesagisto信使正在启动, version: v{}",
-    env!("CARGO_PKG_VERSION")
+    target: TARGET,
+    "{}",
+    t!("log.boot-start", version = env!("CARGO_PKG_VERSION"))
   );
-
   let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config())
     .parse_mode(ParseMode::Html)
     .auto_send();
@@ -93,6 +95,7 @@ async fn run() -> Result<()> {
   });
   tokio::signal::ctrl_c().await?;
   CONFIG.save().await.expect("保存配置文件失败");
-  info!("Mesagisto信使即将关闭");
+  // info!(target: TARGET, "TG信使即将关闭");
+  info!(target: TARGET,"{}",t!("log.shutdown"));
   Ok(())
 }

@@ -8,17 +8,17 @@ use teloxide::{
 use crate::{bot::BotRequester, config::CONFIG, message::handlers};
 
 #[derive(BotCommands, Clone)]
-#[command(rename = "lowercase", description = "信使Bot支持以下命令")]
+#[command(rename = "lowercase", description = "MesagistoTG supports following commands")]
 pub enum Command {
-  #[command(description = "关于本项目")]
+  #[command(description = "About")]
   About,
-  #[command(description = "解绑当前群组的转发地址")]
+  #[command(description = "Unbind the currunt's gruop binding")]
   Unbind,
-  #[command(description = "显示命令帮助")]
+  #[command(description = "Disaplay commands help")]
   Help,
-  #[command(description = "显示状态")]
+  #[command(description = "Disaplay status")]
   Status,
-  #[command(description = "绑定当前群组的转发地址", parse_with = "split")]
+  #[command(description = "Bind currunt's group to address", parse_with = "split")]
   Bind { address: String },
 }
 impl Command {

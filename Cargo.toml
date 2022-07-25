@@ -1,7 +1,6 @@
 [package]
 name = "telegram-message-source"
 version = "1.6.0"
-
 authors = ["Itsusinn <itsusinn@foxmail.com>"]
 edition = "2021"
 
@@ -18,7 +17,7 @@ tokio-console = ["console-subscriber","tokio/tracing"]
 
 [dependencies]
 # bot
-teloxide = { version = "0.10.0", default-features = false, features = ["macros", "auto-send","ctrlc_handler","rustls","nightly"] }
+teloxide = { version = "0.10.1", default-features = false, features = ["macros", "auto-send","ctrlc_handler","rustls","nightly"] }
 teloxide-core = { version = "0.7.0", default-features = false, features = ["rustls","cache_me"] }
 teloxide-macros = "0.6.3"
 

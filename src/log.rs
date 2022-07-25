@@ -7,6 +7,7 @@ pub(crate) fn init() {
   let mut filter = tracing_subscriber::filter::Targets::new()
     .with_target("teloxide", Level::INFO)
     .with_target("telegram_message_source", Level::INFO)
+    .with_target("mesagisto", Level::INFO)
     .with_target("mesagisto_client", Level::TRACE)
     .with_default(Level::WARN);
 
