@@ -2107,6 +2107,7 @@ dependencies = [
 [[package]]
 name = "rust-i18n"
 version = "0.6.2-alpha.0"
+source = "git+https://github.com/Itsusinn/rust-i18n.git?branch=main#691b111afee34883606eeba43c3582764b253238"
 dependencies = [
  "anyhow",
  "clap",
@@ -2125,6 +2126,7 @@ dependencies = [
 [[package]]
 name = "rust-i18n-extract"
 version = "0.4.0"
+source = "git+https://github.com/Itsusinn/rust-i18n.git?branch=main#691b111afee34883606eeba43c3582764b253238"
 dependencies = [
  "anyhow",
  "ignore",
@@ -2141,6 +2143,7 @@ dependencies = [
 [[package]]
 name = "rust-i18n-macro"
 version = "0.4.0"
+source = "git+https://github.com/Itsusinn/rust-i18n.git?branch=main#691b111afee34883606eeba43c3582764b253238"
 dependencies = [
  "glob",
  "once_cell",
@@ -2156,6 +2159,7 @@ dependencies = [
 [[package]]
 name = "rust-i18n-support"
 version = "0.4.0"
+source = "git+https://github.com/Itsusinn/rust-i18n.git?branch=main#691b111afee34883606eeba43c3582764b253238"
 dependencies = [
  "glob",
  "once_cell",
