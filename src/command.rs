@@ -8,7 +8,10 @@ use teloxide::{
 use crate::{bot::BotRequester, config::CONFIG, message::handlers};
 
 #[derive(BotCommands, Clone)]
-#[command(rename = "lowercase", description = "MesagistoTG supports following commands")]
+#[command(
+  rename = "lowercase",
+  description = "MesagistoTG supports following commands"
+)]
 pub enum Command {
   #[command(description = "About")]
   About,

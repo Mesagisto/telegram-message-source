@@ -31,9 +31,9 @@ pub async fn start(bot: &BotRequester) {
   // info!(target: TARGET,"TG信使启动成功");
   info!(target: TARGET, "{}", t!("log.boot-sucess"));
   Dispatcher::builder(bot.clone(), handler)
-    .error_handler(LoggingErrorHandler::with_custom_text(
-      t!("log.log-callback-error"),
-    ))
+    .error_handler(LoggingErrorHandler::with_custom_text(t!(
+      "log.log-callback-error"
+    )))
     .build()
     .dispatch()
     .await;

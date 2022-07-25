@@ -6,3 +6,4 @@ zh-CN:
   log.boot-sucess: "信使TG启动成功"
   log.log-callback-error: "Teloxide调度器发生错误"
   log.shutdown: "TG信使即将关闭"
+  log.locale-not-configured: "本地化选项未设置, 将使用系统语言偏好 %{locale_}"

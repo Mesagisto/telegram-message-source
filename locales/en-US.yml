@@ -6,3 +6,4 @@ en-US:
   log.boot-sucess: "MesagistoTG activation successful."
   log.log-callback-error: "An error occurred in the Teloxide dispatcher."
   log.shutdown: "MesagistoTG is about to close."
+  log.locale-not-configured: "Localization option is not set, system language preference %{locale_} will be used"

@@ -50,7 +50,14 @@ async fn main() -> Result<()> {
 
 async fn run() -> Result<()> {
   Config::reload().await?;
-  rust_i18n::set_locale(&CONFIG.locale);
+  if &CONFIG.locale !=  "" {
+    rust_i18n::set_locale(&CONFIG.locale);
+  } else {
+    use sys_locale::get_locale;
+    let locale = get_locale().unwrap_or_else(|| String::from("en-US")).replace("_", "-");
+    rust_i18n::set_locale(&locale);
+    info!(target:TARGET, "{}", t!("log.locale-not-configured",locale_ = &locale));
+  }
   if !CONFIG.enable {
     warn!(target: TARGET, "{}", t!("log.not-enable"));
     warn!(target: TARGET, "{}", t!("log.not-enable-helper"));
@@ -95,6 +102,6 @@ async fn run() -> Result<()> {
   });
   tokio::signal::ctrl_c().await?;
   CONFIG.save().await.expect("保存配置文件失败");
-  info!(target: TARGET,"{}",t!("log.shutdown"));
+  info!(target: TARGET, "{}", t!("log.shutdown"));
   Ok(())
 }
