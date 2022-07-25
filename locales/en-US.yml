@@ -1,6 +1,8 @@
 ---
 en-US:
-  log.not-enable: "Mesagisto is not enabled and is about to exit the program."
-  log.not-enable-helper: "To enable it, please modify the configuration file."
-  log.boot-start: "信使TG正在启动, version: v%{version}"
-  log.boot-sucess: boot-sucess
+  log.not-enable: "MesagistoTG is not enabled, about to exit the program."
+  log.not-enable-helper: "To enable, please modify the configuration file."
+  log.boot-start: "MesagistoTG is starting, version: v%{version}"
+  log.boot-sucess: "MesagistoTG activation successful."
+  log.log-callback-error: "An error occurred in the Teloxide dispatcher."
+  log.shutdown: "MesagistoTG is about to close."

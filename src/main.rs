@@ -95,7 +95,6 @@ async fn run() -> Result<()> {
   });
   tokio::signal::ctrl_c().await?;
   CONFIG.save().await.expect("保存配置文件失败");
-  // info!(target: TARGET, "TG信使即将关闭");
   info!(target: TARGET,"{}",t!("log.shutdown"));
   Ok(())
 }

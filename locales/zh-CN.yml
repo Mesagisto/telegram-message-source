@@ -1,6 +1,8 @@
 ---
 zh-CN:
-  log.not-enable: "Mesagisto-Bot未被启用, 即将退出程序。"
+  log.not-enable: "信使TG未被启用, 即将退出程序。"
   log.not-enable-helper: "若要启用，请修改配置文件。"
   log.boot-start: "信使TG正在启动, version: v%{version}"
   log.boot-sucess: "信使TG启动成功"
+  log.log-callback-error: "Teloxide调度器发生错误"
+  log.shutdown: "TG信使即将关闭"
