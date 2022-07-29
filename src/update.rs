@@ -1,16 +1,11 @@
-use std::time::Duration;
-
 use color_eyre::eyre::Result;
-use futures::future::ok;
-use reqwest::{header, Proxy};
 use self_update::{cargo_crate_version, Status};
+
 use crate::config::CONFIG;
 
 const SHORT_NAME: &str = "tg";
 
 pub fn update() -> Result<Status> {
-
-
   if CONFIG.auto_update.enable_proxy && CONFIG.proxy.enable {
     std::env::set_var("HTTPS_PROXY", CONFIG.proxy.address.as_str());
   }

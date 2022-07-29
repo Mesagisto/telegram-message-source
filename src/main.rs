@@ -9,7 +9,6 @@ use rust_i18n::t;
 use self_update::Status;
 use teloxide::{prelude::*, types::ParseMode, Bot};
 
-
 use self::message::handlers;
 use crate::config::{Config, CONFIG};
 
@@ -19,6 +18,8 @@ extern crate educe;
 extern crate automatic_config;
 #[macro_use]
 extern crate singleton;
+#[macro_use]
+extern crate tracing;
 #[macro_use]
 extern crate rust_i18n;
 i18n!("locales");
@@ -46,19 +47,26 @@ async fn main() -> Result<()> {
   }
 
   self::log::init();
+
   run().await?;
   Ok(())
 }
 
 async fn run() -> Result<()> {
   Config::reload().await?;
-  if &CONFIG.locale !=  "" {
+  if !&CONFIG.locale.is_empty() {
     rust_i18n::set_locale(&CONFIG.locale);
   } else {
     use sys_locale::get_locale;
-    let locale = get_locale().unwrap_or_else(|| String::from("en-US")).replace("_", "-");
+    let locale = get_locale()
+      .unwrap_or_else(|| String::from("en-US"))
+      .replace('_', "-");
     rust_i18n::set_locale(&locale);
-    info!(target:TARGET, "{}", t!("log.locale-not-configured",locale_ = &locale));
+    info!(
+      target: TARGET,
+      "{}",
+      t!("log.locale-not-configured", locale_ = &locale)
+    );
   }
   if !CONFIG.enable {
     warn!(target: TARGET, "{}", t!("log.not-enable"));
@@ -71,17 +79,18 @@ async fn run() -> Result<()> {
     tokio::task::spawn_blocking(|| {
       match update::update() {
         Ok(Status::UpToDate(_)) => {
-          info!(target: TARGET,"{}",t!("log.update-check-success"));
-        },
+          info!(target: TARGET, "{}", t!("log.update-check-success"));
+        }
         Ok(Status::Updated(_)) => {
-          info!(target: TARGET,"{}",t!("log.upgrade-success"));
+          info!(target: TARGET, "{}", t!("log.upgrade-success"));
           std::process::exit(0);
         }
         Err(e) => {
-          error!("{}",e);
-        },
+          error!("{}", e);
+        }
       };
-    }).await?;
+    })
+    .await?;
   }
   MesagistoConfig::builder()
     .name("tg")
