@@ -16,7 +16,7 @@ pub struct Config {
   pub nats: NatsConfig,
   pub proxy: ProxyConfig,
   pub telegram: TelegramConfig,
-
+  pub auto_update: AutoUpdateConfig,
   // TODO remove in next major version
   target_address_mapper: DashMap<i64, ArcStr>,
 }
@@ -73,4 +73,14 @@ pub struct TelegramConfig {
 #[config_derive]
 pub struct FormatConfig {
   pub msg: ArcStr,
+}
+
+#[config_derive]
+pub struct AutoUpdateConfig {
+  #[educe(Default = true)]
+  pub enable: bool,
+  #[educe(Default = true)]
+  pub enable_proxy: bool,
+  #[educe(Default = false)]
+  pub no_confirm:bool
 }

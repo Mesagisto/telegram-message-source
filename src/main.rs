@@ -6,8 +6,9 @@ use color_eyre::eyre::Result;
 use futures::FutureExt;
 use mesagisto_client::MesagistoConfig;
 use rust_i18n::t;
+use self_update::Status;
 use teloxide::{prelude::*, types::ParseMode, Bot};
-use tracing::*;
+
 
 use self::message::handlers;
 use crate::config::{Config, CONFIG};
@@ -30,6 +31,7 @@ pub mod ext;
 mod log;
 mod message;
 mod net;
+mod update;
 
 const TARGET: &str = "mesagisto";
 
@@ -65,6 +67,22 @@ async fn run() -> Result<()> {
   }
   CONFIG.migrate();
 
+  if CONFIG.auto_update.enable {
+    tokio::task::spawn_blocking(|| {
+      match update::update() {
+        Ok(Status::UpToDate(_)) => {
+          info!(target: TARGET,"{}",t!("log.update-check-success"));
+        },
+        Ok(Status::Updated(_)) => {
+          info!(target: TARGET,"{}",t!("log.upgrade-success"));
+          std::process::exit(0);
+        }
+        Err(e) => {
+          error!("{}",e);
+        },
+      };
+    }).await?;
+  }
   MesagistoConfig::builder()
     .name("tg")
     .cipher_key(CONFIG.cipher.key.clone())

@@ -7,3 +7,5 @@ zh-CN:
   log.log-callback-error: "Teloxide调度器发生错误"
   log.shutdown: "TG信使即将关闭"
   log.locale-not-configured: "本地化选项未设置, 将使用系统语言偏好 %{locale_}"
+  log.update-check-success: "自动更新检查成功,程序是最新的。"
+  log.upgrade-success: "自动升级成功, 请手动重启程序。"
