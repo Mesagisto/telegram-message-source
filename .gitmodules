@@ -1,3 +1,0 @@
-[submodule "libs/rust-i18n"]
-	path = libs/rust-i18n
-	url = git@github.com:Itsusinn/rust-i18n.git
