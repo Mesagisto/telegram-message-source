@@ -10,32 +10,49 @@ default-locale = "en-US"
 load-path = "locales"
 
 [features]
-default = ["color"]
+default = ["default-polylith"]
+default-monolith = ["monolith","color"]
+default-polylith = ["polylith","color"]
 no-color = ["colored/no-color"]
 color = ["tracing-subscriber/ansi"]
-tokio-console = ["console-subscriber","tokio/tracing"]
+monolith = []
+polylith = ["tracing-opentelemetry","opentelemetry","opentelemetry-jaeger","axum"]
 
 [dependencies]
 # bot
-teloxide = { version = "0.10.1", default-features = false, features = ["macros", "auto-send","ctrlc_handler","rustls","nightly"] }
-teloxide-core = { version = "0.7.0", default-features = false, features = ["rustls","cache_me"] }
+teloxide = { version = "0.10.1", default-features = false, features = ["macros", "auto-send","ctrlc_handler","rustls","nightly", "webhooks-axum"] }
+teloxide-core = { version = "0.7.0", default-features = false, features = ["rustls", "cache_me"] }
 teloxide-macros = "0.6.3"
+
+# polylith
+tracing-opentelemetry = { version = "0.17.4",optional = true }
+opentelemetry = { version = "0.17.0", features = ["rt-tokio"], optional = true }
+opentelemetry-jaeger = { version = "0.16.0", features = ["rt-tokio"], optional = true }
+axum = { version = "0.5.13",optional = true }
+
+# mesagisto
+nats = { package = "async-nats", version = "0.17.0" }
+# mesagisto-client = { branch = "master", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git" }
+mesagisto-client = { path = "../../mesagisto-client/rust" }
+automatic-config = { branch = "master", git = "https://github.com/Itsusinn/automatic-config-rs.git" }
+# automatic-config = { path = "/home/itsusinn/Workspace/Code/automatic-config-rs" }
+lateinit = { branch = "master", git = "https://github.com/Itsusinn/lateinit-rs.git" }
+singleton = { branch="master", git = "https://github.com/Itsusinn/singleton-rs.git" }
+# singleton = { path = "/code/singleton-rs" }
 
 # logging
 tracing = "0.1.35"
-tracing-subscriber = { version = "0.3.15", default-features = false, features = ["tracing-log", "std", "local-time","fmt"] }
+tracing-subscriber = { version = "0.3.15" ,default-features = false, features = ["tracing-log", "std", "local-time","fmt"] }
 colored = "2.0.0"
 time = { version = "0.3.11", features = ["macros", "local-offset"] }
 chrono = "0.4.19"
 sys-locale = "0.2.1"
-# rust-i18n = "0.6.1"
-# rust-i18n = { path = "libs/rust-i18n" }
 rust-i18n = { branch = "main", git = "https://github.com/Itsusinn/rust-i18n.git"}
+
 # serialization
 serde = { version = "1.0.140", default-features = false, features = ["derive","rc"] }
 serde_json = "1.0.82"
 serde_yaml = "0.9.0"
-
 
 # asynchronous
 tokio = { version = "1.20.1", default-features = false, features = ["macros","signal","rt-multi-thread"] }
@@ -44,7 +61,6 @@ tokio-stream = "0.1.9"
 futures = "0.3.21"
 async-trait = "0.1.56"
 reqwest = { version = "0.11.11", default-features = false, features = ["rustls","rustls-tls-native-roots","stream","multipart"] }
-console-subscriber = { version = "0.1.6", optional = true }
 
 # error handling
 thiserror = "1.0.31"
@@ -75,15 +91,7 @@ self_update = { branch = "dirty-feat", git = "https://github.com/Itsusinn/self_u
 # database
 sled = "0.34.7"
 
-# mesagisto
-nats = { package = "async-nats", version = "0.17.0" }
-mesagisto-client = { branch = "master", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git" }
-# mesagisto-client = { path = "../../mesagisto-client/rust" }
-automatic-config = { branch = "master", git = "https://github.com/Itsusinn/automatic-config-rs.git" }
-# automatic-config = { path = "/home/itsusinn/Workspace/Code/automatic-config-rs" }
-lateinit = { branch = "master", git = "https://github.com/Itsusinn/lateinit-rs.git" }
-singleton = { branch="master", git = "https://github.com/Itsusinn/singleton-rs.git" }
-# singleton = { path = "/code/singleton-rs" }
+
 
 [profile.release]
 opt-level = 'z'

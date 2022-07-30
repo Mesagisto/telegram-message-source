@@ -13,18 +13,24 @@ use teloxide::{
   Bot,
 };
 use teloxide_core::types::ChatId;
-use tracing::warn;
+use tracing::{instrument, warn};
 
-use crate::{command::Command, config::CONFIG, message::handlers};
+use crate::{commands::bind::BindCommand, config::CONFIG, handlers};
+#[cfg(feature = "polylith")]
+use crate::commands::manage::ManageCommand;
 pub type BotRequester = AutoSend<DefaultParseMode<Bot>>;
 
-#[derive(Singleton, Default)]
+#[derive(Singleton, Default, Debug)]
 pub struct TgBot {
   inner: LateInit<BotRequester>,
 }
 impl TgBot {
   pub async fn init(&self, bot: BotRequester) -> Result<()> {
-    bot.set_my_commands(Command::bot_commands()).await?;
+    let mut commands = Vec::new();
+    commands.append(&mut BindCommand::bot_commands());
+    #[cfg(feature = "polylith")]
+    commands.append(&mut ManageCommand::bot_commands());
+    bot.set_my_commands(commands).await?;
     self.inner.init(bot);
     Ok(())
   }
@@ -52,6 +58,7 @@ impl TgBot {
     .into()
   }
 
+  #[instrument(skip(self))]
   pub async fn send_text<T>(
     &self,
     chat_id: ChatId,
@@ -59,7 +66,7 @@ impl TgBot {
     reply: Option<i32>,
   ) -> Result<teloxide::types::Message>
   where
-    T: Into<String> + Clone,
+    T: Into<String> + Clone + std::fmt::Debug,
   {
     let send = self.inner.send_message(chat_id, text.clone());
     let send = if let Some(reply) = reply {
@@ -92,6 +99,7 @@ impl TgBot {
     }
   }
 
+  #[instrument(skip(self))]
   pub async fn send_image(
     &self,
     chat_id: ChatId,
@@ -109,6 +117,7 @@ impl TgBot {
         "{:?}.gif",
         image_path.file_name().expect("Wrong filename")
       ));
+
       let send = self.inner.send_animation(chat_id, photo.clone());
       if let Some(reply) = reply {
         send.reply_to_message_id(reply).await

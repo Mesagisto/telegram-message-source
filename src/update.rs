@@ -65,17 +65,17 @@ fn target_name() -> String {
 #[test]
 fn test_reqwest() -> Result<()> {
   use std::time::Duration;
+
   use reqwest::header;
   let a = reqwest::blocking::Client::builder()
     .user_agent("rust-reqwest/self-update")
-    .timeout(Duration::from_secs(60))
+    .timeout(Duration::from_secs(5))
     // .proxy(Proxy::http("127.0.0.1:7890").unwrap())
     .build()
     .unwrap()
     .post("https://api.github.com/repos/MeowCat-Studio/telegram-message-source/releases/assets/72134624")
     .header(header::ACCEPT, "application/octet-stream")
-    .send()
-    .unwrap();
+    .send()?;
   dbg!(a);
   Ok(())
 }

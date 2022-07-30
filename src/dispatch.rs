@@ -1,16 +1,16 @@
 use teloxide::prelude::*;
 use tracing::info;
 
-const TARGET: &str = "mesagisto";
-
-use crate::{bot::BotRequester, command::Command, message::handlers};
+use crate::{bot::BotRequester, commands::bind::BindCommand, handlers};
+#[cfg(feature = "polylith")]
+use crate::commands::manage::ManageCommand;
 
 pub async fn start(bot: &BotRequester) {
   let message_handler = Update::filter_message()
     .branch(
       dptree::entry()
-        .filter_command::<Command>()
-        .endpoint(Command::answer),
+        .filter_command::<BindCommand>()
+        .endpoint(BindCommand::answer),
     )
     .branch(
       dptree::filter(|msg: Message| {
@@ -18,18 +18,24 @@ pub async fn start(bot: &BotRequester) {
       })
       .endpoint(handlers::send::answer_common),
     );
+  #[cfg(feature = "polylith")]
+  let message_handler = message_handler.branch(
+    dptree::entry()
+      .filter_command::<ManageCommand>()
+      .endpoint(ManageCommand::answer),
+  );
   let edit_message_handler = Update::filter_edited_message().branch(
     dptree::filter(|msg: Message| {
       msg.chat.is_group() || msg.chat.is_supergroup() || msg.chat.is_channel()
     })
     .endpoint(handlers::send::answer_common),
   );
+
   let handler = dptree::entry()
     .branch(message_handler)
     .branch(edit_message_handler);
 
-  // info!(target: TARGET,"TG信使启动成功");
-  info!(target: TARGET, "{}", t!("log.boot-sucess"));
+  info!("{}", t!("log.boot-sucess"));
   Dispatcher::builder(bot.clone(), handler)
     .error_handler(LoggingErrorHandler::with_custom_text(t!(
       "log.log-callback-error"

@@ -12,7 +12,7 @@ use mesagisto_client::{
 };
 use teloxide::{types::ChatId, utils::html};
 use tokio::sync::mpsc::UnboundedSender;
-use tracing::trace;
+use tracing::{instrument, trace};
 
 use crate::{
   ext::{db::DbExt, err::LogResultExt},
@@ -20,6 +20,8 @@ use crate::{
 };
 
 static CHANNEL: LateInit<UnboundedSender<(i64, ArcStr)>> = LateInit::new();
+
+const TARGET: &str = "msgist::handlers";
 
 pub fn recover() -> Result<()> {
   let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<(i64, ArcStr)>();
@@ -29,7 +31,7 @@ pub fn recover() -> Result<()> {
         .recv(
           ArcStr::from(element.0.to_string()),
           &element.1,
-          server_msg_handler,
+          nats_handler,
         )
         .await
         .log_if_error("error when add callback handler");
@@ -55,28 +57,31 @@ pub fn del(target: i64) -> Result<()> {
   SERVER.unsub(&target.to_string().into());
   Ok(())
 }
-pub async fn server_msg_handler(message: nats::Message, target: ArcStr) -> Result<()> {
+#[instrument(skip_all)]
+pub async fn nats_handler(message: nats::Message, target: ArcStr) -> Result<()> {
   let target: i64 = target.parse()?;
-  trace!("接收到来自目标{}的消息", target);
   let packet = Packet::from_cbor(&message.payload);
   let packet = match packet {
     Ok(v) => v,
     Err(_e) => {
       // todo logging
-      tracing::warn!("未知的数据包类型，请更新本消息源，若已是最新请等待适配");
+      tracing::warn!(
+        target: TARGET,
+        "未知的数据包类型，请更新本消息源，若已是最新请等待适配"
+      );
       return Ok(());
     }
   };
   match packet {
     either::Left(msg) => {
-      left_sub_handler(msg, target).await?;
+      msg_handler(msg, target).await?;
     }
     either::Right(_) => {}
   }
   Ok(())
 }
-
-async fn left_sub_handler(mut message: Message, target: i64) -> Result<()> {
+#[instrument(skip_all)]
+async fn msg_handler(mut message: Message, target: i64) -> Result<()> {
   let chat_id = ChatId(target);
   let sender_name = if message.profile.nick.is_some() {
     message.profile.nick.take().unwrap()
@@ -87,7 +92,7 @@ async fn left_sub_handler(mut message: Message, target: i64) -> Result<()> {
   };
 
   for single in message.chain {
-    trace!("正在处理消息链中的元素");
+    trace!(target:TARGET,element = ?single,"正在处理消息链中的元素");
     match single {
       MessageType::Text { content } => {
         let content = format!(
