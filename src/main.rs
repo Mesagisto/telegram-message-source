@@ -9,7 +9,6 @@ use rust_i18n::t;
 use self_update::Status;
 use teloxide::{prelude::*, types::ParseMode, Bot};
 
-use self::message::handlers;
 use crate::config::{Config, CONFIG};
 
 #[macro_use]
@@ -25,16 +24,17 @@ extern crate rust_i18n;
 i18n!("locales");
 
 mod bot;
-mod command;
+pub mod commands;
 mod config;
 mod dispatch;
 pub mod ext;
+mod handlers;
 mod log;
-mod message;
 mod net;
 mod update;
+mod webhook;
 
-const TARGET: &str = "mesagisto";
+const TARGET: &str = "msgist";
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -45,9 +45,7 @@ async fn main() -> Result<()> {
       .theme(color_eyre::config::Theme::new())
       .install()?;
   }
-
-  self::log::init();
-
+  self::log::init().await?;
   run().await?;
   Ok(())
 }
@@ -86,7 +84,7 @@ async fn run() -> Result<()> {
           std::process::exit(0);
         }
         Err(e) => {
-          error!("{}", e);
+          error!(target: TARGET, "{}", e);
         }
       };
     })
@@ -130,5 +128,8 @@ async fn run() -> Result<()> {
   tokio::signal::ctrl_c().await?;
   CONFIG.save().await.expect("保存配置文件失败");
   info!(target: TARGET, "{}", t!("log.shutdown"));
+
+  #[cfg(feature = "polylith")]
+  opentelemetry::global::shutdown_tracer_provider();
   Ok(())
 }

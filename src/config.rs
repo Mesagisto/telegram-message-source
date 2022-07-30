@@ -82,5 +82,5 @@ pub struct AutoUpdateConfig {
   #[educe(Default = true)]
   pub enable_proxy: bool,
   #[educe(Default = false)]
-  pub no_confirm:bool
+  pub no_confirm: bool,
 }

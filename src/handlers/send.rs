@@ -12,14 +12,17 @@ use mesagisto_client::{
   EitherExt,
 };
 use teloxide::prelude::*;
+use tracing::instrument;
 
 use crate::{
   bot::{BotRequester, TG_BOT},
   config::CONFIG,
   ext::db::DbExt,
 };
+const TARGET: &str = "mesagisto::handlers";
 
-pub async fn answer_common(msg: Message, _bot: BotRequester) -> Result<()> {
+#[instrument(skip(msg))]
+pub async fn answer_common(msg: Message) -> Result<()> {
   let target = msg.chat.id.0;
   if !CONFIG.bindings.contains_key(&target) {
     return Ok(());
@@ -73,8 +76,12 @@ pub async fn answer_common(msg: Message, _bot: BotRequester) -> Result<()> {
       TG_BOT.file(&uid, &file_id).await?;
       chain.push(MessageType::Image { id: uid, url: None })
     }
+    if let Some(mime_type) =  animation.mime_type.as_ref()
+      && let mime::VIDEO = mime_type.type_()
+    {
     // TODO
     // animation is video
+    }
   }
   if let Some(caption) = msg.caption() {
     chain.push(MessageType::Text {
