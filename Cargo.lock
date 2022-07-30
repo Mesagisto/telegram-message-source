@@ -1489,6 +1489,7 @@ dependencies = [
 [[package]]
 name = "mesagisto-client"
 version = "0.1.0"
+source = "git+https://github.com/MeowCat-Studio/mesagisto-client-rs.git?branch=master#c0c2bc27b3c9d6afc66565fee360fb00c4f3e620"
 dependencies = [
  "aes-gcm",
  "arcstr",

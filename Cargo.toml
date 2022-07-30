@@ -32,8 +32,8 @@ axum = { version = "0.5.13",optional = true }
 
 # mesagisto
 nats = { package = "async-nats", version = "0.17.0" }
-# mesagisto-client = { branch = "master", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git" }
-mesagisto-client = { path = "../../mesagisto-client/rust" }
+mesagisto-client = { branch = "master", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git" }
+# mesagisto-client = { path = "../../mesagisto-client/rust" }
 automatic-config = { branch = "master", git = "https://github.com/Itsusinn/automatic-config-rs.git" }
 # automatic-config = { path = "/home/itsusinn/Workspace/Code/automatic-config-rs" }
 lateinit = { branch = "master", git = "https://github.com/Itsusinn/lateinit-rs.git" }
