@@ -36,20 +36,21 @@ pub(crate) async fn init() -> Result<()> {
   #[cfg(feature = "polylith")]
   let registry = registry.with(telemetry);
   registry
-  .with(filter)
-  .with(ErrorLayer::default())
-  .with(
-    tracing_subscriber::fmt::layer()
-      .with_target(true)
-      .with_timer(tracing_subscriber::fmt::time::OffsetTime::new(
-        time::UtcOffset::from_whole_seconds(
-          Local.timestamp(0, 0).offset().fix().local_minus_utc(),
-        )
-        .unwrap_or(time::UtcOffset::UTC),
-        time::macros::format_description!(
-          "[year repr:last_two]-[month]-[day] [hour]:[minute]:[second]"
-        ),
-      )),
-  ).try_init()?;
+    .with(filter)
+    .with(ErrorLayer::default())
+    .with(
+      tracing_subscriber::fmt::layer()
+        .with_target(true)
+        .with_timer(tracing_subscriber::fmt::time::OffsetTime::new(
+          time::UtcOffset::from_whole_seconds(
+            Local.timestamp(0, 0).offset().fix().local_minus_utc(),
+          )
+          .unwrap_or(time::UtcOffset::UTC),
+          time::macros::format_description!(
+            "[year repr:last_two]-[month]-[day] [hour]:[minute]:[second]"
+          ),
+        )),
+    )
+    .try_init()?;
   Ok(())
 }

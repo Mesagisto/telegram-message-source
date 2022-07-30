@@ -42,30 +42,25 @@ pub async fn answer_common(msg: Message) -> Result<()> {
     username: sender.username.clone(),
     nick: Some(sender.full_name()),
   };
+
   let mut chain = Vec::<MessageType>::new();
   if let Some(text) = msg.text() {
-
     chain.push(MessageType::Text {
       content: text.to_string(),
     });
-
   } else if let Some(image) = msg.photo() {
-
     let photo = image.last().unwrap();
     let file_id: Vec<u8> = photo.file_id.as_bytes().to_vec();
     let uid: Vec<u8> = photo.file_unique_id.as_bytes().to_vec();
     RES.put_image_id(&uid, file_id.clone());
     TG_BOT.file(&uid, &file_id).await?;
     chain.push(MessageType::Image { id: uid, url: None })
-
   } else if let Some(sticker) = msg.sticker() {
-
     let file_id: Vec<u8> = sticker.file_id.as_bytes().to_vec();
     let uid: Vec<u8> = sticker.file_unique_id.as_bytes().to_vec();
     RES.put_image_id(&uid, file_id.clone());
     TG_BOT.file(&uid, &file_id).await?;
     chain.push(MessageType::Image { id: uid, url: None });
-
   } else if let Some(_v) = msg.new_chat_members() {
     // TODO
   } else if let Some(_v) = msg.left_chat_member() {
@@ -73,7 +68,6 @@ pub async fn answer_common(msg: Message) -> Result<()> {
   } else if let Some(_v) = msg.audio() {
     // TODO
   } else if let Some(animation) = msg.animation() {
-
     if let Some(mime_type) =  animation.mime_type.as_ref()
       && let mime::GIF = mime_type.subtype()
     {
@@ -89,7 +83,6 @@ pub async fn answer_common(msg: Message) -> Result<()> {
     // TODO
     // animation is video
     }
-
   }
   if let Some(caption) = msg.caption() {
     chain.push(MessageType::Text {

@@ -10,7 +10,7 @@ default-locale = "en-US"
 load-path = "locales"
 
 [features]
-default = ["default-polylith"]
+default = ["default-monolith"]
 default-monolith = ["monolith","color"]
 default-polylith = ["polylith","color"]
 no-color = ["colored/no-color"]

@@ -1,9 +1,9 @@
 use teloxide::prelude::*;
 use tracing::info;
 
-use crate::{bot::BotRequester, commands::bind::BindCommand, handlers};
 #[cfg(feature = "polylith")]
 use crate::commands::manage::ManageCommand;
+use crate::{bot::BotRequester, commands::bind::BindCommand, handlers};
 
 pub async fn start(bot: &BotRequester) {
   let message_handler = Update::filter_message()

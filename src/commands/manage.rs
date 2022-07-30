@@ -12,7 +12,7 @@ use crate::{bot::BotRequester, config::CONFIG, handlers};
 pub enum ManageCommand {
   #[command(description = "Disaplay manage commands help")]
   ManageHelp,
-  #[command(description = "Add a new Nats Server", parse_with = "split")]
+  #[command(description = "Add a new NATS Server", parse_with = "split")]
   NewServer { name: String, address: String },
 }
 impl ManageCommand {
@@ -23,9 +23,7 @@ impl ManageCommand {
           .send_message(msg.chat.id, ManageCommand::descriptions().to_string())
           .await?;
       }
-      ManageCommand::NewServer { name, address } => {
-        
-      }
+      ManageCommand::NewServer { name, address } => {}
     }
     Ok(())
   }

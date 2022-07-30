@@ -15,9 +15,9 @@ use teloxide::{
 use teloxide_core::types::ChatId;
 use tracing::{instrument, warn};
 
-use crate::{commands::bind::BindCommand, config::CONFIG, handlers};
 #[cfg(feature = "polylith")]
 use crate::commands::manage::ManageCommand;
+use crate::{commands::bind::BindCommand, config::CONFIG, handlers};
 pub type BotRequester = AutoSend<DefaultParseMode<Bot>>;
 
 #[derive(Singleton, Default, Debug)]
