@@ -10,9 +10,23 @@ env:
   CRATE_NAME: telegram-message-source
 
 jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    outputs:
+      time: ${{ steps.time.outputs.time }}
+    steps:
+      - name: Get Current Time
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          timeZone: 0
+          format: 'YYYYMMDDHHmmss'
+
   compile:
     name: Compile
     runs-on: ${{ matrix.os }}
+    needs: [prepare]
     strategy:
       matrix:
         include:
@@ -110,7 +124,7 @@ jobs:
 
   release:
     name: Release
-    needs: [compile]
+    needs: [compile, prepare]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -126,13 +140,20 @@ jobs:
       - name: Compress
         run: bash ./.github/compress.sh
 
+      - uses: dev-drprasad/delete-older-releases@v0.2.0
+        with:
+          keep_latest: 2
+          delete_tag_pattern: beta
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Github release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: latest
+          automatic_release_tag: "beta-${{needs.prepare.outputs.time}}"
           prerelease: true
-          title: "Development Build/不稳定发行版"
+          title: "Unstable PreRelease/不稳定预发行版"
           files: |
             packages/*
             LICENSE
