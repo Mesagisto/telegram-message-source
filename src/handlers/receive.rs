@@ -93,9 +93,9 @@ async fn msg_handler(mut message: Message, target: i64) -> Result<()> {
     base64_url::encode(&message.profile.id)
   };
 
+  let mut reunite_text = String::new();
   for single in message.chain {
     trace!(target:TARGET,element = ?single,"正在处理消息链中的元素");
-    let mut reunite_text = String::new();
     match single {
       MessageType::Text { content } => {
         reunite_text.write_str(&html::escape(content.as_str()))?;
@@ -123,20 +123,20 @@ async fn msg_handler(mut message: Message, target: i64) -> Result<()> {
       MessageType::Edit { content: _ } => {}
       _ => {}
     }
-    if !reunite_text.is_empty() {
-      let content = format!(
-        "{}:\n{}",
-        html::bold(sender_name.as_str()),
-        html::escape(reunite_text.trim_end())
-      );
-      let receipt = if let Some(reply_to) = &message.reply {
-        let local_id = DB.get_msg_id_1(&target, reply_to)?;
-        TG_BOT.send_text(chat_id, content, local_id).await?
-      } else {
-        TG_BOT.send_text(chat_id, content, None).await?
-      };
-      DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
-    }
+  }
+  if !reunite_text.is_empty() {
+    let content = format!(
+      "{}:\n{}",
+      html::bold(sender_name.as_str()),
+      html::escape(reunite_text.trim_end())
+    );
+    let receipt = if let Some(reply_to) = &message.reply {
+      let local_id = DB.get_msg_id_1(&target, reply_to)?;
+      TG_BOT.send_text(chat_id, content, local_id).await?
+    } else {
+      TG_BOT.send_text(chat_id, content, None).await?
+    };
+    DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
   }
 
   Ok(())
