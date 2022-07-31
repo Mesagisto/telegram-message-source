@@ -2272,7 +2272,7 @@ dependencies = [
 [[package]]
 name = "self_update"
 version = "0.30.0"
-source = "git+https://github.com/Itsusinn/self_update.git?branch=dirty-feat#636af6e006e8c4aeb7571fdd776f371cf1f81bd8"
+source = "git+https://github.com/Itsusinn/self_update.git?branch=dirty-feat#aeb5d569e48970bf3b0e5ad944b359dd111eb914"
 dependencies = [
  "hyper",
  "indicatif",

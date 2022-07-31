@@ -1,2 +1,3 @@
 [build.env]
 RUSTC_WRAPPER=""
+passthrough = ["MESAGISTO_VERSION"]

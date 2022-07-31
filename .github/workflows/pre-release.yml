@@ -35,56 +35,56 @@ jobs:
             target: x86_64-unknown-linux-musl
             release_name: x86_64-linux
             postfix: ""
-            extra_args: "--no-default-features --features default-monolith"
+            extra_args: "--no-default-features --features default-monolith,beta"
             cross: true
 
           - os: ubuntu-latest
             target: i686-unknown-linux-musl
             release_name: i686-linux
             postfix: ""
-            extra_args: "--no-default-features --features default-monolith"
+            extra_args: "--no-default-features --features default-monolith,beta"
             cross: true
 
           - os: ubuntu-latest
             target: aarch64-unknown-linux-musl
             release_name: aarch64-linux
             postfix: ""
-            extra_args: "--no-default-features --features default-monolith"
+            extra_args: "--no-default-features --features default-monolith,beta"
             cross: true
           # Windows GNU
           - os: ubuntu-latest
             target: x86_64-pc-windows-gnu
             release_name: x86_64-windows.exe
             postfix: ".exe"
-            extra_args: "--no-default-features --features no-color,monolith"
+            extra_args: "--no-default-features --features no-color,monolith,beta"
             cross: true
 
           - os: ubuntu-latest
             target: i686-pc-windows-gnu
             release_name: i686-windows.exe
             postfix: ".exe"
-            extra_args: "--no-default-features --features no-color,monolith"
+            extra_args: "--no-default-features --features no-color,monolith,beta"
             cross: true
 
           - os: ubuntu-latest
             target: x86_64-pc-windows-gnu
             release_name: x86_64-windows-colored.exe
             postfix: ".exe"
-            extra_args: "--no-default-features --features default-monolith"
+            extra_args: "--no-default-features --features default-monolith,beta"
             cross: true
 
           - os: ubuntu-latest
             target: i686-pc-windows-gnu
             release_name: i686-windows-colored.exe
             postfix: ".exe"
-            extra_args: "--no-default-features --features default-monolith"
+            extra_args: "--no-default-features --features default-monolith,beta"
             cross: true
           # Mac OSX
           - os: macos-latest
             target: x86_64-apple-darwin
             release_name: x86_64-mac
             postfix: ""
-            extra_args: "--no-default-features --features default-monolith"
+            extra_args: "--no-default-features --features default-monolith,beta"
             cross: false
 
     steps:
@@ -112,6 +112,8 @@ jobs:
           use-cross: ${{ matrix.cross }}
           command: build
           args: --release --target ${{ matrix.target }} ${{ matrix.extra_args }}
+        env:
+          MESAGISTO_VERSION: "beta-${{needs.prepare.outputs.time}}"
 
       - name: Rename binary
         run: mv target/${{ matrix.target }}/release/${{ env.CRATE_NAME }}${{ matrix.postfix }} ${{ env.SHORT_NAME }}-${{ matrix.release_name }}

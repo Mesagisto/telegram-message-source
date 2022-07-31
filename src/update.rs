@@ -15,11 +15,19 @@ pub fn update() -> Result<Status> {
     .bin_name(&bin_name(SHORT_NAME))
     .show_download_progress(true)
     .target(&target_name())
-    .current_version(cargo_crate_version!())
+    .current_version(current_version())
     .no_confirm(CONFIG.auto_update.no_confirm)
     .build()?
     .update()?;
   Ok(status)
+}
+
+fn current_version() -> &'static str {
+  if cfg!(feature = "beta") {
+    option_env!("MESAGISTO_VERSION").unwrap_or_else(||{ cargo_crate_version!() })
+  } else {
+    cargo_crate_version!()
+  }
 }
 
 fn bin_name(short: &str) -> String {

@@ -73,6 +73,11 @@ async fn run() -> Result<()> {
   }
   CONFIG.migrate();
 
+  if cfg!(feature = "beta") {
+    std::env::set_var("GH_PRE_RELEASE", "1");
+    std::env::set_var("BYPASS_CHECK", "1");
+  }
+
   if CONFIG.auto_update.enable {
     tokio::task::spawn_blocking(|| {
       match update::update() {
