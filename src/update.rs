@@ -24,7 +24,7 @@ pub fn update() -> Result<Status> {
 
 fn current_version() -> &'static str {
   if cfg!(feature = "beta") {
-    option_env!("MESAGISTO_VERSION").unwrap_or_else(||{ cargo_crate_version!() })
+    option_env!("MESAGISTO_VERSION").unwrap_or_else(|| cargo_crate_version!())
   } else {
     cargo_crate_version!()
   }

@@ -92,8 +92,6 @@ self_update = { branch = "dirty-feat", git = "https://github.com/Itsusinn/self_u
 # database
 sled = "0.34.7"
 
-
-
 [profile.release]
 opt-level = 'z'
 debug = 1
