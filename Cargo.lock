@@ -425,9 +425,9 @@ checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
 
 [[package]]
 name = "bytes"
-version = "1.2.0"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f0b3de4a0c5e67e16066a0715723abd91edc2f9001d09c46e1dca929351e130e"
+checksum = "ec8a7b6a70fde80372154c65702f00a0f56f3e1c36abbc6c440484be248856db"
 dependencies = [
  "serde",
 ]
@@ -2272,7 +2272,7 @@ dependencies = [
 [[package]]
 name = "self_update"
 version = "0.30.0"
-source = "git+https://github.com/Itsusinn/self_update.git?branch=dirty-feat#aeb5d569e48970bf3b0e5ad944b359dd111eb914"
+source = "git+https://github.com/Itsusinn/self_update.git?branch=dirty-feat#a260ad4b0cab6a8e38e5d4d94d9969469682f07c"
 dependencies = [
  "hyper",
  "indicatif",
@@ -2402,9 +2402,9 @@ dependencies = [
 
 [[package]]
 name = "serde_yaml"
-version = "0.9.0"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a35a3320a1c8ead0efb4bf508678e8dc29a1bd89118b2f9eae2dccb5123b1a69"
+checksum = "826f989c0f374733af6c286f4822f293bc738def07e2782dc1cbb899960a504a"
 dependencies = [
  "indexmap",
  "itoa",
@@ -2682,7 +2682,7 @@ dependencies = [
  "self_update",
  "serde",
  "serde_json",
- "serde_yaml 0.9.0",
+ "serde_yaml 0.9.2",
  "singleton",
  "sled",
  "sys-locale",

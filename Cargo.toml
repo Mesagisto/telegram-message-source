@@ -26,10 +26,10 @@ teloxide-core = { version = "0.7.0", default-features = false, features = ["rust
 teloxide-macros = "0.6.3"
 
 # polylith
-tracing-opentelemetry = { version = "0.17.4",optional = true }
+tracing-opentelemetry = { version = "0.17.4", optional = true }
 opentelemetry = { version = "0.17.0", features = ["rt-tokio"], optional = true }
 opentelemetry-jaeger = { version = "0.16.0", features = ["rt-tokio"], optional = true }
-axum = { version = "0.5.13",optional = true }
+axum = { version = "0.5.13", optional = true }
 
 # mesagisto
 nats = { package = "async-nats", version = "0.17.0" }
@@ -42,8 +42,8 @@ singleton = { branch="master", git = "https://github.com/Itsusinn/singleton-rs.g
 # singleton = { path = "/code/singleton-rs" }
 
 # logging
-tracing = "0.1.35"
-tracing-subscriber = { version = "0.3.15" ,default-features = false, features = ["tracing-log", "std", "local-time","fmt"] }
+tracing = "0.1.36"
+tracing-subscriber = { version = "0.3.15", default-features = false, features = ["tracing-log", "std", "local-time","fmt"] }
 colored = "2.0.0"
 time = { version = "0.3.11", features = ["macros", "local-offset"] }
 chrono = "0.4.19"
@@ -53,7 +53,7 @@ rust-i18n = { branch = "main", git = "https://github.com/Itsusinn/rust-i18n.git"
 # serialization
 serde = { version = "1.0.140", default-features = false, features = ["derive","rc"] }
 serde_json = "1.0.82"
-serde_yaml = "0.9.0"
+serde_yaml = "0.9.2"
 
 # asynchronous
 tokio = { version = "1.20.1", default-features = false, features = ["macros","signal","rt-multi-thread"] }

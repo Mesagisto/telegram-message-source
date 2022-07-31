@@ -15,7 +15,7 @@ use teloxide::prelude::*;
 use tracing::instrument;
 
 use crate::{
-  bot::{BotRequester, TG_BOT},
+  bot::TG_BOT,
   config::CONFIG,
   ext::db::DbExt,
 };
