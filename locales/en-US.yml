@@ -7,5 +7,5 @@ en-US:
   log.log-callback-error: "An error occurred in the Teloxide dispatcher."
   log.shutdown: "MesagistoTG is about to close."
   log.locale-not-configured: "Localization option is not set, system language preference %{locale_} will be used"
-  log.update-check-success: "Auto update check successfully, progarm is up to date."
+  log.update-check-success: "Auto update check successfully, program is up to date."
   log.upgrade-success: "Auto upgrade successfully, please restart the program mannualy."
