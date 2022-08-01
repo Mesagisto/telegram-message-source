@@ -45,7 +45,7 @@ singleton = { branch="master", git = "https://github.com/Itsusinn/singleton-rs.g
 tracing = "0.1.36"
 tracing-subscriber = { version = "0.3.15", default-features = false, features = ["tracing-log", "std", "local-time","fmt"] }
 colored = "2.0.0"
-time = { version = "0.3.11", features = ["macros", "local-offset"] }
+time = { version = "0.3.12", features = ["macros", "local-offset"] }
 chrono = "0.4.19"
 sys-locale = "0.2.1"
 rust-i18n = { branch = "main", git = "https://github.com/Itsusinn/rust-i18n.git"}
@@ -60,7 +60,7 @@ tokio = { version = "1.20.1", default-features = false, features = ["macros","si
 tokio-util = "0.7.3"
 tokio-stream = "0.1.9"
 futures = "0.3.21"
-async-trait = "0.1.56"
+async-trait = "0.1.57"
 reqwest = { version = "0.11.11", default-features = false, features = ["rustls","rustls-tls-native-roots","stream","multipart", "blocking"] }
 
 # error handling
