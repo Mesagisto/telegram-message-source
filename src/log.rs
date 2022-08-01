@@ -11,7 +11,6 @@ pub(crate) async fn init() -> Result<()> {
   // TODO EnvFilter;
   #[cfg(feature = "polylith")]
   let filter = tracing_subscriber::filter::Targets::new()
-    .with_target("teloxide", Level::TRACE)
     .with_target("telegram_message_source", Level::TRACE)
     .with_target("mesagisto_client", Level::TRACE)
     .with_target("msgist", Level::TRACE)
@@ -20,7 +19,7 @@ pub(crate) async fn init() -> Result<()> {
 
   #[cfg(not(feature = "polylith"))]
   let filter = tracing_subscriber::filter::Targets::new()
-    .with_target("telegram_message_source", Level::DEBUG)
+    .with_target("msgist_tg", Level::DEBUG)
     .with_target("mesagisto_client", Level::DEBUG)
     .with_target("teloxide", Level::INFO)
     .with_default(Level::WARN);

@@ -19,7 +19,6 @@ use crate::{
   config::CONFIG,
   ext::db::DbExt,
 };
-const TARGET: &str = "mesagisto::handlers";
 
 #[instrument(skip(msg))]
 pub async fn answer_common(msg: Message) -> Result<()> {

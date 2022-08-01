@@ -23,8 +23,6 @@ use crate::{
 
 static CHANNEL: LateInit<UnboundedSender<(i64, ArcStr)>> = LateInit::new();
 
-const TARGET: &str = "msgist::handlers";
-
 pub fn recover() -> Result<()> {
   let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<(i64, ArcStr)>();
   tokio::spawn(async move {
@@ -67,10 +65,7 @@ pub async fn nats_handler(message: nats::Message, target: ArcStr) -> Result<()> 
     Ok(v) => v,
     Err(_e) => {
       // todo logging
-      tracing::warn!(
-        target: TARGET,
-        "未知的数据包类型，请更新本消息源，若已是最新请等待适配"
-      );
+      tracing::warn!("未知的数据包类型，请更新本消息源，若已是最新请等待适配");
       return Ok(());
     }
   };
@@ -95,7 +90,7 @@ async fn msg_handler(mut message: Message, target: i64) -> Result<()> {
 
   let mut reunite_text = String::new();
   for single in message.chain {
-    trace!(target:TARGET,element = ?single,"正在处理消息链中的元素");
+    trace!(element = ?single,"正在处理消息链中的元素");
     match single {
       MessageType::Text { content } => {
         reunite_text.write_str(&html::escape(content.as_str()))?;

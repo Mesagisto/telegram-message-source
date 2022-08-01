@@ -34,8 +34,6 @@ mod net;
 mod update;
 mod webhook;
 
-const TARGET: &str = "msgist";
-
 #[tokio::main]
 async fn main() -> Result<()> {
   if cfg!(feature = "color") {
@@ -61,14 +59,13 @@ async fn run() -> Result<()> {
       .replace('_', "-");
     rust_i18n::set_locale(&locale);
     info!(
-      target: TARGET,
       "{}",
       t!("log.locale-not-configured", locale_ = &locale)
     );
   }
   if !CONFIG.enable {
-    warn!(target: TARGET, "{}", t!("log.not-enable"));
-    warn!(target: TARGET, "{}", t!("log.not-enable-helper"));
+    warn!("{}", t!("log.not-enable"));
+    warn!("{}", t!("log.not-enable-helper"));
     return Ok(());
   }
   CONFIG.migrate();
@@ -82,14 +79,14 @@ async fn run() -> Result<()> {
     tokio::task::spawn_blocking(|| {
       match update::update() {
         Ok(Status::UpToDate(_)) => {
-          info!(target: TARGET, "{}", t!("log.update-check-success"));
+          info!("{}", t!("log.update-check-success"));
         }
         Ok(Status::Updated(_)) => {
-          info!(target: TARGET, "{}", t!("log.upgrade-success"));
+          info!("{}", t!("log.upgrade-success"));
           std::process::exit(0);
         }
         Err(e) => {
-          error!(target: TARGET, "{}", e);
+          error!("{}", e);
         }
       };
     })
@@ -116,7 +113,6 @@ async fn run() -> Result<()> {
     .apply()
     .await?;
   info!(
-    target: TARGET,
     "{}",
     t!("log.boot-start", version = env!("CARGO_PKG_VERSION"))
   );
@@ -132,7 +128,7 @@ async fn run() -> Result<()> {
   });
   tokio::signal::ctrl_c().await?;
   CONFIG.save().await.expect("保存配置文件失败");
-  info!(target: TARGET, "{}", t!("log.shutdown"));
+  info!("{}", t!("log.shutdown"));
 
   #[cfg(feature = "polylith")]
   opentelemetry::global::shutdown_tracer_provider();

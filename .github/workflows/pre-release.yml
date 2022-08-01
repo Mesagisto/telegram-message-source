@@ -7,7 +7,7 @@ on:
 
 env:
   SHORT_NAME: tg
-  CRATE_NAME: telegram-message-source
+  CRATE_NAME: msgist-tg
 
 jobs:
   prepare:
@@ -142,13 +142,6 @@ jobs:
       - name: Compress
         run: bash ./.github/compress.sh
 
-      - uses: dev-drprasad/delete-older-releases@v0.2.0
-        with:
-          keep_latest: 2
-          delete_tag_pattern: beta
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Github release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -159,3 +152,11 @@ jobs:
           files: |
             packages/*
             LICENSE
+
+      - name: Delete older releases
+        uses: dev-drprasad/delete-older-releases@v0.2.0
+        with:
+          keep_latest: 1
+          delete_tag_pattern: beta
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
