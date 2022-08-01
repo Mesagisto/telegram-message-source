@@ -74,7 +74,7 @@ base64-url = "1.4.13"
 # hex = "0.4"
 
 # crypto
-aes-gcm = { version = "0.9.4", features = ["std"] }
+aes-gcm = { version = "0.10.1", features = ["std"] }
 
 # tools
 dashmap = { version = "5.3.4", features = ["serde"] }
