@@ -46,14 +46,14 @@ tracing = "0.1.36"
 tracing-subscriber = { version = "0.3.15", default-features = false, features = ["tracing-log", "std", "local-time","fmt"] }
 colored = "2.0.0"
 time = { version = "0.3.12", features = ["macros", "local-offset"] }
-chrono = "0.4.19"
+chrono = "0.4.20"
 sys-locale = "0.2.1"
 rust-i18n = { branch = "main", git = "https://github.com/Itsusinn/rust-i18n.git"}
 
 # serialization
-serde = { version = "1.0.140", default-features = false, features = ["derive","rc"] }
-serde_json = "1.0.82"
-serde_yaml = "0.9.2"
+serde = { version = "1.0.142", default-features = false, features = ["derive","rc"] }
+serde_json = "1.0.83"
+serde_yaml = "0.9.4"
 
 # asynchronous
 tokio = { version = "1.20.1", default-features = false, features = ["macros","signal","rt-multi-thread"] }
@@ -64,7 +64,7 @@ async-trait = "0.1.57"
 reqwest = { version = "0.11.11", default-features = false, features = ["rustls","rustls-tls-native-roots","stream","multipart", "blocking"] }
 
 # error handling
-thiserror = "1.0.31"
+thiserror = "1.0.32"
 color-eyre = "0.6.2"
 tracing-error = "0.2.0"
 color-spantrace = "0.2.0"
