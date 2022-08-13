@@ -12,21 +12,16 @@ use mesagisto_client::{
   EitherExt,
 };
 use teloxide::prelude::*;
-use tracing::instrument;
 
-use crate::{
-  bot::TG_BOT,
-  config::CONFIG,
-  ext::db::DbExt,
-};
+use crate::{bot::TG_BOT, config::CONFIG, ext::db::DbExt};
 
-#[instrument(skip(msg))]
 pub async fn answer_common(msg: Message) -> Result<()> {
   let target = msg.chat.id.0;
   if !CONFIG.bindings.contains_key(&target) {
     return Ok(());
   }
-  let address = CONFIG.bindings.get(&target).unwrap().clone();
+  let room_address = CONFIG.bindings.get(&target).unwrap().clone();
+
   let sender = match msg.from() {
     Some(v) => v,
     // fixme
@@ -106,10 +101,9 @@ pub async fn answer_common(msg: Message) -> Result<()> {
     chain,
     reply,
   };
-  let packet = Packet::from(message.tl())?;
+  let room_id = SERVER.room_id(room_address);
+  let packet = Packet::new(room_id, message.tl())?;
 
-  SERVER
-    .send(&ArcStr::from(target.to_string()), &address, packet, None)
-    .await?;
+  SERVER.send(packet, arcstr::literal!("mesagisto")).await?;
   Ok(())
 }

@@ -80,9 +80,7 @@ impl TgBot {
         teloxide::RequestError::MigrateToChatId(new_id) => {
           let target = chat_id.0;
           warn!("Chat migrated from {} to {}", target, new_id);
-          if let Some(address) = CONFIG.migrate_chat(&target, &new_id) {
-            handlers::receive::del(target)?;
-            handlers::receive::add(new_id, &address)?;
+          if CONFIG.migrate_chat(&target, &new_id) {
             let send = TG_BOT.send_message(ChatId(new_id), text.clone());
             let receipt = if let Some(reply) = reply {
               send.reply_to_message_id(reply).await?
@@ -139,9 +137,7 @@ impl TgBot {
         teloxide::RequestError::MigrateToChatId(new_id) => {
           let target = chat_id.0;
           warn!("Chat migrated from {} to {}", target, new_id);
-          if let Some(address) = CONFIG.migrate_chat(&target, &new_id) {
-            handlers::receive::del(target)?;
-            handlers::receive::add(new_id, &address)?;
+          if CONFIG.migrate_chat(&target, &new_id) {
             let receipt: Message = if is_gif {
               let send = self.inner.send_animation(chat_id, photo.clone());
               if let Some(reply) = reply {

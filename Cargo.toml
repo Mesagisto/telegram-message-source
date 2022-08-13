@@ -32,13 +32,12 @@ opentelemetry-jaeger = { version = "0.16.0", features = ["rt-tokio"], optional =
 axum = { version = "0.5.13", optional = true }
 
 # mesagisto
-nats = { package = "async-nats", version = "0.17.0" }
-mesagisto-client = { branch = "master", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git" }
-# mesagisto-client = { path = "../../mesagisto-client/rust" }
+# mesagisto-client = { branch = "next", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git" }
+mesagisto-client = { path = "../../mesagisto-client/rust" }
 automatic-config = { branch = "master", git = "https://github.com/Itsusinn/automatic-config-rs.git" }
 # automatic-config = { path = "/home/itsusinn/Workspace/Code/automatic-config-rs" }
 lateinit = { branch = "master", git = "https://github.com/Itsusinn/lateinit-rs.git" }
-singleton = { branch="master", git = "https://github.com/Itsusinn/singleton-rs.git" }
+singleton = { branch= "master", git = "https://github.com/Itsusinn/singleton-rs.git" }
 # singleton = { path = "/code/singleton-rs" }
 
 # logging
@@ -86,6 +85,7 @@ linked-hash-map = "0.5.6"
 either = "1.7.0"
 mime = "0.3.16"
 infer = "0.9.0"
+uuid = "1.1.2"
 # self_update = { path = "/home/itsusinn/Workspace/Clone/self_update", features = ["archive-zip","compression-zip-deflate","rustls"] }
 self_update = { branch = "dirty-feat", git = "https://github.com/Itsusinn/self_update.git", default-features = false, features = ["archive-zip","compression-zip-deflate","rustls"] }
 

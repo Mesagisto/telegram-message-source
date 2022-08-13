@@ -48,14 +48,14 @@ impl BindCommand {
             .bindings
             .insert(chat_id.0, ArcStr::from(address.clone()))
           {
-            Some(_) => {
+            Some(before) => {
               bot
                 .send_message(
                   msg.chat.id,
                   format!("成功重新绑定当前群组的信使地址为{}", address),
                 )
                 .await?;
-              handlers::receive::change(chat_id.0, &ArcStr::from(address))?;
+              handlers::receive::change(&before, &ArcStr::from(address)).await?;
             }
             None => {
               bot
@@ -64,7 +64,7 @@ impl BindCommand {
                   format!("成功绑定当前群组的信使地址{}", address),
                 )
                 .await?;
-              handlers::receive::add(chat_id.0, &ArcStr::from(address))?;
+              handlers::receive::add(&ArcStr::from(address))?;
             }
           }
         } else {
@@ -86,11 +86,11 @@ impl BindCommand {
         }
         if is_admin {
           match CONFIG.bindings.remove(&chat_id.0) {
-            Some(_) => {
+            Some(before) => {
               bot
                 .send_message(msg.chat.id, "成功解绑当前群组的信使地址".to_string())
                 .await?;
-              handlers::receive::del(chat_id.0)?;
+              handlers::receive::del(&before.1).await?;
             }
             None => {
               bot

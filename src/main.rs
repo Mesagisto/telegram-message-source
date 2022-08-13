@@ -1,15 +1,20 @@
 #![allow(incomplete_features)]
 #![feature(backtrace, capture_disjoint_fields, let_chains)]
 
+use std::collections::HashMap;
+
 use bot::TG_BOT;
 use color_eyre::eyre::Result;
 use futures::FutureExt;
-use mesagisto_client::MesagistoConfig;
+use mesagisto_client::{MesagistoConfig, MesagistoConfigBuilder};
 use rust_i18n::t;
 use self_update::Status;
 use teloxide::{prelude::*, types::ParseMode, Bot};
 
-use crate::config::{Config, CONFIG};
+use crate::{
+  config::{Config, CONFIG},
+  handlers::receive::packet_handler,
+};
 
 #[macro_use]
 extern crate educe;
@@ -58,10 +63,7 @@ async fn run() -> Result<()> {
       .unwrap_or_else(|| String::from("en-US"))
       .replace('_', "-");
     rust_i18n::set_locale(&locale);
-    info!(
-      "{}",
-      t!("log.locale-not-configured", locale_ = &locale)
-    );
+    info!("{}", t!("log.locale-not-configured", locale_ = &locale));
   }
   if !CONFIG.enable {
     warn!("{}", t!("log.not-enable"));
@@ -92,26 +94,33 @@ async fn run() -> Result<()> {
     })
     .await?;
   }
-  MesagistoConfig::builder()
+  let mut remotes = HashMap::new();
+  remotes.insert(
+    arcstr::literal!("mesagisto"),
+    "msgist://center.itsusinn.site:6996".into(),
+  );
+  MesagistoConfigBuilder::default()
     .name("tg")
     .cipher_key(CONFIG.cipher.key.clone())
-    .nats_address(CONFIG.nats.address.clone())
+    .local_address("0.0.0.0:0")
+    .remote_address(remotes)
     .proxy(if CONFIG.proxy.enable {
       Some(CONFIG.proxy.address.clone())
     } else {
       None
     })
-    .photo_url_resolver(|id_pair| {
-      async {
-        let file = String::from_utf8_lossy(&id_pair.1);
-        let file_path = TG_BOT.get_file(file).await.unwrap().file_path;
-        Ok(TG_BOT.get_url_by_path(file_path))
-      }
-      .boxed()
-    })
-    .build()
+    .build()?
     .apply()
     .await?;
+  MesagistoConfig::photo_url_resolver(|id_pair| {
+    async {
+      let file = String::from_utf8_lossy(&id_pair.1);
+      let file_path = TG_BOT.get_file(file).await.unwrap().file_path;
+      Ok(TG_BOT.get_url_by_path(file_path))
+    }
+    .boxed()
+  });
+  MesagistoConfig::packet_handler(|pkt| async { packet_handler(pkt).await }.boxed());
   info!(
     "{}",
     t!("log.boot-start", version = env!("CARGO_PKG_VERSION"))
