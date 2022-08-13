@@ -1,10 +1,11 @@
 #![allow(incomplete_features)]
-#![feature(backtrace, capture_disjoint_fields, let_chains)]
+#![feature(capture_disjoint_fields, let_chains)]
 
 use std::collections::HashMap;
 
 use bot::TG_BOT;
 use color_eyre::eyre::Result;
+use dashmap::DashMap;
 use futures::FutureExt;
 use mesagisto_client::{MesagistoConfig, MesagistoConfigBuilder};
 use rust_i18n::t;
@@ -94,7 +95,7 @@ async fn run() -> Result<()> {
     })
     .await?;
   }
-  let mut remotes = HashMap::new();
+  let remotes = DashMap::new();
   remotes.insert(
     arcstr::literal!("mesagisto"),
     "msgist://center.itsusinn.site:6996".into(),

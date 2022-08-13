@@ -1,4 +1,3 @@
-use arcstr::ArcStr;
 use color_eyre::eyre::Result;
 use mesagisto_client::{
   data::{
@@ -104,6 +103,6 @@ pub async fn answer_common(msg: Message) -> Result<()> {
   let room_id = SERVER.room_id(room_address);
   let packet = Packet::new(room_id, message.tl())?;
 
-  SERVER.send(packet, arcstr::literal!("mesagisto")).await?;
+  SERVER.send(packet, &arcstr::literal!("mesagisto")).await?;
   Ok(())
 }

@@ -9,15 +9,14 @@ pub(crate) async fn init() -> Result<()> {
   opentelemetry::global::set_text_map_propagator(opentelemetry_jaeger::Propagator::new());
 
   // TODO EnvFilter;
-  #[cfg(feature = "polylith")]
+  #[cfg(any(feature = "polylith", debug_assertions))]
   let filter = tracing_subscriber::filter::Targets::new()
     .with_target("telegram_message_source", Level::TRACE)
     .with_target("mesagisto_client", Level::TRACE)
     .with_target("msgist", Level::TRACE)
     .with_target("teloxide", Level::TRACE)
     .with_default(Level::INFO);
-
-  #[cfg(not(feature = "polylith"))]
+  #[cfg(not(any(feature = "polylith", debug_assertions)))]
   let filter = tracing_subscriber::filter::Targets::new()
     .with_target("msgist_tg", Level::DEBUG)
     .with_target("mesagisto_client", Level::DEBUG)

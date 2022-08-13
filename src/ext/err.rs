@@ -11,10 +11,9 @@ impl<T> LogResultExt<T> for Result<T> {
       Ok(v) => Some(v),
       Err(e) => {
         tracing::error!(
-          "{}, ErrorType {}\n Backtrace {:#?}",
+          "{}\n{:?}",
           message,
           e,
-          e.backtrace()
         );
         None
       }

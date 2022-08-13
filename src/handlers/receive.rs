@@ -12,7 +12,7 @@ use mesagisto_client::{
   },
   db::DB,
   server::SERVER,
-  ResultExt, EitherExt, res::RES,
+  ResultExt, EitherExt
 };
 use teloxide::{types::ChatId, utils::html, requests::Requester};
 use tokio::sync::mpsc::UnboundedSender;
@@ -29,7 +29,7 @@ pub fn recover() -> Result<()> {
       let room_id = SERVER.room_id(room_address);
       let packet = Packet::new_sub(room_id.clone());
       SERVER
-        .send(packet, arcstr::literal!("mesagisto"))
+        .send(packet, &arcstr::literal!("mesagisto"))
         .await
         .unwrap();
     }
@@ -55,7 +55,7 @@ pub async fn del(room_address: &ArcStr) -> Result<()> {
   // FIXME 同侧互通 考虑当接受到不属于任何群聊的数据包时才unsub
   // TODO 更新Config中的cache
   SERVER
-    .unsub(room_id, arcstr::literal!("mesagisto"))
+    .unsub(room_id, &arcstr::literal!("mesagisto"))
     .await
     .log();
   Ok(())
@@ -90,7 +90,7 @@ pub async fn packet_handler(pkt: Packet) -> Result<ControlFlow<Packet>> {
         let url = TG_BOT.get_url_by_path(file_path);
         let event = Event::RespondImage { id: image_uid, url };
         let packet = Packet::new(pkt.room_id, event.to_right())?;
-        SERVER.respond(packet, id, arcstr::literal!("mesagisto")).await?;
+        SERVER.respond(packet, id, &arcstr::literal!("mesagisto")).await?;
         return Ok(ControlFlow::Continue(()))
       } else {
         return Ok(ControlFlow::Break(pkt))
@@ -129,7 +129,7 @@ async fn msg_handler(mut message: Message, target: i64, server: ArcStr) -> Resul
         reunite_text.write_str("\n")?;
       }
       MessageType::Image { id, url } => {
-        let path = CACHE.file(&id, &url, room_id.clone(), server.clone()).await?;
+        let path = CACHE.file(&id, &url, room_id.clone(), &server).await?;
         let receipt = TG_BOT
           .send_text(
             chat_id,
