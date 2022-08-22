@@ -22,7 +22,6 @@ pub struct Config {
   pub telegram: TelegramConfig,
   pub auto_update: AutoUpdateConfig,
 
-
   // TODO remove in next major version
   target_address_mapper: DashMap<i64, ArcStr>,
 }

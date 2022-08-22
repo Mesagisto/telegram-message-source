@@ -10,11 +10,7 @@ impl<T> LogResultExt<T> for Result<T> {
     match self {
       Ok(v) => Some(v),
       Err(e) => {
-        tracing::error!(
-          "{}\n{:?}",
-          message,
-          e,
-        );
+        tracing::error!("{}\n{:?}", message, e,);
         None
       }
     }
