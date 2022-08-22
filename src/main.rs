@@ -40,7 +40,7 @@ mod net;
 mod update;
 mod webhook;
 
-#[tokio::main]
+#[tokio::main(flavor = "multi_thread", worker_threads = 8)]
 async fn main() -> Result<()> {
   if cfg!(feature = "color") {
     color_eyre::install()?;
