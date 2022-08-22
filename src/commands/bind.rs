@@ -64,7 +64,7 @@ impl BindCommand {
                   format!("成功绑定当前群组的信使地址{}", address),
                 )
                 .await?;
-              handlers::receive::add(&ArcStr::from(address))?;
+              handlers::receive::add(&ArcStr::from(address)).await?;
             }
           }
         } else {

@@ -3,51 +3,44 @@ use std::{fmt::Write, ops::ControlFlow};
 use arcstr::ArcStr;
 use color_eyre::eyre::Result;
 use futures::future::join_all;
-use lateinit::LateInit;
 use mesagisto_client::{
   cache::CACHE,
   data::{
+    events::Event,
     message::{Message, MessageType},
-    Packet, events::Event, Inbox,
+    Inbox, Packet,
   },
   db::DB,
   server::SERVER,
-  ResultExt, EitherExt
+  EitherExt, ResultExt,
 };
-use teloxide::{types::ChatId, utils::html, requests::Requester};
-use tokio::sync::mpsc::UnboundedSender;
+use teloxide::{requests::Requester, types::ChatId, utils::html};
 use tracing::trace;
 
 use crate::{ext::db::DbExt, CONFIG, TG_BOT};
 
-static CHANNEL: LateInit<UnboundedSender<ArcStr>> = LateInit::new();
-
-pub fn recover() -> Result<()> {
-  let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<ArcStr>();
-  tokio::spawn(async move {
-    while let Some(room_address) = rx.recv().await {
-      let room_id = SERVER.room_id(room_address);
-      let packet = Packet::new_sub(room_id.clone());
-      SERVER
-        .send(packet, &arcstr::literal!("mesagisto"))
-        .await
-        .unwrap();
-    }
-  });
+pub async fn recover() -> Result<()> {
   for pair in &CONFIG.bindings {
-    tx.send(pair.value().clone())?;
+    let room_id = SERVER.room_id(pair.value().clone());
+    SERVER
+      .sub(room_id, &arcstr::literal!("mesagisto"))
+      .await
+      .log();
   }
-  CHANNEL.init(tx);
   Ok(())
 }
 
-pub fn add(channel: &ArcStr) -> Result<()> {
-  CHANNEL.send(channel.clone())?;
+pub async fn add(room_address: &ArcStr) -> Result<()> {
+  let room_id = SERVER.room_id(room_address.clone());
+  SERVER
+    .sub(room_id, &arcstr::literal!("mesagisto"))
+    .await
+    .log();
   Ok(())
 }
 pub async fn change(before_address: &ArcStr, after_address: &ArcStr) -> Result<()> {
   del(before_address).await?;
-  add(after_address)?;
+  add(after_address).await?;
   Ok(())
 }
 pub async fn del(room_address: &ArcStr) -> Result<()> {
@@ -90,10 +83,12 @@ pub async fn packet_handler(pkt: Packet) -> Result<ControlFlow<Packet>> {
         let url = TG_BOT.get_url_by_path(file_path);
         let event = Event::RespondImage { id: image_uid, url };
         let packet = Packet::new(pkt.room_id, event.to_right())?;
-        SERVER.respond(packet, id, &arcstr::literal!("mesagisto")).await?;
-        return Ok(ControlFlow::Continue(()))
+        SERVER
+          .respond(packet, id, &arcstr::literal!("mesagisto"))
+          .await?;
+        return Ok(ControlFlow::Continue(()));
       } else {
-        return Ok(ControlFlow::Break(pkt))
+        return Ok(ControlFlow::Break(pkt));
       }
     }
     Ok(either::Either::Right(event)) => {
@@ -101,7 +96,10 @@ pub async fn packet_handler(pkt: Packet) -> Result<ControlFlow<Packet>> {
       return Ok(ControlFlow::Break(pkt));
     }
     Err(e) => {
-      tracing::warn!("未知的数据包类型，请更新本消息源，若已是最新请等待适配 {}", e);
+      tracing::warn!(
+        "未知的数据包类型，请更新本消息源，若已是最新请等待适配 {}",
+        e
+      );
     }
   }
   Ok(ControlFlow::Continue(()))

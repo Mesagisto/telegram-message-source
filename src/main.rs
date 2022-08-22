@@ -132,7 +132,7 @@ async fn run() -> Result<()> {
 
   TG_BOT.init(bot).await?;
 
-  handlers::receive::recover()?;
+  handlers::receive::recover().await?;
   tokio::spawn(async {
     dispatch::start(&TG_BOT).await;
   });
