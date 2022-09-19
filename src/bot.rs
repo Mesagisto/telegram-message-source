@@ -17,7 +17,7 @@ use tracing::{instrument, warn};
 
 #[cfg(feature = "polylith")]
 use crate::commands::manage::ManageCommand;
-use crate::{commands::bind::BindCommand, config::CONFIG, handlers};
+use crate::{commands::bind::BindCommand, config::CONFIG};
 pub type BotRequester = AutoSend<DefaultParseMode<Bot>>;
 
 #[derive(Singleton, Default, Debug)]

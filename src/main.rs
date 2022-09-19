@@ -1,8 +1,6 @@
 #![allow(incomplete_features)]
 #![feature(capture_disjoint_fields, let_chains)]
 
-use std::collections::HashMap;
-
 use bot::TG_BOT;
 use color_eyre::eyre::Result;
 use dashmap::DashMap;
@@ -113,14 +111,7 @@ async fn run() -> Result<()> {
     .build()?
     .apply()
     .await?;
-  MesagistoConfig::photo_url_resolver(|id_pair| {
-    async {
-      let file = String::from_utf8_lossy(&id_pair.1);
-      let file_path = TG_BOT.get_file(file).await.unwrap().file_path;
-      Ok(TG_BOT.get_url_by_path(file_path))
-    }
-    .boxed()
-  });
+
   MesagistoConfig::packet_handler(|pkt| async { packet_handler(pkt).await }.boxed());
   info!(
     "{}",
