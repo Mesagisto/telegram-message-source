@@ -10,26 +10,15 @@ default-locale = "en-US"
 load-path = "locales"
 
 [features]
-default = ["default-monolith"]
-default-monolith = ["monolith","color"]
-default-polylith = ["polylith","color"]
+default = ["color"]
 no-color = ["colored/no-color"]
 color = ["tracing-subscriber/ansi"]
-monolith = []
-polylith = ["tracing-opentelemetry","opentelemetry","opentelemetry-jaeger","axum"]
-beta = []
 
 [dependencies]
 # bot
-teloxide = { version = "0.10.1", default-features = false, features = ["macros", "auto-send","ctrlc_handler","rustls","nightly", "webhooks-axum"] }
-teloxide-core = { version = "0.7.1", default-features = false, features = ["rustls", "cache_me"] }
-teloxide-macros = "0.6.3"
-
-# polylith
-tracing-opentelemetry = { version = "0.17.4", optional = true }
-opentelemetry = { version = "0.17.0", features = ["rt-tokio"], optional = true }
-opentelemetry-jaeger = { version = "0.16.0", features = ["rt-tokio"], optional = true }
-axum = { version = "0.5.16", optional = true }
+teloxide = { version = "0.11.0", default-features = false, features = ["macros", "auto-send","ctrlc_handler","rustls","nightly", "webhooks-axum"] }
+teloxide-core = { version = "0.8.0", default-features = false, features = ["rustls", "cache_me"] }
+teloxide-macros = "0.7.0"
 
 # mesagisto
 # mesagisto-client = { branch = "next", git = "https://github.com/MeowCat-Studio/mesagisto-client-rs.git" }
