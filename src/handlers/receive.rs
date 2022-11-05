@@ -2,7 +2,7 @@ use std::{fmt::Write, ops::ControlFlow};
 
 use arcstr::ArcStr;
 use color_eyre::eyre::Result;
-use futures::future::join_all;
+use futures_util::future::join_all;
 use mesagisto_client::{
   cache::CACHE,
   data::{
@@ -55,7 +55,7 @@ pub async fn del(room_address: &ArcStr) -> Result<()> {
 }
 
 pub async fn packet_handler(pkt: Packet) -> Result<ControlFlow<Packet>> {
-  debug!("recv msg pkt from {:#?}", pkt.room_id);
+  tracing::debug!("recv msg pkt from {:#?}", pkt.room_id);
   match pkt.decrypt() {
     Ok(either::Either::Left(message)) => {
       if let Some(targets) = CONFIG.target_id(pkt.room_id.clone()) {
@@ -79,7 +79,7 @@ pub async fn packet_handler(pkt: Packet) -> Result<ControlFlow<Packet>> {
           None => return Ok(ControlFlow::Break(pkt)),
         };
         let file = String::from_utf8_lossy(&image_id);
-        let file_path = TG_BOT.get_file(file).await.unwrap().file_path;
+        let file_path = TG_BOT.get_file(file).await.unwrap().path;
         let url = TG_BOT.get_url_by_path(file_path);
         let event = Event::RespondImage { id: image_uid, url };
         let packet = Packet::new(pkt.room_id, event.to_right())?;
@@ -92,7 +92,7 @@ pub async fn packet_handler(pkt: Packet) -> Result<ControlFlow<Packet>> {
       }
     }
     Ok(either::Either::Right(event)) => {
-      debug!("recv event pkt {:#?}", event);
+      tracing::debug!("recv event pkt {:#?}", event);
       return Ok(ControlFlow::Break(pkt));
     }
     Err(e) => {
@@ -135,14 +135,14 @@ async fn msg_handler(mut message: Message, target: i64, server: ArcStr) -> Resul
             None,
           )
           .await?;
-        DB.put_msg_id_ir_2(&target, &receipt.id, &message.id)?;
+        DB.put_msg_id_ir_2(&target, &receipt.id.0, &message.id)?;
         let receipt = if let Some(reply_to) = &message.reply {
           let local_id = DB.get_msg_id_1(&target, reply_to)?;
           TG_BOT.send_image(chat_id, &path, local_id).await?
         } else {
           TG_BOT.send_image(chat_id, &path, None).await?
         };
-        DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
+        DB.put_msg_id_1(&target, &message.id, &receipt.id.0)?;
       }
       MessageType::Edit { content: _ } => {}
       _ => {}
@@ -160,7 +160,7 @@ async fn msg_handler(mut message: Message, target: i64, server: ArcStr) -> Resul
     } else {
       TG_BOT.send_text(chat_id, content, None).await?
     };
-    DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
+    DB.put_msg_id_1(&target, &message.id, &receipt.id.0)?;
   }
 
   Ok(())

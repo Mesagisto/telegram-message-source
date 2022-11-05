@@ -9,7 +9,7 @@ use crate::{bot::BotRequester, config::CONFIG, handlers};
 
 #[derive(BotCommands, Clone)]
 #[command(
-  rename = "lowercase",
+  rename_rule = "lowercase",
   description = "MesagistoTG supports following commands"
 )]
 pub enum BindCommand {
@@ -21,7 +21,7 @@ pub enum BindCommand {
   Help,
   #[command(description = "Disaplay status")]
   Status,
-  #[command(description = "Bind currunt's group to address", parse_with = "split")]
+  #[command(description = "Bind currunt's group to address")]
   Bind { address: String },
 }
 impl BindCommand {
@@ -52,17 +52,14 @@ impl BindCommand {
               bot
                 .send_message(
                   msg.chat.id,
-                  format!("成功重新绑定当前群组的信使地址为{}", address),
+                  format!("成功重新绑定当前群组的信使地址为{address}"),
                 )
                 .await?;
               handlers::receive::change(&before, &ArcStr::from(address)).await?;
             }
             None => {
               bot
-                .send_message(
-                  msg.chat.id,
-                  format!("成功绑定当前群组的信使地址{}", address),
-                )
+                .send_message(msg.chat.id, format!("成功绑定当前群组的信使地址{address}"))
                 .await?;
               handlers::receive::add(&ArcStr::from(address)).await?;
             }

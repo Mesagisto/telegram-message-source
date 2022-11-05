@@ -32,9 +32,9 @@ fn current_version() -> &'static str {
 
 fn bin_name(short: &str) -> String {
   if cfg!(target_os = "windows") {
-    format!("{}-{}.exe", short, target_name())
+    format!("{short}-{}.exe", target_name())
   } else {
-    format!("{}-{}", short, target_name())
+    format!("{short}-{}", target_name())
   }
 }
 
@@ -67,7 +67,7 @@ fn target_name() -> String {
   } else {
     "unknown"
   };
-  format!("{}-{}", arch, os)
+  format!("{arch}-{os}")
 }
 
 #[test]

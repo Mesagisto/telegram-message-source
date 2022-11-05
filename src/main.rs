@@ -1,10 +1,11 @@
-#![allow(incomplete_features)]
-#![feature(capture_disjoint_fields, let_chains)]
+#![feature(let_chains)]
+
+use std::ops::Deref;
 
 use bot::TG_BOT;
 use color_eyre::eyre::Result;
 use dashmap::DashMap;
-use futures::FutureExt;
+use futures_util::FutureExt;
 use locale_config::Locale;
 use mesagisto_client::{MesagistoConfig, MesagistoConfigBuilder};
 use once_cell::sync::Lazy;

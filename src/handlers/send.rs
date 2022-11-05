@@ -43,14 +43,14 @@ pub async fn answer_common(msg: Message) -> Result<()> {
     });
   } else if let Some(image) = msg.photo() {
     let photo = image.last().unwrap();
-    let file_id: Vec<u8> = photo.file_id.as_bytes().to_vec();
-    let uid: Vec<u8> = photo.file_unique_id.as_bytes().to_vec();
+    let file_id: Vec<u8> = photo.file.id.as_bytes().to_vec();
+    let uid: Vec<u8> = photo.file.unique_id.as_bytes().to_vec();
     RES.put_image_id(&uid, file_id.clone());
     TG_BOT.file(&uid, &file_id).await?;
     chain.push(MessageType::Image { id: uid, url: None })
   } else if let Some(sticker) = msg.sticker() {
-    let file_id: Vec<u8> = sticker.file_id.as_bytes().to_vec();
-    let uid: Vec<u8> = sticker.file_unique_id.as_bytes().to_vec();
+    let file_id: Vec<u8> = sticker.file.id.as_bytes().to_vec();
+    let uid: Vec<u8> = sticker.file.unique_id.as_bytes().to_vec();
     RES.put_image_id(&uid, file_id.clone());
     TG_BOT.file(&uid, &file_id).await?;
     chain.push(MessageType::Image { id: uid, url: None });
@@ -64,8 +64,8 @@ pub async fn answer_common(msg: Message) -> Result<()> {
     if let Some(mime_type) =  animation.mime_type.as_ref()
       && let mime::GIF = mime_type.subtype()
     {
-      let file_id: Vec<u8> = animation.file_id.as_bytes().to_vec();
-      let uid: Vec<u8> = animation.file_unique_id.as_bytes().to_vec();
+      let file_id: Vec<u8> = animation.file.id.as_bytes().to_vec();
+      let uid: Vec<u8> = animation.file.unique_id.as_bytes().to_vec();
       RES.put_image_id(&uid, file_id.clone());
       TG_BOT.file(&uid, &file_id).await?;
       chain.push(MessageType::Image { id: uid, url: None })
@@ -88,15 +88,15 @@ pub async fn answer_common(msg: Message) -> Result<()> {
 
   let reply = match msg.reply_to_message() {
     Some(v) => {
-      let local_id = v.id.to_be_bytes().to_vec();
+      let local_id = v.id.0.to_be_bytes().to_vec();
       DB.get_msg_id_2(&target, &local_id).unwrap_or(None)
     }
     None => None,
   };
-  DB.put_msg_id_0(&msg.chat.id.0, &msg.id, &msg.id)?;
+  DB.put_msg_id_0(&msg.chat.id.0, &msg.id.0, &msg.id.0)?;
   let message = message::Message {
     profile,
-    id: msg.id.to_be_bytes().to_vec(),
+    id: msg.id.0.to_be_bytes().to_vec(),
     chain,
     reply,
   };

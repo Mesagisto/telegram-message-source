@@ -1,14 +1,16 @@
-use arcstr::ArcStr;
 use color_eyre::eyre::Result;
 use teloxide::{
   prelude::*,
   utils::{command::BotCommands, html},
 };
 
-use crate::{bot::BotRequester, config::CONFIG, handlers};
+use crate::bot::BotRequester;
 
 #[derive(BotCommands, Clone)]
-#[command(rename = "lowercase", description = "MesagistoTG management commands")]
+#[command(
+  rename_rule = "lowercase",
+  description = "MesagistoTG management commands"
+)]
 pub enum ManageCommand {
   #[command(description = "Disaplay manage commands help")]
   ManageHelp,
