@@ -46,8 +46,6 @@ tracing-subscriber = { version = "0.3.15", default-features = false, features = 
 colored = "2.0.0"
 time = { version = "0.3.14", features = ["macros", "local-offset"] }
 chrono = "0.4.22"
-sys-locale = "0.2.1"
-rust-i18n = { branch = "main", git = "https://github.com/Itsusinn/rust-i18n.git"}
 
 # serialization
 serde = { version = "1.0.144", default-features = false, features = ["derive","rc"] }
@@ -92,6 +90,11 @@ self_update = { branch = "dirty-feat", git = "https://github.com/Itsusinn/self_u
 # database
 sled = "0.34.7"
 
+# i18n
+i18n-embed = { version = "0.13.4", features = ["fluent-system", "desktop-requester"]}
+i18n-embed-fl = "0.6.4"
+rust-embed = "6.4.2"
+locale_config = "0.3.0"
 [profile.release]
 opt-level = 'z'
 debug = 1
