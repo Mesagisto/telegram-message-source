@@ -4,7 +4,6 @@ use std::ops::Deref;
 
 use bot::TG_BOT;
 use color_eyre::eyre::Result;
-use dashmap::DashMap;
 use futures_util::FutureExt;
 use locale_config::Locale;
 use mesagisto_client::{MesagistoConfig, MesagistoConfigBuilder};
@@ -86,6 +85,7 @@ async fn run() -> Result<()> {
     .name("tg")
     .cipher_key(CONFIG.cipher.key.clone())
     .remote_address(CONFIG.deref().centers.to_owned())
+    .same_side_deliver(true)
     .skip_verify(CONFIG.tls.skip_verify)
     .custom_cert(if CONFIG.tls.custom_cert.is_empty(){
       None

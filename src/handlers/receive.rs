@@ -65,7 +65,9 @@ pub async fn packet_handler(pkt: Packet) -> Result<ControlFlow<Packet>> {
         } else {
           let mut futs = Vec::new();
           for target in targets {
-            futs.push(msg_handler(message.clone(), target, "mesagisto".into()))
+            if target.to_be_bytes() != *message.from {
+              futs.push(msg_handler(message.clone(), target, "mesagisto".into()))
+            }
           }
           join_all(futs).await;
         }
