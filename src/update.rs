@@ -15,19 +15,11 @@ pub fn update() -> Result<Status> {
     .bin_name(&bin_name(SHORT_NAME))
     .show_download_progress(true)
     .target(&target_name())
-    .current_version(current_version())
+    .current_version(cargo_crate_version!())
     .no_confirm(CONFIG.auto_update.no_confirm)
     .build()?
     .update()?;
   Ok(status)
-}
-
-fn current_version() -> &'static str {
-  if cfg!(feature = "beta") {
-    option_env!("MESAGISTO_VERSION").unwrap_or_else(|| cargo_crate_version!())
-  } else {
-    cargo_crate_version!()
-  }
 }
 
 fn bin_name(short: &str) -> String {
@@ -36,14 +28,6 @@ fn bin_name(short: &str) -> String {
   } else {
     format!("{short}-{}", target_name())
   }
-}
-
-#[test]
-fn test() -> Result<()> {
-  // update()
-  println!("target-name: {}", target_name());
-  println!("bin-name: {}", bin_name(SHORT_NAME));
-  Ok(())
 }
 
 fn target_name() -> String {
@@ -68,22 +52,4 @@ fn target_name() -> String {
     "unknown"
   };
   format!("{arch}-{os}")
-}
-
-#[test]
-fn test_reqwest() -> Result<()> {
-  use std::time::Duration;
-
-  use reqwest::header;
-  let a = reqwest::blocking::Client::builder()
-    .user_agent("rust-reqwest/self-update")
-    .timeout(Duration::from_secs(5))
-    // .proxy(Proxy::http("127.0.0.1:7890").unwrap())
-    .build()
-    .unwrap()
-    .post("https://api.github.com/repos/MeowCat-Studio/telegram-message-source/releases/assets/72134624")
-    .header(header::ACCEPT, "application/octet-stream")
-    .send()?;
-  dbg!(a);
-  Ok(())
 }

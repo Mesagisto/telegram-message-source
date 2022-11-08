@@ -1,7 +1,7 @@
 use color_eyre::eyre::Result;
 use teloxide::{
   prelude::*,
-  utils::{command::BotCommands, html},
+  utils::command::BotCommands
 };
 
 use crate::bot::BotRequester;
@@ -14,7 +14,7 @@ use crate::bot::BotRequester;
 pub enum ManageCommand {
   #[command(description = "Disaplay manage commands help")]
   ManageHelp,
-  #[command(description = "Add a new NATS Server", parse_with = "split")]
+  #[command(description = "Add a new WS Server", parse_with = "split")]
   NewServer { name: String, address: String },
 }
 impl ManageCommand {
