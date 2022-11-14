@@ -5,20 +5,21 @@ use color_eyre::eyre::Result;
 use lateinit::LateInit;
 use mesagisto_client::{cache::CACHE, net::NET, res::RES};
 use teloxide::{
-  adaptors::{AutoSend, DefaultParseMode},
+  adaptors::DefaultParseMode,
   payloads::{SendAnimationSetters, SendMessageSetters, SendPhotoSetters},
   prelude::Requester,
-  types::{File as TgFile, InputFile, Message},
+  types::{File as TgFile, InputFile, Message, MessageId},
   utils::command::BotCommands,
   Bot,
 };
 use teloxide_core::types::ChatId;
 use tracing::{instrument, warn};
 
-#[cfg(feature = "polylith")]
-use crate::commands::manage::ManageCommand;
-use crate::{commands::bind::BindCommand, config::CONFIG, handlers};
-pub type BotRequester = AutoSend<DefaultParseMode<Bot>>;
+use crate::{
+  commands::{bind::BindCommand, manage::ManageCommand},
+  config::CONFIG,
+};
+pub type BotRequester = DefaultParseMode<Bot>;
 
 #[derive(Singleton, Default, Debug)]
 pub struct TgBot {
@@ -28,7 +29,6 @@ impl TgBot {
   pub async fn init(&self, bot: BotRequester) -> Result<()> {
     let mut commands = Vec::new();
     commands.append(&mut BindCommand::bot_commands());
-    #[cfg(feature = "polylith")]
     commands.append(&mut ManageCommand::bot_commands());
     bot.set_my_commands(commands).await?;
     self.inner.init(bot);
@@ -38,12 +38,12 @@ impl TgBot {
   // fixme use this-error
   pub async fn file(&self, uid: &Vec<u8>, id: &Vec<u8>) -> Result<()> {
     let id_str: ArcStr = base64_url::encode(id).into();
-    let TgFile { file_path, .. } = self
+    let TgFile { path, .. } = self
       .get_file(String::from_utf8_lossy(id))
       .await
       .expect("获取文件失败");
     let tmp_path = RES.tmp_path(&id_str);
-    let url = self.get_url_by_path(file_path);
+    let url = self.get_url_by_path(path);
     NET.download(&url, &tmp_path).await?;
     CACHE.put_file(uid, &tmp_path).await?;
     Ok(())
@@ -70,7 +70,7 @@ impl TgBot {
   {
     let send = self.inner.send_message(chat_id, text.clone());
     let send = if let Some(reply) = reply {
-      send.reply_to_message_id(reply)
+      send.reply_to_message_id(MessageId(reply))
     } else {
       send
     };
@@ -80,12 +80,10 @@ impl TgBot {
         teloxide::RequestError::MigrateToChatId(new_id) => {
           let target = chat_id.0;
           warn!("Chat migrated from {} to {}", target, new_id);
-          if let Some(address) = CONFIG.migrate_chat(&target, &new_id) {
-            handlers::receive::del(target)?;
-            handlers::receive::add(new_id, &address)?;
+          if CONFIG.migrate_chat(&target, &new_id) {
             let send = TG_BOT.send_message(ChatId(new_id), text.clone());
             let receipt = if let Some(reply) = reply {
-              send.reply_to_message_id(reply).await?
+              send.reply_to_message_id(MessageId(reply)).await?
             } else {
               send.await?
             };
@@ -120,14 +118,14 @@ impl TgBot {
 
       let send = self.inner.send_animation(chat_id, photo.clone());
       if let Some(reply) = reply {
-        send.reply_to_message_id(reply).await
+        send.reply_to_message_id(MessageId(reply)).await
       } else {
         send.await
       }
     } else {
       let send = self.inner.send_photo(chat_id, photo.clone());
       if let Some(reply) = reply {
-        send.reply_to_message_id(reply).await
+        send.reply_to_message_id(MessageId(reply)).await
       } else {
         send.await
       }
@@ -139,20 +137,18 @@ impl TgBot {
         teloxide::RequestError::MigrateToChatId(new_id) => {
           let target = chat_id.0;
           warn!("Chat migrated from {} to {}", target, new_id);
-          if let Some(address) = CONFIG.migrate_chat(&target, &new_id) {
-            handlers::receive::del(target)?;
-            handlers::receive::add(new_id, &address)?;
+          if CONFIG.migrate_chat(&target, &new_id) {
             let receipt: Message = if is_gif {
               let send = self.inner.send_animation(chat_id, photo.clone());
               if let Some(reply) = reply {
-                send.reply_to_message_id(reply).await?
+                send.reply_to_message_id(MessageId(reply)).await?
               } else {
                 send.await?
               }
             } else {
               let send = self.inner.send_photo(chat_id, photo.clone());
               if let Some(reply) = reply {
-                send.reply_to_message_id(reply).await?
+                send.reply_to_message_id(MessageId(reply)).await?
               } else {
                 send.await?
               }

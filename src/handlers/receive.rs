@@ -1,85 +1,117 @@
-use std::fmt::Write;
+use std::{fmt::Write, ops::ControlFlow};
 
 use arcstr::ArcStr;
 use color_eyre::eyre::Result;
-use lateinit::LateInit;
+use futures_util::future::join_all;
 use mesagisto_client::{
   cache::CACHE,
   data::{
+    events::Event,
     message::{Message, MessageType},
-    Packet,
+    Inbox, Packet,
   },
   db::DB,
   server::SERVER,
+  EitherExt, ResultExt,
 };
-use teloxide::{types::ChatId, utils::html};
-use tokio::sync::mpsc::UnboundedSender;
-use tracing::{instrument, trace};
+use teloxide::{requests::Requester, types::ChatId, utils::html};
+use tracing::trace;
 
-use crate::{
-  ext::{db::DbExt, err::LogResultExt},
-  CONFIG, TG_BOT,
-};
+use crate::{ext::db::DbExt, CONFIG, TG_BOT};
 
-static CHANNEL: LateInit<UnboundedSender<(i64, ArcStr)>> = LateInit::new();
-
-pub fn recover() -> Result<()> {
-  let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<(i64, ArcStr)>();
-  tokio::spawn(async move {
-    while let Some(element) = rx.recv().await {
-      SERVER
-        .recv(
-          ArcStr::from(element.0.to_string()),
-          &element.1,
-          nats_handler,
-        )
-        .await
-        .log_if_error("error when add callback handler");
-    }
-  });
+pub async fn recover() -> Result<()> {
   for pair in &CONFIG.bindings {
-    tx.send((pair.key().to_owned(), pair.value().clone()))?;
+    let room_id = SERVER.room_id(pair.value().clone());
+    SERVER
+      .sub(room_id, &arcstr::literal!("mesagisto"))
+      .await
+      .log();
   }
-  CHANNEL.init(tx);
   Ok(())
 }
 
-pub fn add(target: i64, address: &ArcStr) -> Result<()> {
-  CHANNEL.send((target, address.clone()))?;
+pub async fn add(room_address: &ArcStr) -> Result<()> {
+  let room_id = SERVER.room_id(room_address.clone());
+  SERVER
+    .sub(room_id, &arcstr::literal!("mesagisto"))
+    .await
+    .log();
   Ok(())
 }
-pub fn change(target: i64, address: &ArcStr) -> Result<()> {
-  SERVER.unsub(&target.to_string().into());
-  add(target, address)?;
+pub async fn change(before_address: &ArcStr, after_address: &ArcStr) -> Result<()> {
+  del(before_address).await?;
+  add(after_address).await?;
   Ok(())
 }
-pub fn del(target: i64) -> Result<()> {
-  SERVER.unsub(&target.to_string().into());
+pub async fn del(room_address: &ArcStr) -> Result<()> {
+  let room_id = SERVER.room_id(room_address.clone());
+  // FIXME 同侧互通 考虑当接受到不属于任何群聊的数据包时才unsub
+  // TODO 更新Config中的cache
+  SERVER
+    .unsub(room_id, &arcstr::literal!("mesagisto"))
+    .await
+    .log();
   Ok(())
 }
-#[instrument(skip_all)]
-pub async fn nats_handler(message: nats::Message, target: ArcStr) -> Result<()> {
-  let target: i64 = target.parse()?;
-  let packet = Packet::from_cbor(&message.payload);
-  let packet = match packet {
-    Ok(v) => v,
-    Err(_e) => {
-      // todo logging
-      tracing::warn!("未知的数据包类型，请更新本消息源，若已是最新请等待适配");
-      return Ok(());
+
+pub async fn packet_handler(pkt: Packet) -> Result<ControlFlow<Packet>> {
+  tracing::debug!("recv msg pkt from {:#?}", pkt.room_id);
+  match pkt.decrypt() {
+    Ok(either::Either::Left(message)) => {
+      if let Some(targets) = CONFIG.target_id(pkt.room_id.clone()) {
+        if targets.len() == 1 {
+          let target = targets[0];
+          msg_handler(message, target, "mesagisto".into()).await?;
+        } else {
+          let mut futs = Vec::new();
+          for target in targets {
+            if target.to_be_bytes() != *message.from {
+              futs.push(msg_handler(message.clone(), target, "mesagisto".into()))
+            }
+          }
+          join_all(futs).await;
+        }
+      };
     }
-  };
-  match packet {
-    either::Left(msg) => {
-      msg_handler(msg, target).await?;
+    Ok(either::Either::Right(Event::RequestImage { id })) if pkt.inbox.is_some() => {
+      let image_uid = id;
+      if let Inbox::Request { id } = *pkt.inbox.clone().unwrap() {
+        let image_id = match DB.get_image_id(&image_uid) {
+          Some(v) => v,
+          None => return Ok(ControlFlow::Break(pkt)),
+        };
+        let file = String::from_utf8_lossy(&image_id);
+        let file_path = TG_BOT.get_file(file).await.unwrap().path;
+        let url = TG_BOT.get_url_by_path(file_path);
+        let event = Event::RespondImage { id: image_uid, url };
+        let packet = Packet::new(pkt.room_id, event.to_right())?;
+        SERVER
+          .respond(packet, id, &arcstr::literal!("mesagisto"))
+          .await?;
+        return Ok(ControlFlow::Continue(()));
+      } else {
+        return Ok(ControlFlow::Break(pkt));
+      }
     }
-    either::Right(_) => {}
+    Ok(either::Either::Right(event)) => {
+      tracing::debug!("recv event pkt {:#?}", event);
+      return Ok(ControlFlow::Break(pkt));
+    }
+    Err(e) => {
+      tracing::warn!(
+        "未知的数据包类型，请更新本消息源，若已是最新请等待适配 {}",
+        e
+      );
+    }
   }
-  Ok(())
+  Ok(ControlFlow::Continue(()))
 }
-#[instrument(skip_all)]
-async fn msg_handler(mut message: Message, target: i64) -> Result<()> {
+
+async fn msg_handler(mut message: Message, target: i64, server: ArcStr) -> Result<()> {
   let chat_id = ChatId(target);
+  let room = CONFIG.room_address(&target).expect("Room不存在");
+  let room_id = SERVER.room_id(room);
+
   let sender_name = if message.profile.nick.is_some() {
     message.profile.nick.take().unwrap()
   } else if message.profile.username.is_some() {
@@ -97,8 +129,7 @@ async fn msg_handler(mut message: Message, target: i64) -> Result<()> {
         reunite_text.write_str("\n")?;
       }
       MessageType::Image { id, url } => {
-        let channel = CONFIG.mapper(&target).expect("频道不存在");
-        let path = CACHE.file(&id, &url, &channel).await?;
+        let path = CACHE.file(&id, &url, room_id.clone(), &server).await?;
         let receipt = TG_BOT
           .send_text(
             chat_id,
@@ -106,14 +137,14 @@ async fn msg_handler(mut message: Message, target: i64) -> Result<()> {
             None,
           )
           .await?;
-        DB.put_msg_id_ir_2(&target, &receipt.id, &message.id)?;
+        DB.put_msg_id_ir_2(&target, &receipt.id.0, &message.id)?;
         let receipt = if let Some(reply_to) = &message.reply {
           let local_id = DB.get_msg_id_1(&target, reply_to)?;
           TG_BOT.send_image(chat_id, &path, local_id).await?
         } else {
           TG_BOT.send_image(chat_id, &path, None).await?
         };
-        DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
+        DB.put_msg_id_1(&target, &message.id, &receipt.id.0)?;
       }
       MessageType::Edit { content: _ } => {}
       _ => {}
@@ -131,7 +162,7 @@ async fn msg_handler(mut message: Message, target: i64) -> Result<()> {
     } else {
       TG_BOT.send_text(chat_id, content, None).await?
     };
-    DB.put_msg_id_1(&target, &message.id, &receipt.id)?;
+    DB.put_msg_id_1(&target, &message.id, &receipt.id.0)?;
   }
 
   Ok(())

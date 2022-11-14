@@ -1,18 +1,20 @@
-use arcstr::ArcStr;
 use color_eyre::eyre::Result;
 use teloxide::{
   prelude::*,
-  utils::{command::BotCommands, html},
+  utils::command::BotCommands
 };
 
-use crate::{bot::BotRequester, config::CONFIG, handlers};
+use crate::bot::BotRequester;
 
 #[derive(BotCommands, Clone)]
-#[command(rename = "lowercase", description = "MesagistoTG management commands")]
+#[command(
+  rename_rule = "lowercase",
+  description = "MesagistoTG management commands"
+)]
 pub enum ManageCommand {
   #[command(description = "Disaplay manage commands help")]
   ManageHelp,
-  #[command(description = "Add a new NATS Server", parse_with = "split")]
+  #[command(description = "Add a new WS Server", parse_with = "split")]
   NewServer { name: String, address: String },
 }
 impl ManageCommand {

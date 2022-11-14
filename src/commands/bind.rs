@@ -9,7 +9,7 @@ use crate::{bot::BotRequester, config::CONFIG, handlers};
 
 #[derive(BotCommands, Clone)]
 #[command(
-  rename = "lowercase",
+  rename_rule = "lowercase",
   description = "MesagistoTG supports following commands"
 )]
 pub enum BindCommand {
@@ -21,7 +21,7 @@ pub enum BindCommand {
   Help,
   #[command(description = "Disaplay status")]
   Status,
-  #[command(description = "Bind currunt's group to address", parse_with = "split")]
+  #[command(description = "Bind currunt's group to address")]
   Bind { address: String },
 }
 impl BindCommand {
@@ -48,23 +48,20 @@ impl BindCommand {
             .bindings
             .insert(chat_id.0, ArcStr::from(address.clone()))
           {
-            Some(_) => {
+            Some(before) => {
               bot
                 .send_message(
                   msg.chat.id,
-                  format!("成功重新绑定当前群组的信使地址为{}", address),
+                  format!("成功重新绑定当前群组的信使地址为{address}"),
                 )
                 .await?;
-              handlers::receive::change(chat_id.0, &ArcStr::from(address))?;
+              handlers::receive::change(&before, &ArcStr::from(address)).await?;
             }
             None => {
               bot
-                .send_message(
-                  msg.chat.id,
-                  format!("成功绑定当前群组的信使地址{}", address),
-                )
+                .send_message(msg.chat.id, format!("成功绑定当前群组的信使地址{address}"))
                 .await?;
-              handlers::receive::add(chat_id.0, &ArcStr::from(address))?;
+              handlers::receive::add(&ArcStr::from(address)).await?;
             }
           }
         } else {
@@ -86,11 +83,11 @@ impl BindCommand {
         }
         if is_admin {
           match CONFIG.bindings.remove(&chat_id.0) {
-            Some(_) => {
+            Some(before) => {
               bot
                 .send_message(msg.chat.id, "成功解绑当前群组的信使地址".to_string())
                 .await?;
-              handlers::receive::del(chat_id.0)?;
+              handlers::receive::del(&before.1).await?;
             }
             None => {
               bot

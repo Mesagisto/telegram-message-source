@@ -1,8 +1,8 @@
+use crate::fl;
 use teloxide::prelude::*;
-use tracing::info;
 
-#[cfg(feature = "polylith")]
 use crate::commands::manage::ManageCommand;
+use crate::info;
 use crate::{bot::BotRequester, commands::bind::BindCommand, handlers};
 
 pub async fn start(bot: &BotRequester) {
@@ -18,7 +18,6 @@ pub async fn start(bot: &BotRequester) {
       })
       .endpoint(handlers::send::answer_common),
     );
-  #[cfg(feature = "polylith")]
   let message_handler = message_handler.branch(
     dptree::entry()
       .filter_command::<ManageCommand>()
@@ -35,10 +34,10 @@ pub async fn start(bot: &BotRequester) {
     .branch(message_handler)
     .branch(edit_message_handler);
 
-  info!("{}", t!("log.boot-sucess"));
+  info!("log-boot-sucess");
   Dispatcher::builder(bot.clone(), handler)
-    .error_handler(LoggingErrorHandler::with_custom_text(t!(
-      "log.log-callback-error"
+    .error_handler(LoggingErrorHandler::with_custom_text(fl!(
+      "log-callback-error"
     )))
     .build()
     .dispatch()
