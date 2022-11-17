@@ -1,4 +1,6 @@
 #![feature(let_chains)]
+#![feature(trait_alias)]
+#![feature(type_alias_impl_trait)]
 
 use std::ops::Deref;
 
@@ -8,6 +10,7 @@ use futures_util::FutureExt;
 use locale_config::Locale;
 use mesagisto_client::{MesagistoConfig, MesagistoConfigBuilder};
 use once_cell::sync::Lazy;
+use res::TG_RES;
 use self_update::Status;
 use teloxide::{prelude::*, types::ParseMode, Bot};
 
@@ -32,6 +35,7 @@ mod handlers;
 mod i18n;
 mod log;
 mod net;
+pub mod res;
 mod update;
 mod webhook;
 
@@ -87,9 +91,9 @@ async fn run() -> Result<()> {
     .remote_address(CONFIG.deref().centers.to_owned())
     .same_side_deliver(true)
     .skip_verify(CONFIG.tls.skip_verify)
-    .custom_cert(if CONFIG.tls.custom_cert.is_empty(){
+    .custom_cert(if CONFIG.tls.custom_cert.is_empty() {
       None
-    }else{
+    } else {
       Some(CONFIG.deref().tls.custom_cert.to_owned())
     })
     .proxy(if CONFIG.proxy.enable {
@@ -100,7 +104,7 @@ async fn run() -> Result<()> {
     .build()?
     .apply()
     .await?;
-
+  TG_RES.init().await;
   MesagistoConfig::packet_handler(|pkt| async { packet_handler(pkt).await }.boxed());
   info!("log-boot-start", version = env!("CARGO_PKG_VERSION"));
   let bot = Bot::with_client(CONFIG.telegram.token.clone(), net::client_from_config())

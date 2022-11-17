@@ -99,7 +99,7 @@ pub async fn answer_common(msg: Message) -> Result<()> {
     id: msg.id.0.to_be_bytes().to_vec(),
     chain,
     reply,
-    from: target.to_be_bytes().to_vec()
+    from: target.to_be_bytes().to_vec(),
   };
   let room_id = SERVER.room_id(room_address);
   let packet = Packet::new(room_id, message.tl())?;

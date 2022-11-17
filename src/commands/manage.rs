@@ -1,8 +1,5 @@
 use color_eyre::eyre::Result;
-use teloxide::{
-  prelude::*,
-  utils::command::BotCommands
-};
+use teloxide::{prelude::*, utils::command::BotCommands};
 
 use crate::bot::BotRequester;
 
@@ -15,7 +12,7 @@ pub enum ManageCommand {
   #[command(description = "Disaplay manage commands help")]
   ManageHelp,
   #[command(description = "Add a new WS Server", parse_with = "split")]
-  NewServer { name: String, address: String },
+  NewProfile { name: String, address: String },
 }
 impl ManageCommand {
   pub async fn answer(msg: Message, bot: BotRequester, cmd: ManageCommand) -> Result<()> {
@@ -25,7 +22,7 @@ impl ManageCommand {
           .send_message(msg.chat.id, ManageCommand::descriptions().to_string())
           .await?;
       }
-      ManageCommand::NewServer { name, address } => {}
+      ManageCommand::NewProfile { name, address } => {}
     }
     Ok(())
   }

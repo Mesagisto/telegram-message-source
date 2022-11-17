@@ -28,7 +28,7 @@ pub(crate) async fn init() -> Result<()> {
         .with_target(true)
         .with_timer(tracing_subscriber::fmt::time::OffsetTime::new(
           time::UtcOffset::from_whole_seconds(
-            Local.timestamp(0, 0).offset().fix().local_minus_utc(),
+            Local.timestamp_opt(0, 0).unwrap().offset().fix().local_minus_utc(),
           )
           .unwrap_or(time::UtcOffset::UTC),
           time::macros::format_description!(

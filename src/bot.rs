@@ -3,7 +3,7 @@ use std::ops::Deref;
 use arcstr::ArcStr;
 use color_eyre::eyre::Result;
 use lateinit::LateInit;
-use mesagisto_client::{cache::CACHE, net::NET, res::RES};
+use mesagisto_client::{net::NET, res::RES};
 use teloxide::{
   adaptors::DefaultParseMode,
   payloads::{SendAnimationSetters, SendMessageSetters, SendPhotoSetters},
@@ -45,7 +45,7 @@ impl TgBot {
     let tmp_path = RES.tmp_path(&id_str);
     let url = self.get_url_by_path(path);
     NET.download(&url, &tmp_path).await?;
-    CACHE.put_file(uid, &tmp_path).await?;
+    RES.put_file(uid, &tmp_path).await?;
     Ok(())
   }
 
@@ -109,7 +109,7 @@ impl TgBot {
       .expect("file read failed when refering file type")
       .expect("Unkown file type");
     let is_gif = "gif" == kind.extension();
-
+    let is_webp = "webp" == kind.extension();
     let result = if is_gif {
       let photo = photo.clone().file_name(format!(
         "{:?}.gif",
@@ -123,11 +123,15 @@ impl TgBot {
         send.await
       }
     } else {
-      let send = self.inner.send_photo(chat_id, photo.clone());
-      if let Some(reply) = reply {
-        send.reply_to_message_id(MessageId(reply)).await
+      if is_webp {
+        self.inner.send_sticker(chat_id, photo.clone()).await
       } else {
-        send.await
+        let send = self.inner.send_photo(chat_id, photo.clone());
+        if let Some(reply) = reply {
+          send.reply_to_message_id(MessageId(reply)).await
+        } else {
+          send.await
+        }
       }
     };
 

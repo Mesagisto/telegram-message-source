@@ -1,9 +1,10 @@
-use crate::fl;
 use teloxide::prelude::*;
 
-use crate::commands::manage::ManageCommand;
-use crate::info;
-use crate::{bot::BotRequester, commands::bind::BindCommand, handlers};
+use crate::{
+  bot::BotRequester,
+  commands::{bind::BindCommand, manage::ManageCommand},
+  fl, handlers, info,
+};
 
 pub async fn start(bot: &BotRequester) {
   let message_handler = Update::filter_message()

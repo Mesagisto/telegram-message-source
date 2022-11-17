@@ -52,7 +52,11 @@ impl Config {
   }
 
   pub fn migrate(&self) {
-    self.centers.insert("mesagisto".into(), "wss://center.mesagisto.org".into());
+    if !self.centers.contains_key("mesagisto".into()) {
+      self
+        .centers
+        .insert("mesagisto".into(), "wss://center.mesagisto.org".into());
+    }
   }
 
   pub fn migrate_chat(&self, old_chat_id: &i64, new_chat_id: &i64) -> bool {
@@ -103,5 +107,5 @@ pub struct AutoUpdateConfig {
 pub struct TlsConfig {
   #[educe(Default = false)]
   pub skip_verify: bool,
-  pub custom_cert: ArcStr
+  pub custom_cert: ArcStr,
 }
