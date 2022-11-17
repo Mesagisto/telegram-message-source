@@ -4,20 +4,24 @@ use arcstr::ArcStr;
 use color_eyre::eyre::Result;
 use futures_util::future::join_all;
 use mesagisto_client::{
-  cache::CACHE,
   data::{
     events::Event,
     message::{Message, MessageType},
     Inbox, Packet,
   },
   db::DB,
+  res::RES,
   server::SERVER,
   EitherExt, ResultExt,
 };
 use teloxide::{requests::Requester, types::ChatId, utils::html};
 use tracing::trace;
 
-use crate::{ext::db::DbExt, CONFIG, TG_BOT};
+use crate::{
+  ext::{db::DbExt, WebpConverter},
+  res::TG_RES,
+  CONFIG, TG_BOT,
+};
 
 pub async fn recover() -> Result<()> {
   for pair in &CONFIG.bindings {
@@ -55,13 +59,15 @@ pub async fn del(room_address: &ArcStr) -> Result<()> {
 }
 
 pub async fn packet_handler(pkt: Packet) -> Result<ControlFlow<Packet>> {
-  tracing::debug!("recv msg pkt from {:#?}", pkt.room_id);
+  tracing::debug!("recv msg pkt from {}", pkt.room_id);
   match pkt.decrypt() {
     Ok(either::Either::Left(message)) => {
       if let Some(targets) = CONFIG.target_id(pkt.room_id.clone()) {
         if targets.len() == 1 {
           let target = targets[0];
-          msg_handler(message, target, "mesagisto".into()).await?;
+          if target.to_be_bytes() != *message.from {
+            msg_handler(message, target, "mesagisto".into()).await?;
+          }
         } else {
           let mut futs = Vec::new();
           for target in targets {
@@ -129,7 +135,32 @@ async fn msg_handler(mut message: Message, target: i64, server: ArcStr) -> Resul
         reunite_text.write_str("\n")?;
       }
       MessageType::Image { id, url } => {
-        let path = CACHE.file(&id, &url, room_id.clone(), &server).await?;
+        let path = RES.file(&id, &url, room_id.clone(), &server).await?;
+        let receipt = TG_BOT
+          .send_text(
+            chat_id,
+            format!("{}:", html::bold(sender_name.as_str())),
+            None,
+          )
+          .await?;
+        DB.put_msg_id_ir_2(&target, &receipt.id.0, &message.id)?;
+        let receipt = if let Some(reply_to) = &message.reply {
+          let local_id = DB.get_msg_id_1(&target, reply_to)?;
+          TG_BOT.send_image(chat_id, &path, local_id).await?
+        } else {
+          TG_BOT.send_image(chat_id, &path, None).await?
+        };
+        DB.put_msg_id_1(&target, &message.id, &receipt.id.0)?;
+      }
+      MessageType::Sticker { id, url } => {
+        RES.file(&id, &url, room_id.clone(), &server).await?;
+        let path = TG_RES
+          .convert(
+            &base64_url::encode(&id).into(),
+            &"webp".into(),
+            WebpConverter,
+          )
+          .await?;
         let receipt = TG_BOT
           .send_text(
             chat_id,
