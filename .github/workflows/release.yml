@@ -90,7 +90,7 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: nightly-2022-09-14
+          toolchain: nightly
           target: ${{ matrix.target }}
 
       - uses: actions-rs/cargo@v1
