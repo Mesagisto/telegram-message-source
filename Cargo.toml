@@ -1,6 +1,6 @@
 [package]
 name = "msgist-tg"
-version = "1.7.0"
+version = "1.7.1"
 authors = ["Itsusinn <itsusinn@foxmail.com>"]
 edition = "2021"
 
