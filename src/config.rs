@@ -53,9 +53,8 @@ impl Config {
 
   pub fn migrate(&self) {
     self
-    .centers
-    .insert("mesagisto".into(), "wss://builtin".into());
-
+      .centers
+      .insert("mesagisto".into(), "wss://builtin".into());
   }
 
   pub fn migrate_chat(&self, old_chat_id: &i64, new_chat_id: &i64) -> bool {

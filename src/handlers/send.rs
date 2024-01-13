@@ -61,7 +61,7 @@ pub async fn answer_common(msg: Message) -> Result<()> {
   } else if let Some(_v) = msg.audio() {
     // TODO
   } else if let Some(animation) = msg.animation() {
-    if let Some(mime_type) =  animation.mime_type.as_ref()
+    if let Some(mime_type) = animation.mime_type.as_ref()
       && let mime::GIF = mime_type.subtype()
     {
       let file_id: Vec<u8> = animation.file.id.as_bytes().to_vec();
@@ -70,11 +70,11 @@ pub async fn answer_common(msg: Message) -> Result<()> {
       TG_BOT.file(&uid, &file_id).await?;
       chain.push(MessageType::Image { id: uid, url: None })
     }
-    if let Some(mime_type) =  animation.mime_type.as_ref()
+    if let Some(mime_type) = animation.mime_type.as_ref()
       && let mime::VIDEO = mime_type.type_()
     {
-    // TODO
-    // animation is video
+      // TODO
+      // animation is video
     }
   }
   if let Some(caption) = msg.caption() {

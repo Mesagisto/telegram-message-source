@@ -1,6 +1,7 @@
 #![feature(let_chains)]
 #![feature(trait_alias)]
 #![feature(type_alias_impl_trait)]
+#![feature(impl_trait_in_assoc_type)]
 
 use std::ops::Deref;
 
