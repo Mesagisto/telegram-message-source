@@ -22,7 +22,7 @@ impl ManageCommand {
           .send_message(msg.chat.id, ManageCommand::descriptions().to_string())
           .await?;
       }
-      ManageCommand::NewProfile { name, address } => {}
+      ManageCommand::NewProfile { name: _, address: _ } => {}
     }
     Ok(())
   }

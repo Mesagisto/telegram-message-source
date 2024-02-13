@@ -46,7 +46,7 @@ impl BindCommand {
         if is_admin {
           match CONFIG
             .bindings
-            .insert(chat_id.0, ArcStr::from(address.clone()))
+            .insert(chat_id.0.to_string(), ArcStr::from(address.clone()))
           {
             Some(before) => {
               bot
@@ -82,7 +82,7 @@ impl BindCommand {
           }
         }
         if is_admin {
-          match CONFIG.bindings.remove(&chat_id.0) {
+          match CONFIG.bindings.remove(&chat_id.0.to_string()) {
             Some(before) => {
               bot
                 .send_message(msg.chat.id, "成功解绑当前群组的信使地址".to_string())

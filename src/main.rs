@@ -24,8 +24,6 @@ use crate::{
 #[macro_use]
 extern crate educe;
 #[macro_use]
-extern crate automatic_config;
-#[macro_use]
 extern crate singleton;
 
 mod bot;

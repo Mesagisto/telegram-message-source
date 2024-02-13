@@ -15,10 +15,11 @@ use crate::{bot::TG_BOT, config::CONFIG, ext::db::DbExt};
 
 pub async fn answer_common(msg: Message) -> Result<()> {
   let target = msg.chat.id.0;
-  if !CONFIG.bindings.contains_key(&target) {
+  let target_str = msg.chat.id.0.to_string();
+  if !CONFIG.bindings.contains_key(&target_str) {
     return Ok(());
   }
-  let room_address = CONFIG.bindings.get(&target).unwrap().clone();
+  let room_address = CONFIG.bindings.get(&target_str).unwrap().clone();
 
   let sender = match msg.from() {
     Some(v) => v,
