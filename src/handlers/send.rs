@@ -8,7 +8,6 @@ use mesagisto_client::{
   db::DB,
   res::RES,
   server::SERVER,
-  EitherExt,
 };
 use teloxide::prelude::*;
 
@@ -102,7 +101,7 @@ pub async fn answer_common(msg: Message) -> Result<()> {
     from: target.to_be_bytes().to_vec(),
   };
   let room_id = SERVER.room_id(room_address);
-  let packet = Packet::new(room_id, message.tl())?;
+  let packet = Packet::new(room_id, message.into())?;
 
   SERVER.send(packet, &arcstr::literal!("mesagisto")).await?;
   Ok(())

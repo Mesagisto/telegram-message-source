@@ -2,6 +2,7 @@
 #![feature(trait_alias)]
 #![feature(type_alias_impl_trait)]
 #![feature(impl_trait_in_assoc_type)]
+#![feature(if_let_guard)]
 
 use std::ops::Deref;
 
@@ -90,13 +91,6 @@ async fn run() -> Result<()> {
     .name("tg")
     .cipher_key(CONFIG.cipher.key.clone())
     .remote_address(CONFIG.deref().centers.to_owned())
-    .same_side_deliver(true)
-    .skip_verify(CONFIG.tls.skip_verify)
-    .custom_cert(if CONFIG.tls.custom_cert.is_empty() {
-      None
-    } else {
-      Some(CONFIG.deref().tls.custom_cert.to_owned())
-    })
     .proxy(if CONFIG.proxy.enable {
       Some(CONFIG.proxy.address.clone())
     } else {
